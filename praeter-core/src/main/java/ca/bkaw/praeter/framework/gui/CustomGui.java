@@ -20,6 +20,15 @@ public abstract class CustomGui {
         this.type = type;
     }
 
+    /**
+     * Get the {@link CustomGuiType} of this custom gui.
+     *
+     * @return The type.
+     */
+    public CustomGuiType getType() {
+        return this.type;
+    }
+
     public <T extends GuiComponent> T get(GuiComponentType<T> componentType) {
         // TODO
         throw new UnsupportedOperationException();
