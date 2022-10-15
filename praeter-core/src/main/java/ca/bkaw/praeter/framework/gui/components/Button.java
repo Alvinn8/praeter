@@ -1,17 +1,17 @@
-package ca.bkaw.praeter.framework.inventory.components;
+package ca.bkaw.praeter.framework.gui.components;
 
-import ca.bkaw.praeter.framework.inventory.CustomInventory;
-import ca.bkaw.praeter.framework.inventory.InventoryComponent;
-import ca.bkaw.praeter.framework.inventory.InventoryComponentType;
+import ca.bkaw.praeter.framework.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.GuiComponent;
+import ca.bkaw.praeter.framework.gui.GuiComponentType;
 
 /**
- * A button in a {@link CustomInventory}.
+ * A button in a {@link CustomGui}.
  */
-public class Button extends InventoryComponent {
+public class Button extends GuiComponent {
     /**
-     * The {@link InventoryComponentType} for a {@link Button}.
+     * The {@link GuiComponentType} for a {@link Button}.
      */
-    public static class Type extends InventoryComponentType<Button> {
+    public static class Type extends GuiComponentType<Button> {
         /**
          * Create a new type for {@link Button}.
          *

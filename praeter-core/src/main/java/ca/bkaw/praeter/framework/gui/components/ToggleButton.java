@@ -1,19 +1,19 @@
-package ca.bkaw.praeter.framework.inventory.components;
+package ca.bkaw.praeter.framework.gui.components;
 
-import ca.bkaw.praeter.framework.inventory.CustomInventory;
-import ca.bkaw.praeter.framework.inventory.InventoryComponent;
-import ca.bkaw.praeter.framework.inventory.InventoryComponentType;
+import ca.bkaw.praeter.framework.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.GuiComponent;
+import ca.bkaw.praeter.framework.gui.GuiComponentType;
 
 /**
- * A button in a {@link CustomInventory} that can be enabled and disabled.
+ * A button in a {@link CustomGui} that can be enabled and disabled.
  * <p>
  * When the button is disabled the click handler will not be called. <!-- TODO -->
  */
-public class ToggleButton extends InventoryComponent {
+public class ToggleButton extends GuiComponent {
     /**
-     * Create a {@link InventoryComponentType} for a {@link ToggleButton}.
+     * Create a {@link GuiComponentType} for a {@link ToggleButton}.
      */
-    public static class Type extends InventoryComponentType<ToggleButton> {
+    public static class Type extends GuiComponentType<ToggleButton> {
         /**
          * Create a new type for {@link ToggleButton}.
          *
