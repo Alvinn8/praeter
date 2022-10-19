@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.framework.test;
 
 import ca.bkaw.praeter.framework.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.CustomGuiRenderer;
 import ca.bkaw.praeter.framework.gui.CustomGuiType;
 import ca.bkaw.praeter.framework.gui.components.Button;
 import ca.bkaw.praeter.framework.gui.components.ToggleButton;
@@ -17,13 +18,13 @@ public class TestGui extends CustomGui {
         1, 2
     );
 
-    public static final CustomGuiType TYPE = CustomGuiType
-            .builder(TestGui::new)
-            .add(BUTTON_1, BUTTON_2)
-            .build();
+    public static final CustomGuiType TYPE = CustomGuiType.builder()
+        .height(6)
+        .add(BUTTON_1, BUTTON_2)
+        .build();
 
-    public TestGui() {
-        super(TYPE);
+    public TestGui(CustomGuiRenderer renderer) {
+        super(TYPE, renderer);
     }
 
     public void toggleButton2() {

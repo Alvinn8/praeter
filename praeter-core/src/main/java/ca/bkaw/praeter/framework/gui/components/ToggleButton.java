@@ -14,7 +14,7 @@ public class ToggleButton extends GuiComponent {
     /**
      * Create a {@link GuiComponentType} for a {@link ToggleButton}.
      */
-    public static class Type extends GuiComponentType<ToggleButton> {
+    public static class Type extends GuiComponentType<ToggleButton, ToggleButton.Type> {
         /**
          * Create a new type for {@link ToggleButton}.
          *

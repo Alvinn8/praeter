@@ -8,13 +8,14 @@ package ca.bkaw.praeter.framework.gui;
  * Instances of {@link GuiComponent} are created for each component in each
  * {@link CustomGui} that is created.
  *
- * @param <T> The type created for each opened gui of this type.
+ * @param <C> The type created for each opened gui of this type.
+ * @param <T> The type of the component type.
  *
  * @see GuiComponent
  * @see CustomGuiType
  */
-public abstract class GuiComponentType<T extends GuiComponent> {
-    private final GuiComponentRenderer<T, ?> renderer;
+public abstract class GuiComponentType<C extends GuiComponent, T extends GuiComponentType<C, T>> {
+    private final GuiComponentRenderer<C, T> renderer;
     private final int x, y, width, height;
 
     /**
@@ -26,7 +27,7 @@ public abstract class GuiComponentType<T extends GuiComponent> {
      * @param width The width position of the component.
      * @param height The height position of the component.
      */
-    public GuiComponentType(GuiComponentRenderer<T, ?> renderer, int x, int y, int width, int height) {
+    public GuiComponentType(GuiComponentRenderer<C, T> renderer, int x, int y, int width, int height) {
         this.renderer = renderer;
         this.x = x;
         this.y = y;
@@ -39,7 +40,16 @@ public abstract class GuiComponentType<T extends GuiComponent> {
      *
      * @return The created instance.
      */
-    public abstract T create();
+    public abstract C create();
+
+    /**
+     * Get the renderer for this component type.
+     *
+     * @return The renderer.
+     */
+    public GuiComponentRenderer<C, T> getRenderer() {
+        return this.renderer;
+    }
 
     // todo javadoc
     public int getX() {

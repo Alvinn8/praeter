@@ -1,12 +1,15 @@
 package ca.bkaw.praeter.framework.gui;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * A type of custom gui.
@@ -14,14 +17,17 @@ import java.util.function.Supplier;
  * @see CustomGui
  */
 public class CustomGuiType {
-    private final Supplier<CustomGui> constructor;
-    private final List<GuiComponentType<?>> componentTypes;
     private Plugin plugin;
+    private final List<GuiComponentType<?, ?>> componentTypes;
+    private final int height;
+    private final Component title;
 
-    private CustomGuiType(Supplier<CustomGui> constructor,
-                          List<GuiComponentType<?>> componentTypes) {
-        this.constructor = constructor;
-        this.componentTypes = componentTypes;
+    private CustomGuiType(List<GuiComponentType<?, ?>> componentTypes,
+                          int height,
+                          Component title) {
+        this.componentTypes = Collections.unmodifiableList(componentTypes);
+        this.height = height;
+        this.title = title;
     }
 
     /**
@@ -34,27 +40,57 @@ public class CustomGuiType {
     }
 
     /**
+     * Get a collection of component types.
+     *
+     * @return The collection.
+     */
+    @Unmodifiable
+    public Collection<GuiComponentType<?, ?>> getComponentTypes() {
+        return this.componentTypes;
+    }
+
+    /**
+     * Get the height of this gui, also known as the amount of rows.
+     *
+     * @return The height.
+     */
+    public int getHeight() {
+        return this.height;
+    }
+
+    /**
+     * Get the title of the gui.
+     * <p>
+     * If this is null, the {@link CustomGui} subclass must override the method
+     * {@link CustomGui#getTitle()}. For example to provide a dynamic title.
+     *
+     * @return The title.
+     */
+    @Nullable
+    public Component getTitle() {
+        return this.title;
+    }
+
+    /**
      * Create a builder for a custom gui type.
      *
-     * @param constructor The function that constructs a new instance of the custom gui.
      * @return The builder.
      */
-    public static Builder builder(Supplier<CustomGui> constructor) {
-        return new Builder(constructor);
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
      * A builder for {@link CustomGuiType}.
      *
-     * @see #builder(Supplier)
+     * @see #builder()
      */
     public static class Builder {
-        private final Supplier<CustomGui> constructor;
-        private final List<GuiComponentType<?>> componentTypes = new ArrayList<>();
+        private final List<GuiComponentType<?, ?>> componentTypes = new ArrayList<>();
+        private int height = 6;
+        private Component title;
 
-        private Builder(Supplier<CustomGui> constructor) {
-            this.constructor = constructor;
-        }
+        private Builder() {}
 
         /**
          * Add {@link GuiComponentType component types} to the inventory type.
@@ -63,8 +99,36 @@ public class CustomGuiType {
          * @return The builder, for chaining.
          */
         @Contract("_ -> this")
-        public Builder add(GuiComponentType<?>... componentTypes) {
+        public Builder add(GuiComponentType<?, ?>... componentTypes) {
             Collections.addAll(this.componentTypes, componentTypes);
+            return this;
+        }
+
+        /**
+         * Set the height of the gui, also known as the amount of rows.
+         *
+         * @param height The height. [1-6] (inclusive, inclusive)
+         * @return The builder, for chaining.
+         */
+        @Contract("_ -> this")
+        public Builder height(int height) {
+            this.height = height;
+            return this;
+        }
+
+        /**
+         * Set the title of the gui.
+         * <p>
+         * The title can also be changed dynamically by overriding
+         * {@link CustomGui#getTitle()}.
+         *
+         * @param title The title.
+         * @return The builder, for chaining.
+         * @see CustomGui#getTitle()
+         */
+        @Contract("_ -> this")
+        public Builder title(@Nullable Component title) {
+            this.title = title;
             return this;
         }
 
@@ -74,7 +138,7 @@ public class CustomGuiType {
          * @return The created {@link CustomGuiType}.
          */
         public CustomGuiType build() {
-            return new CustomGuiType(this.constructor, this.componentTypes);
+            return new CustomGuiType(this.componentTypes, this.height, this.title);
         }
     }
 }

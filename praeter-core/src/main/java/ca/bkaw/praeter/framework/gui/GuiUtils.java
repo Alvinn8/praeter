@@ -35,7 +35,7 @@ public final class GuiUtils {
      * @param componentType The component type.
      * @param slotConsumer A consumer called with each slot.
      */
-    public static void forEachSlot(GuiComponentType<?> componentType, IntConsumer slotConsumer) {
+    public static void forEachSlot(GuiComponentType<?, ?> componentType, IntConsumer slotConsumer) {
         forEachSlot(
             componentType.getX(),
             componentType.getY(),

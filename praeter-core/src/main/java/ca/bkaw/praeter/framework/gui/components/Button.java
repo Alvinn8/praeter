@@ -12,7 +12,7 @@ public class Button extends GuiComponent {
     /**
      * The {@link GuiComponentType} for a {@link Button}.
      */
-    public static class Type extends GuiComponentType<Button> {
+    public static class Type extends GuiComponentType<Button, Button.Type> {
         /**
          * Create a new type for {@link Button}.
          *

@@ -12,12 +12,12 @@ import org.bukkit.inventory.Inventory;
  * If {@code praeter-resources} is used, renderers from that module will render
  * components using a resource pack.
  *
- * @param <C> The type of the {@link GuiComponent component} this renderer will
- *            render.
+ * @param <C> The type of the {@link GuiComponent component} that this renderer
+ *            will render.
  * @param <T> The type of the {@link GuiComponentType component type} this
  *            renderer will render.
  */
-public interface GuiComponentRenderer<C extends GuiComponent, T extends GuiComponentType<C>> {
+public interface GuiComponentRenderer<C extends GuiComponent, T extends GuiComponentType<C, T>> {
     /**
      * A method called during startup when the custom gui type is being created.
      * <p>
