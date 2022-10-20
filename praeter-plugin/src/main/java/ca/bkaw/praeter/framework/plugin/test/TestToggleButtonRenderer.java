@@ -18,7 +18,7 @@ public class TestToggleButtonRenderer implements GuiComponentRenderer<ToggleButt
     }
 
     @Override
-    public void render(CustomGuiType customGuiType, CustomGui customGui, ToggleButton.Type componentType, ToggleButton component, Inventory inventory) {
+    public void renderItems(CustomGuiType customGuiType, CustomGui customGui, ToggleButton.Type componentType, ToggleButton component, Inventory inventory) {
         GuiUtils.forEachSlot(componentType, slot -> {
             ItemStack item = new ItemStack(
                 component.isEnabled()

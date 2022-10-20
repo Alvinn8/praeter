@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.framework.plugin.test;
 
+import ca.bkaw.praeter.framework.gui.ItemGuiRenderer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,7 +22,7 @@ public class TestingCommand implements CommandExecutor {
 
     public void gui(@NotNull CommandSender sender) {
         if (sender instanceof Player player) {
-            TestGui gui = new TestGui(new TestCustomGuiRenderer());
+            TestGui gui = new TestGui(new ItemGuiRenderer());
             if (Math.random() > 0.5) {
                 gui.toggleButton2();
                 player.sendRawMessage("Called toggleButton2");

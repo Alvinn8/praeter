@@ -64,6 +64,7 @@ public abstract class CustomGui {
      * This will re-render all components.
      */
     public void update() {
+        // Create the title to use
         Component renderTitle = this.renderer.getRenderTitle(this.getTitle(), this);
 
         // In case the title has changed we need to recreate the inventory
@@ -75,9 +76,12 @@ public abstract class CustomGui {
         }
 
         if (this.inventory == null) {
+            // Create the inventory
             // todo inventory holder
-            this.inventory = Bukkit.createInventory(null, this.type.getHeight() * 9, renderTitle);
+            int slotCount = this.type.getHeight() * 9;
+            this.inventory = Bukkit.createInventory(null, slotCount, renderTitle);
             this.currentRenderTitle = renderTitle;
+
             // If the inventory was recreated with a new title,
             // open the new inventory for the viewers
             if (viewers != null) {
@@ -85,8 +89,10 @@ public abstract class CustomGui {
             }
         }
 
+        // Clear the items
         this.inventory.clear();
 
+        // Let components render items
         this.components.forEach(this::renderComponent);
     }
 
@@ -94,7 +100,7 @@ public abstract class CustomGui {
     void renderComponent(T componentType, C component) {
         // generics can not be used in lambda methods, but method references are okay
         // so this is a method
-        componentType.getRenderer().render(this.type, this, componentType,
+        componentType.getRenderer().renderItems(this.type, this, componentType,
             component, this.inventory);
     }
 

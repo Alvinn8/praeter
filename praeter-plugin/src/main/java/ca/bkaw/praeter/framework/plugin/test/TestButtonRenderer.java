@@ -19,7 +19,7 @@ public class TestButtonRenderer implements GuiComponentRenderer<Button, Button.T
     }
 
     @Override
-    public void render(CustomGuiType customGuiType, CustomGui customGui, Button.Type componentType, Button component, Inventory inventory) {
+    public void renderItems(CustomGuiType customGuiType, CustomGui customGui, Button.Type componentType, Button component, Inventory inventory) {
         GuiUtils.forEachSlot(componentType, slot -> {
             ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
             item.editMeta(meta -> meta.displayName(
