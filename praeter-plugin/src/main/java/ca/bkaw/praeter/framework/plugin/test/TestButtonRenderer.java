@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.test;
+package ca.bkaw.praeter.framework.plugin.test;
 
 import ca.bkaw.praeter.framework.gui.CustomGui;
 import ca.bkaw.praeter.framework.gui.CustomGuiType;
@@ -15,13 +15,13 @@ public class TestButtonRenderer implements GuiComponentRenderer<Button, Button.T
 
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType) {
-
+        System.out.println("setting up TestButtonRenderer");
     }
 
     @Override
-    public void render(CustomGuiType customGuiType, Button.Type componentType, CustomGui customGui, Button component, Inventory inventory) {
+    public void render(CustomGuiType customGuiType, CustomGui customGui, Button.Type componentType, Button component, Inventory inventory) {
         GuiUtils.forEachSlot(componentType, slot -> {
-            ItemStack item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
+            ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
             item.editMeta(meta -> meta.displayName(
                 Component.text("A button", NamedTextColor.WHITE)
             ));

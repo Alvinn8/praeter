@@ -33,6 +33,7 @@ public abstract class CustomGui {
     public CustomGui(CustomGuiType type, CustomGuiRenderer renderer) {
         this.type = type;
         this.renderer = renderer;
+        this.create();
     }
 
     /**
@@ -41,9 +42,6 @@ public abstract class CustomGui {
      * @param player The player to open the gui for.
      */
     public void show(Player player) {
-        if (this.inventory == null) {
-            this.create();
-        }
         player.openInventory(this.inventory);
     }
 
@@ -51,7 +49,7 @@ public abstract class CustomGui {
         for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
             this.createComponent(componentType);
         }
-        this.render();
+        this.update();
     }
 
     private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
@@ -65,20 +63,21 @@ public abstract class CustomGui {
      * <p>
      * This will re-render all components.
      */
-    public void render() {
+    public void update() {
         Component renderTitle = this.renderer.getRenderTitle(this.getTitle(), this);
 
         // In case the title has changed we need to recreate the inventory
         // and open it again for all viewers
         List<HumanEntity> viewers = null;
-        if (!renderTitle.equals(this.currentRenderTitle)) {
+        if (!renderTitle.equals(this.currentRenderTitle) && this.inventory != null) {
             viewers = this.inventory.getViewers();
             this.inventory = null;
         }
 
         if (this.inventory == null) {
             // todo inventory holder
-            this.inventory = Bukkit.createInventory(null, this.type.getHeight(), renderTitle);
+            this.inventory = Bukkit.createInventory(null, this.type.getHeight() * 9, renderTitle);
+            this.currentRenderTitle = renderTitle;
             // If the inventory was recreated with a new title,
             // open the new inventory for the viewers
             if (viewers != null) {
@@ -88,15 +87,27 @@ public abstract class CustomGui {
 
         this.inventory.clear();
 
-        this.components.forEach(new ComponentMap.ForEachConsumer() {
-            @Override
-            public <C extends GuiComponent, T extends GuiComponentType<C, T>> void accept(GuiComponentType<C, T> componentType, C component) {
-                // todo
-                componentType.getRenderer().render(type, (T) componentType, CustomGui.this, component, inventory);
-            }
-        });
+        this.components.forEach(this::renderComponent);
     }
 
+    private <C extends GuiComponent, T extends GuiComponentType<C, T>>
+    void renderComponent(T componentType, C component) {
+        // generics can not be used in lambda methods, but method references are okay
+        // so this is a method
+        componentType.getRenderer().render(this.type, this, componentType,
+            component, this.inventory);
+    }
+
+    /**
+     * Get the title to use for this custom gui.
+     * <p>
+     * Subclasses can override this method to provide a dynamic title.
+     * <p>
+     * If this method is not overridden, a title must be set in the custom gui type
+     * using {@link CustomGuiType.Builder#title(Component)}.
+     *
+     * @return The title.
+     */
     @NotNull
     public Component getTitle() {
         Component title = this.type.getTitle();

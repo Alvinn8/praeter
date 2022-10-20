@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * An object that maps component types to a component.
+ * An object that maps component types to a component in a generic-safe way.
  */
 public class ComponentMap {
     private final Map<GuiComponentType<?, ?>, GuiComponent> map = new HashMap<>();
@@ -14,9 +14,9 @@ public class ComponentMap {
      *
      * @param type The component type.
      * @param component The component to map to.
-     * @param <T> The type of the component.
+     * @param <C> The type of the component.
      */
-    public <T extends GuiComponent> void put(GuiComponentType<T, ?> type, T component) {
+    public <C extends GuiComponent> void put(GuiComponentType<C, ?> type, C component) {
         this.map.put(type, component);
     }
 
@@ -24,23 +24,39 @@ public class ComponentMap {
      * Get a component from a component type.
      *
      * @param type The component type.
-     * @param <T> The type of the component.
+     * @param <C> The type of the component.
      * @return The component.
      */
-    public <T extends GuiComponent> T get(GuiComponentType<T, ?> type) {
+    public <C extends GuiComponent> C get(GuiComponentType<C, ?> type) {
         // This is safe because we only insert into the map where the generics line up
         // noinspection unchecked
-        return (T) this.map.get(type);
+        return (C) this.map.get(type);
     }
 
-    // todo you can not use this as a lambda
+    /**
+     * A consumer used by {@link #forEach(ForEachConsumer)}.
+     */
     interface ForEachConsumer {
-        <C extends GuiComponent, T extends GuiComponentType<C, T>> void accept(GuiComponentType<C, T> componentType, C component);
+        /**
+         * Consume a pair in a component map.
+         *
+         * @param componentType The component type.
+         * @param component The component.
+         * @param <C> The type of the component.
+         * @param <T> The type of the component type.
+         */
+        <C extends GuiComponent, T extends GuiComponentType<C, T>> void accept(T componentType, C component);
     }
 
+    /**
+     * Loop trough each entry in the map.
+     *
+     * @param consumer The consumer for the component type and component.
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void forEach(ForEachConsumer consumer) {
         this.map.forEach(((componentType0, component) ->
+            // Ugly cast to a raw type, but we know the generics will line up
             consumer.accept((GuiComponentType) componentType0, component)
         ));
     }

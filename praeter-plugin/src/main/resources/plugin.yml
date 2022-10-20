@@ -1,0 +1,8 @@
+name: "Praeter"
+main: "${group}.plugin.PraeterPlugin"
+version: "${version}"
+api-version: "1.19"
+author: "Alvinn8"
+
+commands:
+  praetertest: {}

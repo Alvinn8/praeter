@@ -32,8 +32,8 @@ public interface GuiComponentRenderer<C extends GuiComponent, T extends GuiCompo
 
     // todo javadoc
     void render(CustomGuiType customGuiType,
-                T componentType,
                 CustomGui customGui,
+                T componentType,
                 C component,
                 Inventory inventory);
 }
