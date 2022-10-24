@@ -6,6 +6,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -165,5 +166,23 @@ public abstract class CustomGui {
     @NotNull
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    /**
+     * Get the component type at the specified coordinates.
+     *
+     * @param x The x coodrinate.
+     * @param y The y coordinate.
+     * @return The component type.
+     */
+    @Nullable
+    public GuiComponentType<?, ?> getComponentTypeAt(int x, int y) {
+        for (GuiComponentType<?, ?> c : this.components.getComponentTypes()) {
+            if (x >= c.getX() && x < c.getX() + c.getWidth()
+            &&  y >= c.getY() && y < c.getY() + c.getHeight()) {
+                return c;
+            }
+        }
+        return null;
     }
 }

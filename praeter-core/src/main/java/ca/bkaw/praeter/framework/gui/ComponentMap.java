@@ -1,7 +1,11 @@
 package ca.bkaw.praeter.framework.gui;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An object that maps component types to a component in a generic-safe way.
@@ -27,6 +31,7 @@ public class ComponentMap {
      * @param <C> The type of the component.
      * @return The component.
      */
+    @Nullable
     public <C extends GuiComponent> C get(GuiComponentType<C, ?> type) {
         // This is safe because we only insert into the map where the generics line up
         // noinspection unchecked
@@ -59,5 +64,14 @@ public class ComponentMap {
             // Ugly cast to a raw type, but we know the generics will line up
             consumer.accept((GuiComponentType) componentType0, component)
         ));
+    }
+
+    /**
+     * Get an unmodifiable set of the component types stored as keys in this map.
+     *
+     * @return The set.
+     */
+    public Set<GuiComponentType<?, ?>> getComponentTypes() {
+        return Collections.unmodifiableSet(this.map.keySet());
     }
 }

@@ -44,4 +44,24 @@ public final class GuiUtils {
             slotConsumer
         );
     }
+
+    /**
+     * Get the x coordinate from a slot in a 9-slot-wide inventory.
+     *
+     * @param slot The slot.
+     * @return The x coordinate.
+     */
+    public static int getX(int slot) {
+        return slot % 9;
+    }
+
+    /**
+     * Get the y coordinate from a slot in a 9-slot-wide inventory.
+     *
+     * @param slot The slot.
+     * @return The y coordinate.
+     */
+    public static int getY(int slot) {
+        return slot / 9;
+    }
 }

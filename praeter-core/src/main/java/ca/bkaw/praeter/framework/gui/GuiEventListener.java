@@ -6,6 +6,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.function.Consumer;
+
 /**
  * He walked down, the street then left.
  */
@@ -14,12 +16,39 @@ public class GuiEventListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         InventoryHolder holder = event.getView().getTopInventory().getHolder();
-        if (holder instanceof CustomGuiHolder) {
-            event.setCancelled(true);
+        if (!(holder instanceof CustomGuiHolder customGuiHolder)) {
+            return;
+        }
+        // The user clicked while a custom gui was open
+        CustomGui customGui = customGuiHolder.getCustomGui();
+        event.setCancelled(true);
+
+        if (event.getClickedInventory() == event.getView().getTopInventory()) {
+            // The user clicked the top inventory,
+            // the one that contains the components.
+            int slot = event.getSlot();
+            int x = GuiUtils.getX(slot);
+            int y = GuiUtils.getY(slot);
+            GuiComponentType<?, ?> componentType = customGui.getComponentTypeAt(x, y);
+            if (componentType != null) {
+                // The user clicked a component
+                GuiComponent guiComponent = customGui.get(componentType);
+                Consumer<GuiComponentClickEvent> clickHandler = guiComponent.getClickHandler();
+                if (clickHandler != null) {
+                    // Call the click handler on the component
+                    GuiComponentClickEvent guiEvent = new GuiComponentClickEvent(event);
+                    clickHandler.accept(guiEvent);
+                }
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
+        InventoryHolder holder = event.getView().getTopInventory().getHolder();
+        if (!(holder instanceof CustomGuiHolder customGuiHolder)) {
+            return;
+        }
+        event.setCancelled(true);
     }
 }

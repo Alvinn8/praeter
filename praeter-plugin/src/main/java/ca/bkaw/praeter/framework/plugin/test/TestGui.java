@@ -27,6 +27,8 @@ public class TestGui extends CustomGui {
 
     public TestGui(CustomGuiRenderer renderer) {
         super(TYPE, renderer);
+
+        get(BUTTON_2).setOnClick(event -> toggleButton2());
     }
 
     public void toggleButton2() {
