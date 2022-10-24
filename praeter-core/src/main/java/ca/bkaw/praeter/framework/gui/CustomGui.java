@@ -79,7 +79,8 @@ public abstract class CustomGui {
             // Create the inventory
             // todo inventory holder
             int slotCount = this.type.getHeight() * 9;
-            this.inventory = Bukkit.createInventory(null, slotCount, renderTitle);
+            CustomGuiHolder holder = new CustomGuiHolder(this);
+            this.inventory = Bukkit.createInventory(holder, slotCount, renderTitle);
             this.currentRenderTitle = renderTitle;
 
             // If the inventory was recreated with a new title,
@@ -130,6 +131,7 @@ public abstract class CustomGui {
      *
      * @return The type.
      */
+    @NotNull
     public CustomGuiType getType() {
         return this.type;
     }
@@ -145,6 +147,7 @@ public abstract class CustomGui {
      * @return The component.
      * @throws IllegalArgumentException If the component type was not registered.
      */
+    @NotNull
     public <T extends GuiComponent> T get(GuiComponentType<T, ?> componentType) {
         T component = this.components.get(componentType);
         if (component == null) {
@@ -152,5 +155,15 @@ public abstract class CustomGui {
                 "custom gui, did you forget to add it to the custom gui type?");
         }
         return component;
+    }
+
+    /**
+     * Get the inventory that is rendering this custom gui.
+     *
+     * @return The inventory.
+     */
+    @NotNull
+    public Inventory getInventory() {
+        return this.inventory;
     }
 }
