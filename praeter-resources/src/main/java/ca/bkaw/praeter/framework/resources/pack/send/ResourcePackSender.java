@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.framework.resources.pack.send;
 
+import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -12,8 +13,8 @@ import javax.annotation.Nullable;
  * pack senders are responsible for crafting a URL to send to clients.
  * <p>
  * Resource pack senders are required to be able to send packs from the main
- * praeter resource packs directory. No garantees are made on whether sending other
- * resource packs is implemented. If unsure, check {@link #canSend(Object)}.
+ * praeter resource packs directory. No guarantees are made on whether sending other
+ * resource packs is implemented. If unsure, check {@link #canSend(BakedResourcePack)}.
  */
 public interface ResourcePackSender {
     /**
@@ -26,8 +27,7 @@ public interface ResourcePackSender {
      *
      * @see Player#setResourcePack(String, String, boolean, Component)
      */
-    void send(Object resourcePack, Player player, boolean required, @Nullable Component prompt);
-    // TODO replace Object with a baked resource pack
+    void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt);
 
     /**
      * Check whether the specified resource pack can be sent.
@@ -35,5 +35,5 @@ public interface ResourcePackSender {
      * @param resourcePack The resource pack.
      * @return Whether it can be sent.
      */
-    boolean canSend(Object resourcePack);
+    boolean canSend(BakedResourcePack resourcePack);
 }

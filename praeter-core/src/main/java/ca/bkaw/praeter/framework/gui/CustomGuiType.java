@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.framework.gui;
 
+import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
@@ -25,7 +26,7 @@ public class CustomGuiType {
     private CustomGuiType(List<GuiComponentType<?, ?>> componentTypes,
                           int height,
                           Component title) {
-        this.componentTypes = Collections.unmodifiableList(componentTypes);
+        this.componentTypes = ImmutableList.copyOf(componentTypes);
         this.height = height;
         this.title = title;
     }
