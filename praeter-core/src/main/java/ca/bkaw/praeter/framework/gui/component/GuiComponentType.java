@@ -1,4 +1,7 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.component;
+
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 
 /**
  * A component that exists in a {@link CustomGuiType}.

@@ -1,5 +1,7 @@
 package ca.bkaw.praeter.framework.gui;
 
+import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
+
 import java.util.function.IntConsumer;
 
 /**

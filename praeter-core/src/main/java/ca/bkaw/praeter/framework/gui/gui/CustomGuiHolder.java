@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.gui;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

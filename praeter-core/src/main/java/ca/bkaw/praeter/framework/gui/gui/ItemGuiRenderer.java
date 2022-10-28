@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.gui;
 
 import net.kyori.adventure.text.Component;
 

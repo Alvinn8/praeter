@@ -1,5 +1,9 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.component;
 
+import ca.bkaw.praeter.framework.gui.GuiUtils;
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.gui.CustomGuiRenderer;
+import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.function.IntConsumer;

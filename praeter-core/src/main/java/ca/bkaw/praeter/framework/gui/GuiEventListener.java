@@ -1,5 +1,10 @@
 package ca.bkaw.praeter.framework.gui;
 
+import ca.bkaw.praeter.framework.gui.component.GuiComponent;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentClickEvent;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.gui.CustomGuiHolder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -8,9 +13,6 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.function.Consumer;
 
-/**
- * He walked down, the street then left.
- */
 public class GuiEventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)

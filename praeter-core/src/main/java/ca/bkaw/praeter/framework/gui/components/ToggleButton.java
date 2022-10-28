@@ -1,9 +1,9 @@
 package ca.bkaw.praeter.framework.gui.components;
 
-import ca.bkaw.praeter.framework.gui.CustomGui;
-import ca.bkaw.praeter.framework.gui.GuiComponent;
-import ca.bkaw.praeter.framework.gui.GuiComponentRenderer;
-import ca.bkaw.praeter.framework.gui.GuiComponentType;
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.component.GuiComponent;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentRenderer;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 
 /**
  * A button in a {@link CustomGui} that can be enabled and disabled.

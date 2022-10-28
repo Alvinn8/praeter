@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.component;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class ComponentMap {
     /**
      * A consumer used by {@link #forEach(ForEachConsumer)}.
      */
-    interface ForEachConsumer {
+    public interface ForEachConsumer {
         /**
          * Consume a pair in a component map.
          *

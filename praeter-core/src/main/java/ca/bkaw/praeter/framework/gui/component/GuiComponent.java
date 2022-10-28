@@ -1,5 +1,6 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.component;
 
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;

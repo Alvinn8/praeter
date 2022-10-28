@@ -1,8 +1,8 @@
 package ca.bkaw.praeter.framework.plugin.test;
 
-import ca.bkaw.praeter.framework.gui.CustomGui;
-import ca.bkaw.praeter.framework.gui.CustomGuiType;
-import ca.bkaw.praeter.framework.gui.GuiComponentRenderer;
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
+import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentRenderer;
 import ca.bkaw.praeter.framework.gui.GuiUtils;
 import ca.bkaw.praeter.framework.gui.components.ToggleButton;
 import net.kyori.adventure.text.Component;

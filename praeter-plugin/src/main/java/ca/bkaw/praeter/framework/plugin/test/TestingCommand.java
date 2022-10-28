@@ -1,6 +1,6 @@
 package ca.bkaw.praeter.framework.plugin.test;
 
-import ca.bkaw.praeter.framework.gui.ItemGuiRenderer;
+import ca.bkaw.praeter.framework.gui.gui.ItemGuiRenderer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -1,5 +1,6 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.gui;
 
+import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;

@@ -1,5 +1,8 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.gui;
 
+import ca.bkaw.praeter.framework.gui.component.ComponentMap;
+import ca.bkaw.praeter.framework.gui.component.GuiComponent;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;

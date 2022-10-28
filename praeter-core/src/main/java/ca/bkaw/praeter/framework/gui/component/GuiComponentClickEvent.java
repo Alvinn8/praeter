@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.gui;
+package ca.bkaw.praeter.framework.gui.component;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
 
