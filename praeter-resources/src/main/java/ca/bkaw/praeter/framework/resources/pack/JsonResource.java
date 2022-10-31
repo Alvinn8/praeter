@@ -16,7 +16,7 @@ import java.nio.file.Path;
 public class JsonResource {
     public static final Gson GSON = new Gson();
 
-    private final Pack resourcePack;
+    private final Pack pack;
     private final Path path;
     private final JsonObject json;
 
@@ -29,7 +29,7 @@ public class JsonResource {
      * @throws JsonSyntaxException If the JSON is not properly formatted.
      */
     public JsonResource(Pack pack, Path path) throws IOException, JsonSyntaxException {
-        this.resourcePack = pack;
+        this.pack = pack;
         this.path = path;
 
         JsonElement jsonElement = JsonParser.parseReader(Files.newBufferedReader(path));
@@ -47,7 +47,7 @@ public class JsonResource {
      * @param json The json to use for the resource.
      */
     public JsonResource(Pack pack, Path path, JsonObject json) {
-        this.resourcePack = pack;
+        this.pack = pack;
         this.path = path;
         this.json = json;
     }
@@ -58,7 +58,7 @@ public class JsonResource {
      * @return The pack.
      */
     public Pack getPack() {
-        return this.resourcePack;
+        return this.pack;
     }
 
     /**
