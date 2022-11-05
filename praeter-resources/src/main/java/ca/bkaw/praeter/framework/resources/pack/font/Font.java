@@ -6,10 +6,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Unmodifiable;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A font in a {@link ResourcePack}.
@@ -74,7 +80,7 @@ public class Font {
      */
     private void addProvider(BitmapFontProvider provider) throws IOException {
         JsonObject json = this.fontJson.getJson();
-        JsonArray providers = json.get("providers").getAsJsonArray();
+        JsonArray providers = json.getAsJsonArray("providers");
         for (JsonElement element : providers) {
             JsonObject jsonObject = element.getAsJsonObject();
             if (provider.isEqual(jsonObject)) {
@@ -113,5 +119,67 @@ public class Font {
             // We have an unused character.
             return c;
         }
+    }
+
+    /**
+     * Get the next free character to use as a list for passing to a bitmap provider.
+     * <p>
+     * The list will always have one string with a length of one.
+     *
+     * @return The list.
+     * @see #getNextChar()
+     */
+    @Unmodifiable
+    public List<String> getNextCharAsList() {
+        return Collections.singletonList(String.valueOf(this.getNextChar()));
+    }
+
+    /**
+     * Get the namespaced key for an almost-transparent, 1x1-pixel image.
+     *
+     * @return The key.
+     * @throws IOException If an I/O error occurs while writing the texture.
+     */
+    private NamespacedKey getAlmostTransparent1x1Texture() throws IOException {
+        Path path = this.pack.getPath("assets/praeter/textures/font/transparent_1.png");
+        if (!Files.exists(path)) {
+            Files.createDirectories(path.getParent());
+            BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+            image.setRGB(0, 0, 0x11000000);
+            try (OutputStream output = Files.newOutputStream(path)) {
+                ImageIO.write(image, "png", output);
+            }
+        }
+        return new NamespacedKey("praeter", "font/transparent_1.png");
+    }
+
+    private char getChar(BitmapFontProvider provider) {
+        return provider.getChars().get(0).charAt(0);
+    }
+
+    /**
+     * Get or create a font character that is a negative space of the specified amount
+     * of pixels.
+     * <p>
+     * Using this character will move the text cursor backwards.
+     *
+     * @param pixels The positive amount of pixels to go back.
+     * @return The character to use.
+     * @throws IOException If an I/O error occurs.
+     */
+    public char negativeSpace(int pixels) throws IOException {
+        BitmapFontProvider provider = new BitmapFontProvider(
+            this.getAlmostTransparent1x1Texture(),
+
+            // subtract 2 to remove the pixels before and after the character
+            -pixels - 2, // width/height (negative)
+
+            // make it not visible, it's already transparent though
+            -32768, // ascent
+
+            this.getNextCharAsList()
+        );
+        this.addProvider(provider);
+        return this.getChar(provider);
     }
 }

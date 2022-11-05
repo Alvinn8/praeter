@@ -25,6 +25,7 @@ import java.util.stream.Stream;
  */
 public class BakedResourcePack {
     private final Map<NamespacedKey, BakedItemModel> itemModels;
+    private final Map<FontCharIdentifier, BakedFontChar> fontChars;
 
     /**
      * Create a new baked resource pack.
@@ -34,8 +35,10 @@ public class BakedResourcePack {
      * @param itemModels The map of baked item models.
      * @see #bake(ResourcePack)
      */
-    public BakedResourcePack(Map<NamespacedKey, BakedItemModel> itemModels) {
+    public BakedResourcePack(Map<NamespacedKey, BakedItemModel> itemModels,
+                             Map<FontCharIdentifier, BakedFontChar> fontChars) {
         this.itemModels = ImmutableMap.copyOf(itemModels);
+        this.fontChars = ImmutableMap.copyOf(fontChars);
     }
 
     /**
@@ -50,9 +53,20 @@ public class BakedResourcePack {
     }
 
     /**
+     * Get the baked font char from the font char identifier.
+     *
+     * @param identifier The font char identifier.
+     * @return The baked font character.
+     */
+    @Nullable
+    public BakedFontChar getFontChar(FontCharIdentifier identifier) {
+        return this.fontChars.get(identifier);
+    }
+
+    /**
      * Bake the specified resource pack.
      * <p>
-     * This will scan the resource pack to create mappings for models.
+     * This will scan the resource pack to create mappings for models and font chars.
      * <p>
      * If the resource pack is changed, changes will not be reflected in the baked
      * resource pack. It is therefore recommended that the resource pack is closed
@@ -64,8 +78,9 @@ public class BakedResourcePack {
      */
     public static BakedResourcePack bake(ResourcePack pack) throws IOException {
         Map<NamespacedKey, BakedItemModel> itemModels = bakeItemModels(pack);
+        Map<FontCharIdentifier, BakedFontChar> fontChars = bakeFontChars(pack);
 
-        return new BakedResourcePack(itemModels);
+        return new BakedResourcePack(itemModels, fontChars);
     }
 
     private static Map<NamespacedKey, BakedItemModel> bakeItemModels(ResourcePack pack) throws IOException {
@@ -96,5 +111,51 @@ public class BakedResourcePack {
         }
 
         return itemModels;
+    }
+
+    private static Map<FontCharIdentifier, BakedFontChar> bakeFontChars(ResourcePack pack) throws IOException {
+        Map<FontCharIdentifier, BakedFontChar> fontChars = new HashMap<>();
+
+        try (Stream<Path> s = Files.list(pack.getPath("assets"))) {
+            for (Path namespacePath : s
+                .filter(Files::isDirectory)
+                .filter(path -> Files.isDirectory(path.resolve("font")))
+                .toList()) {
+                try (Stream<Path> s2 = Files.list(namespacePath.resolve("font"))) {
+                    for (Path path : s2
+                        .filter(path -> path.toString().endsWith(".json"))
+                        .toList()) {
+                        JsonResource jsonResource = new JsonResource(pack, path);
+                        for (JsonElement element : jsonResource.getJson().getAsJsonArray("providers")) {
+                            JsonObject provider = element.getAsJsonObject();
+                            if (!"bitmap".equals(provider.get("type").getAsString())) {
+                                continue;
+                            }
+                            JsonArray chars = provider.getAsJsonArray("chars");
+                            if (chars.size() != 1) {
+                                continue;
+                            }
+                            String charString = chars.get(0).getAsString();
+                            if (charString.length() != 1) {
+                                continue;
+                            }
+                            int ascent = provider.get("ascent").getAsInt();
+                            Integer height = provider.has("height") ? provider.get("height").getAsInt() : null;
+                            NamespacedKey textureKey = NamespacedKey.fromString(provider.get("file").getAsString());
+
+                            String namespace = namespacePath.getFileName().toString();
+                            String fontName = path.getFileName().toString();
+                            fontName = fontName.substring(0, fontName.length() - ".json".length());
+                            NamespacedKey fontKey = new NamespacedKey(namespace, fontName);
+
+                            FontCharIdentifier identifier = new FontCharIdentifier(textureKey, height, ascent);
+                            fontChars.put(identifier, new BakedFontChar(fontKey, charString.charAt(0)));
+                        }
+                    }
+                }
+            }
+        }
+
+        return fontChars;
     }
 }

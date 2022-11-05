@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,21 +28,19 @@ public class BitmapFontProvider {
      * @param chars The list of characters.
      */
     public BitmapFontProvider(NamespacedKey textureKey, int ascent, List<String> chars) {
-        this.textureKey = textureKey;
-        this.ascent = ascent;
-        this.chars = chars;
+        this(textureKey, null, ascent, chars);
     }
 
     /**
      * Create a new bitmap font provider.
      *
-     * @param textureKey The resource location of the texture, relative to the namespace's
+     * @param textureKey The namespaced key of the texture, relative to the namespace's
      *                   textures folder. The file extension must be present.
      * @param height The height of the character.
      * @param ascent The vertical shift of the character.
      * @param chars The list of characters.
      */
-    public BitmapFontProvider(NamespacedKey textureKey, int height, int ascent, List<String> chars) {
+    public BitmapFontProvider(NamespacedKey textureKey, @Nullable Integer height, int ascent, List<String> chars) {
         this.textureKey = textureKey;
         this.height = height;
         this.ascent = ascent;
@@ -56,11 +55,12 @@ public class BitmapFontProvider {
         this.textureKey = textureKey;
     }
 
+    @Nullable
     public Integer getHeight() {
         return this.height;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(@Nullable Integer height) {
         this.height = height;
     }
 
