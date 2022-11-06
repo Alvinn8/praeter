@@ -25,18 +25,6 @@ import java.util.function.IntConsumer;
  */
 public interface GuiComponentRenderer<C extends GuiComponent, T extends GuiComponentType<C, T>> {
     /**
-     * A method called during startup when the custom gui type is being created.
-     * <p>
-     * This allows for preparation that needs to be performed during startup, for
-     * example to allow renderers from {@code praeter-resources} to generate textures
-     * and other assets that need to be included in resource packs.
-     *
-     * @param customGuiType The custom gui type the component type is a part of.
-     * @param componentType The component type this renderer should render.
-     */
-    void onSetup(CustomGuiType customGuiType, T componentType);
-
-    /**
      * Render items in the inventory.
      * <p>
      * This method is called regardless of what {@link CustomGuiRenderer} is used.

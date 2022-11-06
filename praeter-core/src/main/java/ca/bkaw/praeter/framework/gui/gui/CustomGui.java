@@ -81,7 +81,6 @@ public abstract class CustomGui {
 
         if (this.inventory == null) {
             // Create the inventory
-            // todo inventory holder
             int slotCount = this.type.getHeight() * 9;
             CustomGuiHolder holder = new CustomGuiHolder(this);
             this.inventory = Bukkit.createInventory(holder, slotCount, renderTitle);
@@ -174,7 +173,7 @@ public abstract class CustomGui {
     /**
      * Get the component type at the specified coordinates.
      *
-     * @param x The x coodrinate.
+     * @param x The x coordinate.
      * @param y The y coordinate.
      * @return The component type.
      */

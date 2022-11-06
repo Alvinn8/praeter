@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.framework.gui.gui;
 
 import ca.bkaw.praeter.framework.gui.component.GuiComponent;
+import ca.bkaw.praeter.framework.gui.component.GuiComponentRenderer;
 import net.kyori.adventure.text.Component;
 
 /**
@@ -10,6 +11,17 @@ import net.kyori.adventure.text.Component;
  * @see ItemGuiRenderer
  */
 public interface CustomGuiRenderer {
+    /**
+     * Check whether this custom gui renderer supports the specified gui component renderer.
+     * <p>
+     * For example, if a gui is rendered using items, component renderers that require
+     * custom fonts will not be supported by the gui renderer.
+     *
+     * @param componentRenderer The component renderer.
+     * @return Whether the component renderer is supported.
+     */
+    boolean supports(GuiComponentRenderer<?, ?> componentRenderer);
+
     /**
      * A method called during startup when the custom gui type is being created.
      * <p>

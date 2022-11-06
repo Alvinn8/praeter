@@ -13,11 +13,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class TestToggleButtonRenderer implements GuiComponentRenderer<ToggleButton, ToggleButton.Type> {
     @Override
-    public void onSetup(CustomGuiType customGuiType, ToggleButton.Type componentType) {
-        System.out.println("setting up TestToggleButtonRenderer");
-    }
-
-    @Override
     public void renderItems(CustomGuiType customGuiType, CustomGui customGui, ToggleButton.Type componentType, ToggleButton component, Inventory inventory) {
         GuiUtils.forEachSlot(componentType, slot -> {
             ItemStack item = new ItemStack(

@@ -14,11 +14,6 @@ import org.bukkit.inventory.ItemStack;
 public class TestButtonRenderer implements GuiComponentRenderer<Button, Button.Type> {
 
     @Override
-    public void onSetup(CustomGuiType customGuiType, Button.Type componentType) {
-        System.out.println("setting up TestButtonRenderer");
-    }
-
-    @Override
     public void renderItems(CustomGuiType customGuiType, CustomGui customGui, Button.Type componentType, Button component, Inventory inventory) {
         GuiUtils.forEachSlot(componentType, slot -> {
             ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);

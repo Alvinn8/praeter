@@ -78,7 +78,7 @@ public class Font {
      * @param provider The provider.
      * @throws IOException If an I/O error occurs.
      */
-    private void addProvider(BitmapFontProvider provider) throws IOException {
+    public void addProvider(BitmapFontProvider provider) throws IOException {
         JsonObject json = this.fontJson.getJson();
         JsonArray providers = json.getAsJsonArray("providers");
         for (JsonElement element : providers) {
