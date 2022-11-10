@@ -57,8 +57,8 @@ public abstract class CustomGui {
     }
 
     private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
-        // This method is used in the constructor and
-        // is required for generics to line up
+        // This method is used in the create method
+        // and is required for generics to line up
         this.components.put(componentType, componentType.create());
     }
 
@@ -106,6 +106,15 @@ public abstract class CustomGui {
         // so this is a method
         componentType.getRenderer().renderItems(this.type, this, componentType,
             component, this.inventory);
+    }
+
+    /**
+     * Loop trough each component in the gui.
+     *
+     * @param consumer The consumer for the entries.
+     */
+    public void forEachComponent(ComponentMap.ForEachConsumer consumer) {
+        this.components.forEach(consumer);
     }
 
     /**

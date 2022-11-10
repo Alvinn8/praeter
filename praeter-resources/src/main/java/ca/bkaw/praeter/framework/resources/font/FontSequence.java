@@ -6,9 +6,9 @@ import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.framework.resources.bake.FontCharIdentifier;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,21 +28,21 @@ public record FontSequence(@Unmodifiable List<FontCharIdentifier> fontChars) {
     }
 
     /**
-     * Get a text component that renders this font sequence.
+     * Get a list of text components that render this font sequence.
      *
      * @param pack The baked resource pack to get baked font chars from.
-     * @return The text component.
+     * @return The text components.
      */
-    public Component getChars(BakedResourcePack pack) {
-        TextComponent.Builder component = Component.text();
+    public List<Component> getChars(BakedResourcePack pack) {
+        List<Component> components = new ArrayList<>();
         for (FontCharIdentifier fontCharIdentifier : this.fontChars) {
             BakedFontChar fontChar = pack.getFontChar(fontCharIdentifier);
             if (fontChar == null) {
                 throw new MissingAssetException("Expected the font char to be baked, but it was " +
                     "not found. fontCharIdentifier: " + fontCharIdentifier);
             }
-            component.append(fontChar.asComponent());
+            components.add(fontChar.asComponent());
         }
-        return component.build();
+        return components;
     }
 }

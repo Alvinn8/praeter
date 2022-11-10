@@ -3,6 +3,7 @@ package ca.bkaw.praeter.framework.resources.gui;
 import ca.bkaw.praeter.framework.gui.component.GuiComponent;
 import ca.bkaw.praeter.framework.gui.component.GuiComponentRenderer;
 import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
+import ca.bkaw.praeter.framework.gui.gui.CustomGui;
 import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 
 /**
@@ -29,4 +30,18 @@ public interface FontGuiComponentRenderer<C extends GuiComponent, T extends GuiC
      */
     void onSetup(CustomGuiType customGuiType, T componentType, RenderSetupContext context);
 
+    /**
+     * A method called when a component is being rendered.
+     *
+     * @param customGuiType The custom gui type the component is a part of.
+     * @param customGui The custom gui instance to render inside.
+     * @param componentType The component type this renderer should render.
+     * @param component The component to render.
+     * @param renderDispatcher The render dispatcher where font sequences can be appended.
+     */
+    void onRender(CustomGuiType customGuiType,
+                  CustomGui customGui,
+                  T componentType,
+                  C component,
+                  RenderDispatcher renderDispatcher);
 }
