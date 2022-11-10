@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
  * The server can only send resource packs to clients using an HTTP url. Resource
  * pack senders are responsible for crafting a URL to send to clients.
  * <p>
- * Resource pack senders are required to be able to send packs from the main
- * praeter resource packs directory. No guarantees are made on whether sending other
- * resource packs is implemented. If unsure, check {@link #canSend(BakedResourcePack)}.
+ * Resource pack senders are required to be able to send packs created by praeter
+ * that are used to render custom additions to the game. No guarantees are made on
+ * whether sending user-created resource packs is implemented.
  */
 public interface ResourcePackSender {
     /**
@@ -28,12 +28,4 @@ public interface ResourcePackSender {
      * @see Player#setResourcePack(String, String, boolean, Component)
      */
     void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt);
-
-    /**
-     * Check whether the specified resource pack can be sent.
-     *
-     * @param resourcePack The resource pack.
-     * @return Whether it can be sent.
-     */
-    boolean canSend(BakedResourcePack resourcePack);
 }
