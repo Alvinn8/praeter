@@ -86,9 +86,11 @@ public class BakedResourcePack {
     private static Map<NamespacedKey, BakedItemModel> bakeItemModels(ResourcePack pack) throws IOException {
         Map<NamespacedKey, BakedItemModel> itemModels = new HashMap<>();
 
-        // Loop through all vanilla items to look for custom model data
-        // TODO Caused by: java.nio.file.NotDirectoryException: assets/minecraft/item
-        try (Stream<Path> s = Files.list(pack.getPath("assets/minecraft/item"))) {
+        Path itemPath = pack.getPath("assets/minecraft/item");
+        if (Files.notExists(itemPath)) {
+            return itemModels;
+        }
+        try (Stream<Path> s = Files.list(itemPath)) {
             for (Path path : s
                 .filter(path -> path.toString().endsWith(".json"))
                 .toList()) {
@@ -117,7 +119,11 @@ public class BakedResourcePack {
     private static Map<FontCharIdentifier, BakedFontChar> bakeFontChars(ResourcePack pack) throws IOException {
         Map<FontCharIdentifier, BakedFontChar> fontChars = new HashMap<>();
 
-        try (Stream<Path> s = Files.list(pack.getPath("assets"))) {
+        Path assetsPath = pack.getPath("assets");
+        if (Files.notExists(assetsPath)) {
+            return fontChars;
+        }
+        try (Stream<Path> s = Files.list(assetsPath)) {
             for (Path namespacePath : s
                 .filter(Files::isDirectory)
                 .filter(path -> Files.isDirectory(path.resolve("font")))
