@@ -87,7 +87,7 @@ public final class VanillaAssets {
         JsonElement versionManifest = JsonParser.parseReader(getVersionManifest());
 
         // Find the current version in the version manifest
-        String version = Bukkit.getVersion();
+        String version = Bukkit.getMinecraftVersion();
 
         JsonArray versions = versionManifest.getAsJsonObject().get("versions").getAsJsonArray();
         String url = null;
@@ -110,7 +110,7 @@ public final class VanillaAssets {
 
         // Get the url to the client jar and download it
         JsonObject clientDownload = versionInfo.getAsJsonObject().get("downloads").getAsJsonObject().get("client").getAsJsonObject();
-        Path downloadPath = Paths.get("praeter/client.jar");
+        Path downloadPath = Files.createTempFile("client", ".jar");
         download(clientDownload.get("url").getAsString(), clientDownload.get("sha1").getAsString(), downloadPath);
 
         LOGGER.info("    Extracting vanilla assets from client jar");

@@ -47,6 +47,11 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
         }
     }
 
+    @Override
+    public void remove() {
+        this.server.stop(1000);
+    }
+
     private class Handler implements HttpHandler {
         private final Path path;
         private HttpContext context;

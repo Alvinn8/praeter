@@ -2,6 +2,7 @@ package ca.bkaw.praeter.framework.resources;
 
 import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.ResourcePack;
+import ca.bkaw.praeter.framework.resources.pack.send.ResourcePackSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,7 @@ public class ResourceManager {
     private ResourcePack mainResourcePack;
     private ResourcePack vanillaAssets;
     private BakedResourcePack mainBakedResourcePack;
+    private ResourcePackSender resourcePackSender;
 
     /**
      * Get the baked resource pack to currently use for the specified player. The
@@ -48,4 +50,14 @@ public class ResourceManager {
         this.mainBakedResourcePack = mainBakedResourcePack;
     }
 
+    public ResourcePackSender getResourcePackSender() {
+        return this.resourcePackSender;
+    }
+
+    public void setResourcePackSender(ResourcePackSender resourcePackSender) {
+        if (this.resourcePackSender != null) {
+            this.resourcePackSender.remove();
+        }
+        this.resourcePackSender = resourcePackSender;
+    }
 }

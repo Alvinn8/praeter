@@ -7,6 +7,7 @@ import ca.bkaw.praeter.framework.resources.ResourceManager;
 import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.ResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.VanillaAssets;
+import ca.bkaw.praeter.framework.resources.pack.send.HttpServerResourcePackSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -36,8 +37,10 @@ public class PraeterPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        this.setupDirectories();
         this.setupVanillaAssets();
         this.setupMainResourcePack();
+        this.setupResourcePackSender();
 
         // Bake the packs right before startup, after plugins have loaded
         this.getServer().getScheduler().runTaskLater(this, this::bakePacks, 1L);
@@ -47,6 +50,14 @@ public class PraeterPlugin extends JavaPlugin {
 
         // Register event listener
         getServer().getPluginManager().registerEvents(new GuiEventListener(), this);
+    }
+
+    private void setupDirectories() {
+        try {
+            Files.createDirectories(this.resourcePacksFolder);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create directories.", e);
+        }
     }
 
     private void setupVanillaAssets() {
@@ -73,15 +84,19 @@ public class PraeterPlugin extends JavaPlugin {
         resourceManager.setMainResourcePack(mainResourcePack);
     }
 
+    private void setupResourcePackSender() {
+        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+        try {
+            resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e);
+        }
+    }
+
     private void bakePacks() {
         ResourceManager resourceManager = PraeterResources.get().getResourceManager();
         ResourcePack pack = resourceManager.getMainResourcePack();
         resourceManager.setMainResourcePack(null);
-        try {
-            pack.getRoot().getFileSystem().close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to close main resource pack.", e);
-        }
 
         try {
             resourceManager.getVanillaAssets().getRoot().getFileSystem().close();
@@ -97,5 +112,11 @@ public class PraeterPlugin extends JavaPlugin {
             throw new RuntimeException("Failed to bake main resource pack.", e);
         }
         resourceManager.setMainBakedResourcePack(baked);
+
+        try {
+            pack.getRoot().getFileSystem().close();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to close main resource pack.", e);
+        }
     }
 }

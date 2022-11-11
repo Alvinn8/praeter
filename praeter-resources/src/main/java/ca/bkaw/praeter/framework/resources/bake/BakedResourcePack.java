@@ -87,6 +87,7 @@ public class BakedResourcePack {
         Map<NamespacedKey, BakedItemModel> itemModels = new HashMap<>();
 
         // Loop through all vanilla items to look for custom model data
+        // TODO Caused by: java.nio.file.NotDirectoryException: assets/minecraft/item
         try (Stream<Path> s = Files.list(pack.getPath("assets/minecraft/item"))) {
             for (Path path : s
                 .filter(path -> path.toString().endsWith(".json"))

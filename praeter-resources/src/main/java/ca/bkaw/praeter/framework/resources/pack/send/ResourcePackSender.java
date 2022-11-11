@@ -28,4 +28,9 @@ public interface ResourcePackSender {
      * @see Player#setResourcePack(String, String, boolean, Component)
      */
     void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt);
+
+    /**
+     * Called when the resource pack sender is being removed. Can be used to clean up.
+     */
+    void remove();
 }
