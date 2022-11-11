@@ -40,7 +40,7 @@ public class Font {
         Path path = this.pack.getPath("assets")
             .resolve(key.getNamespace())
             .resolve("font")
-            .resolve(key + ".json");
+            .resolve(key.getKey() + ".json");
         if (Files.exists(path)) {
             this.fontJson = new JsonResource(this.pack, path);
         } else {

@@ -22,7 +22,7 @@ public class TestingCommand implements CommandExecutor {
 
     public void gui(@NotNull CommandSender sender) {
         if (sender instanceof Player player) {
-            TestGui gui = new TestGui(new ItemGuiRenderer());
+            TestGui gui = new TestGui();
             if (Math.random() > 0.5) {
                 gui.toggleButton2();
                 player.sendRawMessage("Called toggleButton2");

@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * An implementation of {@link ResourcePackSender} that sends resource packs via
@@ -37,11 +39,22 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
 
     @Override
     public void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt) {
+        // TODO
         Path file = Path.of("plugins/praeter/internal/resourcepacks/main.zip"); // TODO
         if (Files.exists(file)) {
-            String path = "/praeter/main.zip";
+            String path = "/";
             Handler handler = new Handler(file);
             handler.context = this.server.createContext(path, handler);
+
+            byte[] hash;
+            try {
+                byte[] bytes = Files.readAllBytes(file);
+                hash = MessageDigest.getInstance("SHA-1").digest(bytes);
+            } catch (IOException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+
+            player.setResourcePack("http://localhost:" + PORT + path, hash, prompt, required);
         } else {
             throw new IllegalArgumentException("Can not send the specified pack.");
         }
@@ -63,10 +76,11 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             try (InputStream inputStream = Files.newInputStream(this.path)) {
+                exchange.sendResponseHeaders(200, Files.size(this.path));
                 inputStream.transferTo(exchange.getResponseBody());
                 exchange.close();
             } finally {
-                server.removeContext(context);
+                // server.removeContext(context);
             }
         }
     }

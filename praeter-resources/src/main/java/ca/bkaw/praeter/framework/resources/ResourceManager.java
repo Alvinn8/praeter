@@ -4,7 +4,11 @@ import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.ResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.send.ResourcePackSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.List;
 
 // TODO
 public class ResourceManager {
@@ -30,8 +34,22 @@ public class ResourceManager {
             "this world.");
     }
 
+    /**
+     * Get a list of resource packs where the specified plugin is enabled.
+     *
+     * @param plugin The plugin.
+     * @return The list of resource packs.
+     */
+    public List<ResourcePack> getResourcePacks(Plugin plugin) {
+        return Collections.singletonList(this.mainResourcePack); // TODO
+    }
+
     public ResourcePack getMainResourcePack() {
         return mainResourcePack;
+    }
+
+    public BakedResourcePack getMainBakedResourcePack() {
+        return mainBakedResourcePack;
     }
 
     public ResourcePack getVanillaAssets() {

@@ -141,7 +141,7 @@ public class BitmapFontProvider {
      * @return The identifier.
      */
     public FontCharIdentifier createIdentifier() {
-        if (this.chars.size() == 1 || this.chars.get(0).length() == 1) {
+        if (this.chars.size() != 1 || this.chars.get(0).length() != 1) {
             throw new IllegalStateException("Can only create a font char identifier for " +
                     "bitmap font providers that only have one character.");
         }

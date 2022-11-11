@@ -4,6 +4,7 @@ import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -45,6 +46,34 @@ public class CustomGuiType {
     }
 
     /**
+     * Get the plugin that registered the custom gui type.
+     *
+     * @return The plugin
+     * @throws IllegalStateException If the custom gui type has not been registered yet.
+     */
+    public Plugin getPlugin() {
+        if (this.plugin == null) {
+            throw new IllegalStateException("The custom gui type has not been registered.");
+        }
+        return this.plugin;
+    }
+
+    /**
+     * Set the plugin that registered the custom gui type.
+     * <p>
+     * This method is for internal use. Use TODO to register the gui.
+     *
+     * @param plugin The plugin.
+     */
+    @ApiStatus.Internal
+    public void setPlugin(Plugin plugin) {
+        if (this.plugin != null) {
+            throw new IllegalStateException("Cannot change the registered plugin.");
+        }
+        this.plugin = plugin;
+    }
+
+    /**
      * Get a collection of component types.
      *
      * @return The collection.
@@ -74,6 +103,15 @@ public class CustomGuiType {
     @Nullable
     public Component getTitle() {
         return this.title;
+    }
+
+    /**
+     * Get the renderer that is responsible for rendering this custom gui type.
+     *
+     * @return The renderer.
+     */
+    public CustomGuiRenderer getRenderer() {
+        return this.renderer;
     }
 
     /**
@@ -138,7 +176,16 @@ public class CustomGuiType {
             return this;
         }
 
-        // TODO
+        /**
+         * Set the renderer of the gui.
+         * <p>
+         * If no renderer is set, a renderer will be chosen automatically based on the gui
+         * component renderers.
+         *
+         * @param renderer The renderer.
+         * @return The builder, for chaining.
+         */
+        @Contract("_ -> this")
         public Builder renderer(CustomGuiRenderer renderer) {
             this.renderer = renderer;
             return this;
@@ -150,7 +197,13 @@ public class CustomGuiType {
          * @return The created {@link CustomGuiType}.
          */
         public CustomGuiType build() {
-            return new CustomGuiType(this.componentTypes, this.height, this.title, renderer);
+            if (this.renderer == null) {
+                // No renderer was set by the user
+                // TODO determine one.
+                throw new IllegalStateException("No gui renderer was set");
+            }
+            return new CustomGuiType(this.componentTypes, this.height, this.title,
+                this.renderer);
         }
     }
 }

@@ -11,11 +11,12 @@ import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 import ca.bkaw.praeter.framework.resources.PraeterResources;
 import ca.bkaw.praeter.framework.resources.ResourceManager;
 import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
+import ca.bkaw.praeter.framework.resources.pack.ResourcePack;
 import net.kyori.adventure.text.Component;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A {@link CustomGuiRenderer} that uses custom fonts to render the gui.
@@ -31,7 +32,8 @@ public class FontGuiRenderer implements CustomGuiRenderer {
 
     @Override
     public void onSetup(CustomGuiType customGuiType) {
-        RenderSetupContext context = new RenderSetupContext(); // TODO
+        List<ResourcePack> resourcePacks = PraeterResources.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
+        RenderSetupContext context = new RenderSetupContext(resourcePacks);
 
         for (GuiComponentType<?, ?> componentType : customGuiType.getComponentTypes()) {
             // TODO fix generics...
@@ -54,15 +56,13 @@ public class FontGuiRenderer implements CustomGuiRenderer {
     public Component getRenderTitle(Component title, CustomGui customGui) {
         BakedResourcePack bakedResourcePack = null;
         ResourceManager resourceManager = PraeterResources.get().getResourceManager();
-        for (HumanEntity viewer : customGui.getInventory().getViewers()) {
-            if (viewer instanceof Player player) {
-                BakedResourcePack playerPack = resourceManager.getBakedResourcePack(player);
-                if (bakedResourcePack == null) {
-                    bakedResourcePack = playerPack;
-                } else if (bakedResourcePack != playerPack) {
-                    throw new RuntimeException("Viewers of a gui had different baked resource packs. " +
-                        "Are there players from different worlds viewing the same gui?");
-                }
+        for (Player viewer : customGui.getViewers()) {
+            BakedResourcePack playerPack = resourceManager.getBakedResourcePack(viewer);
+            if (bakedResourcePack == null) {
+                bakedResourcePack = playerPack;
+            } else if (bakedResourcePack != playerPack) {
+                throw new RuntimeException("Viewers of a gui had different baked resource packs. " +
+                    "Are there players from different worlds viewing the same gui?");
             }
         }
         if (bakedResourcePack == null) {

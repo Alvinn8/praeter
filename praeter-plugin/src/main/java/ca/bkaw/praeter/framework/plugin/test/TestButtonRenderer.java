@@ -25,7 +25,7 @@ public class TestButtonRenderer implements FontGuiComponentRenderer<Button, Butt
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType, RenderSetupContext context) throws IOException {
         this.fontSequence = context.newFontSequence()
-                .renderImage(new NamespacedKey("praetertest", "texture1"), 10, 10)
+                .renderImage(new NamespacedKey("minecraft", "item/diamond.png"), 5, 5)
                 .build();
     }
 

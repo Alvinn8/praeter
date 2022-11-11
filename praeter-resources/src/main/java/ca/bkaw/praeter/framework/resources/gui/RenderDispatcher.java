@@ -3,6 +3,7 @@ package ca.bkaw.praeter.framework.resources.gui;
 import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.framework.resources.font.FontSequence;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class RenderDispatcher {
      * @param component The component.
      */
     public void addTitle(Component component) {
-        this.components.add(component);
+        this.components.add(component.color(NamedTextColor.DARK_GRAY));
     }
 
     /**
@@ -50,6 +51,6 @@ public class RenderDispatcher {
      * @return The text component.
      */
     public Component toComponent() {
-        return Component.text().append(this.components).build();
+        return Component.text().color(NamedTextColor.WHITE).append(this.components).build();
     }
 }

@@ -14,12 +14,14 @@ import java.util.List;
  * @see FontGuiComponentRenderer#onSetup(CustomGuiType, GuiComponentType, RenderSetupContext)
  */
 public class RenderSetupContext {
-    private List<ResourcePack> getResourcePacks() {
-        throw new UnsupportedOperationException(); // TODO
+    private final List<ResourcePack> resourcePacks;
+
+    public RenderSetupContext(List<ResourcePack> resourcePacks) {
+        this.resourcePacks = resourcePacks;
     }
 
     public GuiFontSequenceBuilder newFontSequence() throws IOException {
         NamespacedKey fontKey = new NamespacedKey("praeter", "gui"); // TODO use gui key?
-        return new GuiFontSequenceBuilder(this.getResourcePacks(), fontKey);
+        return new GuiFontSequenceBuilder(this.resourcePacks, fontKey);
     }
 }

@@ -4,6 +4,7 @@ import ca.bkaw.praeter.framework.gui.component.ComponentMap;
 import ca.bkaw.praeter.framework.gui.component.GuiComponent;
 import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,21 +25,30 @@ import java.util.List;
  */
 public abstract class CustomGui {
     private final CustomGuiType type;
-    private final CustomGuiRenderer renderer;
     private final ComponentMap components = new ComponentMap();
+    @Nullable
     private Inventory inventory;
+    @Nullable
     private Component currentRenderTitle;
+    @Nullable
+    private Player pendingPlayer;
 
     /**
      * Create a new {@link CustomGui} instance.
      *
      * @param type The type of custom inventory. Usually from a static constant.
-     * @param renderer The renderer to use for this custom gui.
      */
-    public CustomGui(CustomGuiType type, CustomGuiRenderer renderer) {
+    public CustomGui(CustomGuiType type) {
         this.type = type;
-        this.renderer = renderer;
-        this.create();
+        for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
+            this.createComponent(componentType);
+        }
+    }
+
+    private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
+        // This method is used in the constructor
+        // and is required for generics to line up
+        this.components.put(componentType, componentType.create());
     }
 
     /**
@@ -46,20 +57,15 @@ public abstract class CustomGui {
      * @param player The player to open the gui for.
      */
     public void show(Player player) {
-        player.openInventory(this.inventory);
-    }
-
-    private void create() {
-        for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
-            this.createComponent(componentType);
+        if (this.inventory == null) {
+            // We must set pending player to allow the getPlayers method to be populated
+            // with the player that is about to view the gui. This allows getting the
+            // correct baked resource pack.
+            this.pendingPlayer = player;
+            this.update();
+            this.pendingPlayer = null;
         }
-        this.update();
-    }
-
-    private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
-        // This method is used in the create method
-        // and is required for generics to line up
-        this.components.put(componentType, componentType.create());
+        player.openInventory(this.inventory);
     }
 
     /**
@@ -69,7 +75,8 @@ public abstract class CustomGui {
      */
     public void update() {
         // Create the title to use
-        Component renderTitle = this.renderer.getRenderTitle(this.getTitle(), this);
+        Component renderTitle = this.type.getRenderer().getRenderTitle(this.getTitle(), this);
+        System.out.println(GsonComponentSerializer.gson().serialize(renderTitle));
 
         // In case the title has changed we need to recreate the inventory
         // and open it again for all viewers
@@ -106,6 +113,26 @@ public abstract class CustomGui {
         // so this is a method
         componentType.getRenderer().renderItems(this.type, this, componentType,
             component, this.inventory);
+    }
+
+    /**
+     * Get a list of players that are viewing the gui.
+     *
+     * @return The list of playrs.
+     */
+    public List<Player> getViewers() {
+        List<Player> players = new ArrayList<>();
+        if (this.inventory != null) {
+            for (HumanEntity viewer : this.inventory.getViewers()) {
+                if (viewer instanceof Player player) {
+                    players.add(player);
+                }
+            }
+        }
+        if (this.pendingPlayer != null && !players.contains(this.pendingPlayer)) {
+            players.add(this.pendingPlayer);
+        }
+        return players;
     }
 
     /**
@@ -171,10 +198,12 @@ public abstract class CustomGui {
 
     /**
      * Get the inventory that is rendering this custom gui.
+     * <p>
+     * Will be null if the gui has not been rendered (updated) for the first time.
      *
-     * @return The inventory.
+     * @return The inventory, or null.
      */
-    @NotNull
+    @Nullable
     public Inventory getInventory() {
         return this.inventory;
     }

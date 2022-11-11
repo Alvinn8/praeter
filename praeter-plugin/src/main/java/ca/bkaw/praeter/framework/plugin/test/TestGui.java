@@ -5,6 +5,7 @@ import ca.bkaw.praeter.framework.gui.gui.CustomGuiRenderer;
 import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 import ca.bkaw.praeter.framework.gui.components.Button;
 import ca.bkaw.praeter.framework.gui.components.ToggleButton;
+import ca.bkaw.praeter.framework.resources.gui.FontGuiRenderer;
 import net.kyori.adventure.text.Component;
 
 public class TestGui extends CustomGui {
@@ -22,11 +23,12 @@ public class TestGui extends CustomGui {
     public static final CustomGuiType TYPE = CustomGuiType.builder()
         .height(6)
         .title(Component.text("Test Gui"))
+        .renderer(new FontGuiRenderer())
         .add(BUTTON_1, BUTTON_2)
         .build();
 
-    public TestGui(CustomGuiRenderer renderer) {
-        super(TYPE, renderer);
+    public TestGui() {
+        super(TYPE);
 
         get(BUTTON_2).setOnClick(event -> toggleButton2());
     }
