@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.framework.resources.pack.font;
 
+import ca.bkaw.praeter.framework.resources.bake.FontCharIdentifier;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -131,5 +132,19 @@ public class BitmapFontProvider {
         }
         json.add("chars", chars);
         return json;
+    }
+
+    /**
+     * Create a font character identifier for the font character described by this
+     * bitmap font provider.
+     *
+     * @return The identifier.
+     */
+    public FontCharIdentifier createIdentifier() {
+        if (this.chars.size() == 1 || this.chars.get(0).length() == 1) {
+            throw new IllegalStateException("Can only create a font char identifier for " +
+                    "bitmap font providers that only have one character.");
+        }
+        return new FontCharIdentifier(this.textureKey, this.height, this.ascent);
     }
 }

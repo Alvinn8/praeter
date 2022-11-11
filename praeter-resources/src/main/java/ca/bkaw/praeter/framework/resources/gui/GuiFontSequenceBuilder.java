@@ -46,15 +46,17 @@ public class GuiFontSequenceBuilder {
         }
     }
 
-    /* package-private */ FontSequence build() {
+    public FontSequence build() {
         return new FontSequence(this.fontChars);
     }
 
-    public void renderImage(NamespacedKey textureKey, int pixelX, int pixelY) throws IOException {
+    public GuiFontSequenceBuilder renderImage(NamespacedKey textureKey, int pixelX, int pixelY) throws IOException {
         // TODO x offset
         for (Font font : this.fonts) {
             BitmapFontProvider provider = new BitmapFontProvider(textureKey, pixelY, font.getNextCharAsList());
             font.addProvider(provider);
+            this.fontChars.add(provider.createIdentifier());
         }
+        return this;
     }
 }

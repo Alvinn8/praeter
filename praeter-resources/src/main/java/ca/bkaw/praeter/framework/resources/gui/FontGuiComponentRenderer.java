@@ -6,6 +6,8 @@ import ca.bkaw.praeter.framework.gui.component.GuiComponentType;
 import ca.bkaw.praeter.framework.gui.gui.CustomGui;
 import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
 
+import java.io.IOException;
+
 /**
  * A {@link GuiComponentRenderer} that renders components using custom fonts.
  * <p>
@@ -28,7 +30,7 @@ public interface FontGuiComponentRenderer<C extends GuiComponent, T extends GuiC
      * @param componentType The component type this renderer should render.
      * @param context The render setup context that can be used to use custom fonts.
      */
-    void onSetup(CustomGuiType customGuiType, T componentType, RenderSetupContext context);
+    void onSetup(CustomGuiType customGuiType, T componentType, RenderSetupContext context) throws IOException;
 
     /**
      * A method called when a component is being rendered.

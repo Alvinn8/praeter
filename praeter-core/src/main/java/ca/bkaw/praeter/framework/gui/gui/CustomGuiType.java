@@ -23,13 +23,16 @@ public class CustomGuiType {
     private final List<GuiComponentType<?, ?>> componentTypes;
     private final int height;
     private final Component title;
+    private final CustomGuiRenderer renderer;
 
     private CustomGuiType(List<GuiComponentType<?, ?>> componentTypes,
                           int height,
-                          Component title) {
+                          Component title,
+                          CustomGuiRenderer renderer) {
         this.componentTypes = ImmutableList.copyOf(componentTypes);
         this.height = height;
         this.title = title;
+        this.renderer = renderer;
     }
 
     /**
@@ -91,6 +94,7 @@ public class CustomGuiType {
         private final List<GuiComponentType<?, ?>> componentTypes = new ArrayList<>();
         private int height = 6;
         private Component title;
+        private CustomGuiRenderer renderer;
 
         private Builder() {}
 
@@ -134,13 +138,19 @@ public class CustomGuiType {
             return this;
         }
 
+        // TODO
+        public Builder renderer(CustomGuiRenderer renderer) {
+            this.renderer = renderer;
+            return this;
+        }
+
         /**
          * Create the {@link CustomGuiType} from this builder.
          *
          * @return The created {@link CustomGuiType}.
          */
         public CustomGuiType build() {
-            return new CustomGuiType(this.componentTypes, this.height, this.title);
+            return new CustomGuiType(this.componentTypes, this.height, this.title, renderer);
         }
     }
 }

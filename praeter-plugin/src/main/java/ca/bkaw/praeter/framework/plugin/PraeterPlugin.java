@@ -1,10 +1,12 @@
 package ca.bkaw.praeter.framework.plugin;
 
 import ca.bkaw.praeter.framework.gui.GuiEventListener;
+import ca.bkaw.praeter.framework.plugin.test.TestGui;
 import ca.bkaw.praeter.framework.plugin.test.TestingCommand;
 import ca.bkaw.praeter.framework.resources.PraeterResources;
 import ca.bkaw.praeter.framework.resources.ResourceManager;
 import ca.bkaw.praeter.framework.resources.bake.BakedResourcePack;
+import ca.bkaw.praeter.framework.resources.gui.FontGuiComponentRenderer;
 import ca.bkaw.praeter.framework.resources.pack.ResourcePack;
 import ca.bkaw.praeter.framework.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.framework.resources.pack.send.HttpServerResourcePackSender;

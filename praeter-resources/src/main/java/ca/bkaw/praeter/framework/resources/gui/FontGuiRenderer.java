@@ -15,6 +15,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
+
 /**
  * A {@link CustomGuiRenderer} that uses custom fonts to render the gui.
  * <p>
@@ -40,7 +42,11 @@ public class FontGuiRenderer implements CustomGuiRenderer {
     private <C extends GuiComponent, T extends GuiComponentType<C, T>> void forEachComponentType(T componentType, CustomGuiType customGuiType, RenderSetupContext context) {
         GuiComponentRenderer<C, T> renderer = componentType.getRenderer();
         if (renderer instanceof FontGuiComponentRenderer<C, T> fontComponentRenderer) {
-            fontComponentRenderer.onSetup(customGuiType, componentType, context);
+            try {
+                fontComponentRenderer.onSetup(customGuiType, componentType, context);
+            } catch (IOException e) {
+                throw new RuntimeException(e); // TODO handle errors somewhere, dont crash everything
+            }
         }
     }
 
