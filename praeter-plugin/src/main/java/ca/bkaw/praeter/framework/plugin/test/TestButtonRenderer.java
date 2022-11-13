@@ -2,13 +2,12 @@ package ca.bkaw.praeter.framework.plugin.test;
 
 import ca.bkaw.praeter.framework.gui.gui.CustomGui;
 import ca.bkaw.praeter.framework.gui.gui.CustomGuiType;
-import ca.bkaw.praeter.framework.gui.component.GuiComponentRenderer;
 import ca.bkaw.praeter.framework.gui.GuiUtils;
 import ca.bkaw.praeter.framework.gui.components.Button;
 import ca.bkaw.praeter.framework.resources.font.FontSequence;
-import ca.bkaw.praeter.framework.resources.gui.FontGuiComponentRenderer;
-import ca.bkaw.praeter.framework.resources.gui.RenderDispatcher;
-import ca.bkaw.praeter.framework.resources.gui.RenderSetupContext;
+import ca.bkaw.praeter.framework.gui.font.FontGuiComponentRenderer;
+import ca.bkaw.praeter.framework.gui.font.RenderDispatcher;
+import ca.bkaw.praeter.framework.gui.font.RenderSetupContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

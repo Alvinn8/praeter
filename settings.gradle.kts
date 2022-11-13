@@ -1,3 +1,3 @@
 rootProject.name = "praeter-parent"
 
-include("praeter-core", "praeter-resources", "praeter-plugin")
+include("praeter-core", "praeter-gui", "praeter-plugin")

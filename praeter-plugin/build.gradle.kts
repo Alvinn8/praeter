@@ -13,7 +13,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
     implementation(project(":praeter-core"))
-    implementation(project(":praeter-resources"))
+    implementation(project(":praeter-gui"))
 }
 
 tasks {

@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.resources.gui;
+package ca.bkaw.praeter.framework.gui.font;
 
 import ca.bkaw.praeter.framework.resources.bake.FontCharIdentifier;
 import ca.bkaw.praeter.framework.resources.font.FontSequence;

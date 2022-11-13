@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.framework.resources.gui;
+package ca.bkaw.praeter.framework.gui.font;
 
 import ca.bkaw.praeter.framework.gui.component.ComponentMap;
 import ca.bkaw.praeter.framework.gui.component.GuiComponent;
