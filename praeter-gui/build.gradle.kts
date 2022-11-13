@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "ca.bkaw.praeter.framework"
+group = "ca.bkaw.praeter"
 version = "0.1-SNAPSHOT"
 
 repositories {
