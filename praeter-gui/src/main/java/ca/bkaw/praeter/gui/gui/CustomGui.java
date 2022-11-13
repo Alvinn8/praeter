@@ -96,7 +96,7 @@ public abstract class CustomGui {
             // If the inventory was recreated with a new title,
             // open the new inventory for the viewers
             if (viewers != null) {
-                viewers.forEach(viewer -> viewer.openInventory(this.inventory));
+                viewers.forEach(viewer -> viewer.openInventory(this.inventory)); // TODO ConcurrentModificationException
             }
         }
 

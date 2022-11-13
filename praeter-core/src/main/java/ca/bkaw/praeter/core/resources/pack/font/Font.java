@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.core.resources.pack.font;
 
+import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
 import ca.bkaw.praeter.core.resources.pack.JsonResource;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import com.google.gson.JsonArray;
@@ -81,17 +82,23 @@ public class Font {
     public void addProvider(BitmapFontProvider provider) throws IOException {
         JsonObject json = this.fontJson.getJson();
         JsonArray providers = json.getAsJsonArray("providers");
-        for (JsonElement element : providers) {
-            JsonObject jsonObject = element.getAsJsonObject();
-            if (provider.isEqual(jsonObject)) {
-                // Great, we already had this provider!
-                System.out.println("debug: provider already exists");
-                return;
-            }
-        }
-        System.out.println("debug: adding provider");
         providers.add(provider.asJsonObject());
         this.fontJson.save();
+    }
+
+    /**
+     * Add the font character identifier by using the next free character.
+     *
+     * @param fontChar The font character to add.
+     * @throws IOException If an I/O error occurs.
+     */
+    public void addFontChar(FontCharIdentifier fontChar) throws IOException {
+        this.addProvider(new BitmapFontProvider(
+            fontChar.textureKey(),
+            fontChar.height(),
+            fontChar.ascent(),
+            this.getNextCharAsList()
+        ));
     }
 
     /**
@@ -108,7 +115,7 @@ public class Font {
             for (JsonElement element : providers) {
                 JsonArray chars = element.getAsJsonObject().getAsJsonArray("chars");
                 for (JsonElement element2 : chars) {
-                    if (element2.getAsString().indexOf(c) > 0) {
+                    if (element2.getAsString().indexOf(c) >= 0) {
                         // This character is occupied, lets increment and try again
                         i++;
                         continue freeValueLoop;
@@ -140,6 +147,7 @@ public class Font {
      * @return The key.
      * @throws IOException If an I/O error occurs while writing the texture.
      */
+    @Deprecated(forRemoval = true)
     private NamespacedKey getAlmostTransparent1x1Texture() throws IOException {
         Path path = this.pack.getPath("assets/praeter/textures/font/transparent_1.png");
         if (!Files.exists(path)) {
@@ -153,8 +161,9 @@ public class Font {
         return new NamespacedKey("praeter", "font/transparent_1.png");
     }
 
+    @Deprecated(forRemoval = true)
     private char getChar(BitmapFontProvider provider) {
-        return provider.getChars().get(0).charAt(0);
+        return provider.chars().get(0).charAt(0);
     }
 
     /**
@@ -167,6 +176,8 @@ public class Font {
      * @return The character to use.
      * @throws IOException If an I/O error occurs.
      */
+    // TODO this maybe shouldn't be here?
+    @Deprecated(forRemoval = true)
     public char negativeSpace(int pixels) throws IOException {
         BitmapFontProvider provider = new BitmapFontProvider(
             this.getAlmostTransparent1x1Texture(),

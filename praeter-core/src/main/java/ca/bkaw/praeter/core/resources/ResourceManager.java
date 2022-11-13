@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +44,43 @@ public class ResourceManager {
      */
     public List<ResourcePack> getResourcePacks(Plugin plugin) {
         return Collections.singletonList(this.mainResourcePack); // TODO
+    }
+
+    /**
+     * Get a resource that exists in all the specified packs. Or if not found, search
+     * vanilla assets too.
+     * <p>
+     * If the resource is found in one of the packs, but not another, an exception
+     * will be thrown.
+     *
+     * @param resourcePacks The resource packs to search.
+     * @param filePath The file path to search for.
+     * @return The path.
+     * @throws RuntimeException If the resource could not be found, or mismatch
+     * between the provided packs was detected.
+     */
+    @NotNull
+    public Path getResource(List<ResourcePack> resourcePacks, String filePath) {
+        Path foundPath = null;
+        for (ResourcePack resourcePack : resourcePacks) {
+            Path path = resourcePack.getPath(filePath);
+            if (Files.exists(path)) {
+                foundPath = path;
+            } else if (foundPath != null) {
+                // The resource was found in one pack, but not in another
+                throw new RuntimeException("The resource '" + filePath + "' was found in one pack, but not in another.");
+            }
+        }
+        if (foundPath != null) {
+            return foundPath;
+        }
+        // The resource was not found in the packs, lets search the vanilla assets
+        Path path = this.vanillaAssets.getPath(filePath);
+        if (Files.exists(path)) {
+            return path;
+        } else {
+            throw new RuntimeException("The resource '" + filePath + "' was not found.");
+        }
     }
 
     public ResourcePack getMainResourcePack() {
