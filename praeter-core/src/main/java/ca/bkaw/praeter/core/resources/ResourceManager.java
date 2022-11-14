@@ -2,6 +2,7 @@ package ca.bkaw.praeter.core.resources;
 
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
+import ca.bkaw.praeter.core.resources.pack.send.ResourcePackRequest;
 import ca.bkaw.praeter.core.resources.pack.send.ResourcePackSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -10,12 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The manager of resource packs.
  */
 public class ResourceManager {
+    private final Map<Player, ResourcePackRequest> pendingRequests = new HashMap<>();
     private ResourcePacksHolder packs;
     private PacksHolder<BakedResourcePack> bakedPacks;
     private ResourcePackSender resourcePackSender;
@@ -124,5 +128,15 @@ public class ResourceManager {
             this.resourcePackSender.remove();
         }
         this.resourcePackSender = resourcePackSender;
+    }
+
+    /**
+     * Get the mutable map of pending resource pack requests.
+     *
+     * @return The map.
+     */
+    @ApiStatus.Internal
+    public Map<Player, ResourcePackRequest> getPendingRequests() {
+        return this.pendingRequests;
     }
 }

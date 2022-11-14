@@ -48,8 +48,8 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
         Praeter.get().setLogger(this.getLogger());
 
         this.setupDirectories();
-        this.setupVanillaAssets();
         this.setupMainResourcePack();
+        this.setupVanillaAssets();
         this.setupResourcePackSender();
 
         // Bake the packs right before startup, after plugins have loaded

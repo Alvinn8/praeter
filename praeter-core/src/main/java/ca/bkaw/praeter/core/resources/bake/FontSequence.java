@@ -1,9 +1,6 @@
-package ca.bkaw.praeter.core.resources.font;
+package ca.bkaw.praeter.core.resources.bake;
 
-import ca.bkaw.praeter.core.resources.bake.BakedFontChar;
 import ca.bkaw.praeter.core.resources.MissingAssetException;
-import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
-import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Unmodifiable;

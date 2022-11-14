@@ -1,6 +1,6 @@
 package ca.bkaw.praeter.plugin.test;
 
-import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.core.resources.bake.FontSequence;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.font.FontGuiComponentRenderer;
 import ca.bkaw.praeter.gui.font.GuiFontSequenceBuilder;

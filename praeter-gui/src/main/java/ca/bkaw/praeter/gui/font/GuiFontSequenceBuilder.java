@@ -2,7 +2,7 @@ package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
-import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.core.resources.bake.FontSequence;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.font.Font;
 import org.bukkit.NamespacedKey;
@@ -59,7 +59,7 @@ public class GuiFontSequenceBuilder {
     private GuiFontSequenceBuilder renderImageRaw(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
         // TODO x offset
 
-        int ascent = offsetY;
+        int ascent = -offsetY;
 
         // Read the texture
         Path texturePath = Praeter.get().getResourceManager().getPacks().getResource(
