@@ -1,6 +1,6 @@
 package ca.bkaw.praeter.gui.font;
 
-import ca.bkaw.praeter.core.resources.PraeterResources;
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
@@ -62,7 +62,7 @@ public class GuiFontSequenceBuilder {
         int ascent = offsetY;
 
         // Read the texture
-        Path texturePath = PraeterResources.get().getResourceManager().getResource(
+        Path texturePath = Praeter.get().getResourceManager().getPacks().getResource(
             this.resourcePacks,
             "assets/" + textureKey.getNamespace() + "/textures/" + textureKey.getKey()
         );

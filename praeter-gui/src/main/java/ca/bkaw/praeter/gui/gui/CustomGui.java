@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.gui.gui;
 
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
@@ -76,13 +77,13 @@ public abstract class CustomGui {
     public void update() {
         // Create the title to use
         Component renderTitle = this.type.getRenderer().getRenderTitle(this.getTitle(), this);
-        System.out.println(GsonComponentSerializer.gson().serialize(renderTitle));
+        Praeter.get().getLogger().info(GsonComponentSerializer.gson().serialize(renderTitle)); // TODO debug code
 
         // In case the title has changed we need to recreate the inventory
         // and open it again for all viewers
         List<HumanEntity> viewers = null;
         if (!renderTitle.equals(this.currentRenderTitle) && this.inventory != null) {
-            viewers = this.inventory.getViewers();
+            viewers = new ArrayList<>(this.inventory.getViewers());
             this.inventory = null;
         }
 
@@ -96,7 +97,7 @@ public abstract class CustomGui {
             // If the inventory was recreated with a new title,
             // open the new inventory for the viewers
             if (viewers != null) {
-                viewers.forEach(viewer -> viewer.openInventory(this.inventory)); // TODO ConcurrentModificationException
+                viewers.forEach(viewer -> viewer.openInventory(this.inventory));
             }
         }
 

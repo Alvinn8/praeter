@@ -1,9 +1,11 @@
 package ca.bkaw.praeter.plugin;
 
+import ca.bkaw.praeter.core.resources.PacksHolder;
+import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.gui.GuiEventListener;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;
-import ca.bkaw.praeter.core.resources.PraeterResources;
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.ResourceManager;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
@@ -43,6 +45,8 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
 
+        Praeter.get().setLogger(this.getLogger());
+
         this.setupDirectories();
         this.setupVanillaAssets();
         this.setupMainResourcePack();
@@ -73,10 +77,10 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
 
     private void setupVanillaAssets() {
         // TODO only do this setup if praeter-resources is actually used?
-        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
         Path vanillaAssetsPath = this.resourcePacksFolder.resolve("vanilla.zip");
         try {
-            resourceManager.setVanillaAssets(VanillaAssets.readOrExtract(vanillaAssetsPath));
+            resourceManager.getPacks().setVanillaAssets(VanillaAssets.readOrExtract(vanillaAssetsPath));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read or extract vanilla assets.", e);
         }
@@ -84,7 +88,7 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
 
     private void setupMainResourcePack() {
         this.getLogger().info("Setting up resource packs");
-        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
         Path path = this.resourcePacksFolder.resolve("main.zip");
         ResourcePack mainResourcePack;
         try {
@@ -94,11 +98,12 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
         } catch (IOException e) {
             throw new RuntimeException("Failed to set up the main resource pack.", e);
         }
-        resourceManager.setMainResourcePack(mainResourcePack);
+        ResourcePacksHolder holder = new ResourcePacksHolder(mainResourcePack);
+        resourceManager.setPacks(holder);
     }
 
     private void setupResourcePackSender() {
-        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
         try {
             resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
         } catch (IOException e) {
@@ -108,16 +113,18 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
 
     private void bakePacks() {
         this.getLogger().info("Baking and closing packs");
-        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
-        ResourcePack pack = resourceManager.getMainResourcePack();
-        resourceManager.setMainResourcePack(null);
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
+        // Get the packs before removing the PacksHolder
+        ResourcePack pack = resourceManager.getPacks().getMain();
+        ResourcePack vanillaAssets = resourceManager.getPacks().getVanillaAssets();
+        // Remove the PacksHolder for resource packs
+        resourceManager.setPacks(null);
 
         try {
-            resourceManager.getVanillaAssets().getRoot().getFileSystem().close();
+            vanillaAssets.getRoot().getFileSystem().close();
         } catch (Throwable e) {
             throw new RuntimeException("Failed to close vanilla assets.", e);
         }
-        resourceManager.setVanillaAssets(null);
 
         BakedResourcePack baked;
         try {
@@ -125,7 +132,9 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
         } catch (Throwable e) {
             throw new RuntimeException("Failed to bake main resource pack.", e);
         }
-        resourceManager.setMainBakedResourcePack(baked);
+
+        // Create the PacksHolder for baked resource packs
+        resourceManager.setBakedPacks(new PacksHolder<>(baked));
 
         try {
             pack.getRoot().getFileSystem().close();
@@ -141,9 +150,9 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
         this.getServer().getScheduler().runTaskLater(this, () -> {
-            ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+            ResourceManager resourceManager = Praeter.get().getResourceManager();
             resourceManager.getResourcePackSender().send(
-                resourceManager.getMainBakedResourcePack(),
+                resourceManager.getBakedPacks().getMain(),
                 player,
                 true,
                 Component.text("Please accept the resource pack to see custom additions to the game.")

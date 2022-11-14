@@ -1,23 +1,23 @@
 package ca.bkaw.praeter.core.resources;
 
-import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
+import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.send.ResourcePackSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-// TODO
+/**
+ * The manager of resource packs.
+ */
 public class ResourceManager {
-    // TODO
-    private ResourcePack mainResourcePack;
-    private ResourcePack vanillaAssets;
-    private BakedResourcePack mainBakedResourcePack;
+    private ResourcePacksHolder packs;
+    private PacksHolder<BakedResourcePack> bakedPacks;
     private ResourcePackSender resourcePackSender;
 
     /**
@@ -30,7 +30,7 @@ public class ResourceManager {
     @NotNull
     public BakedResourcePack getBakedResourcePack(Player player) {
         if (player.hasResourcePack()) {
-            return this.mainBakedResourcePack;
+            return this.bakedPacks.getMain();
         }
         throw new IllegalArgumentException("The player does not have a resource pack in " +
             "this world.");
@@ -43,75 +43,83 @@ public class ResourceManager {
      * @return The list of resource packs.
      */
     public List<ResourcePack> getResourcePacks(Plugin plugin) {
-        return Collections.singletonList(this.mainResourcePack); // TODO
+        return Collections.singletonList(this.packs.getMain()); // TODO
     }
 
     /**
-     * Get a resource that exists in all the specified packs. Or if not found, search
-     * vanilla assets too.
+     * Get the {@link ResourcePacksHolder} that contains the resource packs.
      * <p>
-     * If the resource is found in one of the packs, but not another, an exception
-     * will be thrown.
+     * It is only possible to get the resource packs during startup. After startup, the
+     * packs are baked.
      *
-     * @param resourcePacks The resource packs to search.
-     * @param filePath The file path to search for.
-     * @return The path.
-     * @throws RuntimeException If the resource could not be found, or mismatch
-     * between the provided packs was detected.
+     * @return The {@link ResourcePacksHolder}.
      */
     @NotNull
-    public Path getResource(List<ResourcePack> resourcePacks, String filePath) {
-        Path foundPath = null;
-        for (ResourcePack resourcePack : resourcePacks) {
-            Path path = resourcePack.getPath(filePath);
-            if (Files.exists(path)) {
-                foundPath = path;
-            } else if (foundPath != null) {
-                // The resource was found in one pack, but not in another
-                throw new RuntimeException("The resource '" + filePath + "' was found in one pack, but not in another.");
-            }
+    public ResourcePacksHolder getPacks() {
+        if (this.packs == null) {
+            throw new IllegalStateException("Packs are only accessible during startup.");
         }
-        if (foundPath != null) {
-            return foundPath;
+        return this.packs;
+    }
+
+    /**
+     * Get the {@link PacksHolder} that contains the baked resource packs.
+     * <p>
+     * It is only possible to get the baked resource packs after startup. Before that,
+     * the packs have not been baked yet.
+     *
+     * @return The {@link PacksHolder}.
+     */
+    @NotNull
+    public PacksHolder<BakedResourcePack> getBakedPacks() {
+        if (this.bakedPacks == null) {
+            throw new IllegalStateException("Packs have not been baked yet.");
         }
-        // The resource was not found in the packs, lets search the vanilla assets
-        Path path = this.vanillaAssets.getPath(filePath);
-        if (Files.exists(path)) {
-            return path;
-        } else {
-            throw new RuntimeException("The resource '" + filePath + "' was not found.");
-        }
+        return this.bakedPacks;
     }
 
-    public ResourcePack getMainResourcePack() {
-        return mainResourcePack;
+    /**
+     * Set the {@link ResourcePacksHolder} for resource packs.
+     *
+     * @param packs The holder.
+     */
+    @ApiStatus.Internal
+    public void setPacks(@Nullable ResourcePacksHolder packs) {
+        this.packs = packs;
     }
 
-    public BakedResourcePack getMainBakedResourcePack() {
-        return mainBakedResourcePack;
+    /**
+     * Set the {@link PacksHolder} for baked resource packs.
+     *
+     * @param bakedPacks The holder.
+     */
+    @ApiStatus.Internal
+    public void setBakedPacks(@Nullable PacksHolder<BakedResourcePack> bakedPacks) {
+        this.bakedPacks = bakedPacks;
     }
 
-    public ResourcePack getVanillaAssets() {
-        return vanillaAssets;
-    }
-
-    public void setMainResourcePack(ResourcePack mainResourcePack) {
-        this.mainResourcePack = mainResourcePack;
-    }
-
-    public void setVanillaAssets(ResourcePack vanillaAssets) {
-        this.vanillaAssets = vanillaAssets;
-    }
-
-    public void setMainBakedResourcePack(BakedResourcePack mainBakedResourcePack) {
-        this.mainBakedResourcePack = mainBakedResourcePack;
-    }
-
+    /**
+     * Get the {@link ResourcePackSender}.
+     *
+     * @return The resource pack sender.
+     */
+    @NotNull
     public ResourcePackSender getResourcePackSender() {
+        if (this.resourcePackSender == null) {
+            throw new RuntimeException("No resource pack sender has been set.");
+        }
         return this.resourcePackSender;
     }
 
-    public void setResourcePackSender(ResourcePackSender resourcePackSender) {
+    /**
+     * Set the {@link ResourcePackSender} to use on the server.
+     * <p>
+     * If a resource pack sender previously was set, the
+     * {@link ResourcePackSender#remove()} method will be called on that instance.
+     *
+     * @param resourcePackSender The resource pack sender.
+     */
+    public void setResourcePackSender(@NotNull ResourcePackSender resourcePackSender) {
         if (this.resourcePackSender != null) {
             this.resourcePackSender.remove();
         }

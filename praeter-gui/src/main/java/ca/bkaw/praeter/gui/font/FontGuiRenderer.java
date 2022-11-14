@@ -8,7 +8,7 @@ import ca.bkaw.praeter.gui.component.ItemGuiComponentRenderer;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiRenderer;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
-import ca.bkaw.praeter.core.resources.PraeterResources;
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.ResourceManager;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
@@ -32,7 +32,7 @@ public class FontGuiRenderer implements CustomGuiRenderer {
 
     @Override
     public void onSetup(CustomGuiType customGuiType) {
-        List<ResourcePack> resourcePacks = PraeterResources.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
+        List<ResourcePack> resourcePacks = Praeter.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
         RenderSetupContext context = new RenderSetupContext(resourcePacks);
 
         for (GuiComponentType<?, ?> componentType : customGuiType.getComponentTypes()) {
@@ -55,7 +55,7 @@ public class FontGuiRenderer implements CustomGuiRenderer {
     @Override
     public Component getRenderTitle(Component title, CustomGui customGui) {
         BakedResourcePack bakedResourcePack = null;
-        ResourceManager resourceManager = PraeterResources.get().getResourceManager();
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
         for (Player viewer : customGui.getViewers()) {
             BakedResourcePack playerPack = resourceManager.getBakedResourcePack(viewer);
             if (bakedResourcePack == null) {

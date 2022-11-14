@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.core.resources.pack.send;
 
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -32,9 +33,8 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
     public HttpServerResourcePackSender() throws IOException {
         this.server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
         this.server.start();
-        // TODO logger
-        System.out.println("Started an HTTP Server on port " + PORT + " that will send " +
-            "resource packs to players.");
+        Praeter.get().getLogger().info("Started an HTTP Server on port " + PORT + " that" +
+                "will send resource packs to players.");
     }
 
     @Override

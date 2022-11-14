@@ -1,6 +1,6 @@
 package ca.bkaw.praeter.core.resources.pack;
 
-import ca.bkaw.praeter.core.resources.PraeterResources;
+import ca.bkaw.praeter.core.Praeter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -108,7 +108,7 @@ public class ResourcePack extends Pack {
         Path path = this.getModelPath(vanillaModel);
         if (!Files.exists(path)) {
             // Copy from vanilla assets
-            ResourcePack vanillaAssets = PraeterResources.get().getResourceManager().getVanillaAssets();
+            ResourcePack vanillaAssets = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
             Path vanillaPath = vanillaAssets.getModelPath(vanillaModel);
             if (!Files.exists(vanillaPath)) {
                 throw new IllegalArgumentException("The model " + vanillaModel + " was not found in the vanilla resource pack.");
