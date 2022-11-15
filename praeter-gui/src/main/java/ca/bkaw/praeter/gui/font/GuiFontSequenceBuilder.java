@@ -56,8 +56,12 @@ public class GuiFontSequenceBuilder {
         return new FontSequence(this.fontChars);
     }
 
+    public void shiftLeft(int pixels) {}
+
+    public void shiftRight(int pixels) {}
+
     private GuiFontSequenceBuilder renderImageRaw(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
-        // TODO x offset
+        this.shiftRight(offsetX);
 
         int ascent = -offsetY;
 
@@ -112,6 +116,10 @@ public class GuiFontSequenceBuilder {
         for (Font font : this.fonts) {
             font.addFontChar(fontChar);
         }
+
+        int width = 0; // TODO determine the effective width
+        this.shiftLeft(offsetX + width);
+
         return this;
     }
 

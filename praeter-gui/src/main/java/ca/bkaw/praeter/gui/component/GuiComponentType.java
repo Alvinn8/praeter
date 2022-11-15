@@ -54,19 +54,38 @@ public abstract class GuiComponentType<C extends GuiComponent, T extends GuiComp
         return this.renderer;
     }
 
-    // todo javadoc
+    /**
+     * Get the x coordinate, measured in slots from the top left.
+     *
+     * @return The coordinate.
+     */
     public int getX() {
         return this.x;
     }
 
+    /**
+     * Get the y coordinate, measured in slots from the top left.
+     *
+     * @return The coordinate.
+     */
     public int getY() {
         return this.y;
     }
 
+    /**
+     * Get the width of the component, measured in slots.
+     *
+     * @return The width.
+     */
     public int getWidth() {
         return this.width;
     }
 
+    /**
+     * Get the height of the component, measured in slots.
+     *
+     * @return The height.
+     */
     public int getHeight() {
         return this.height;
     }
