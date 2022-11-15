@@ -20,6 +20,7 @@ import java.util.Map;
  */
 public class ResourceManager {
     private final Map<Player, ResourcePackRequest> pendingRequests = new HashMap<>();
+    private final Map<Player, BakedResourcePack> appliedPacks = new HashMap<>();
     private ResourcePacksHolder packs;
     private PacksHolder<BakedResourcePack> bakedPacks;
     private ResourcePackSender resourcePackSender;
@@ -33,11 +34,7 @@ public class ResourceManager {
      */
     @NotNull
     public BakedResourcePack getBakedResourcePack(Player player) {
-        if (player.hasResourcePack()) {
-            return this.bakedPacks.getMain();
-        }
-        throw new IllegalArgumentException("The player does not have a resource pack in " +
-            "this world.");
+        return this.appliedPacks.get(player);
     }
 
     /**
@@ -138,5 +135,15 @@ public class ResourceManager {
     @ApiStatus.Internal
     public Map<Player, ResourcePackRequest> getPendingRequests() {
         return this.pendingRequests;
+    }
+
+    /**
+     * Get the mutable map of applied resource packs.
+     *
+     * @return The map.
+     */
+    @ApiStatus.Internal
+    public Map<Player, BakedResourcePack> getAppliedPacks() {
+        return appliedPacks;
     }
 }

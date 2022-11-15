@@ -1,8 +1,10 @@
 package ca.bkaw.praeter.core.resources;
 
 import ca.bkaw.praeter.core.resources.pack.send.ResourcePackRequest;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 /**
@@ -17,21 +19,30 @@ public class ResourceEventListener implements Listener {
 
     @EventHandler
     public void onPlayerResourcePackStatus(PlayerResourcePackStatusEvent event) {
-        ResourcePackRequest resourcePackRequest = this.resourceManager.getPendingRequests().get(event.getPlayer());
-        if (resourcePackRequest == null) {
+        Player player = event.getPlayer();
+        ResourcePackRequest request = this.resourceManager.getPendingRequests().get(player);
+        if (request == null) {
             return;
         }
 
         switch (event.getStatus()) {
             case FAILED_DOWNLOAD -> {
-                if (!resourcePackRequest.isSecondAttempt()) {
+                if (!request.isSecondAttempt()) {
                     // If the second attempt has not been attempted, send the pack again.
                     // This works around a bug, see ResourcePackRequest.
-                    resourcePackRequest.resend();
+                    request.resend();
                 }
             }
-            case SUCCESSFULLY_LOADED, DECLINED ->
-                this.resourceManager.getPendingRequests().remove(event.getPlayer());
+            case SUCCESSFULLY_LOADED -> {
+                this.resourceManager.getAppliedPacks().put(player, request.getResourcePack());
+                this.resourceManager.getPendingRequests().remove(player);
+            }
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        this.resourceManager.getPendingRequests().remove(event.getPlayer());
+        this.resourceManager.getAppliedPacks().remove(event.getPlayer());
     }
 }
