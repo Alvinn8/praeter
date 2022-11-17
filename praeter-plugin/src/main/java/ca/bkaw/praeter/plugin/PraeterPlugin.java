@@ -12,6 +12,7 @@ import ca.bkaw.praeter.core.resources.pack.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -52,8 +53,9 @@ public class PraeterPlugin extends JavaPlugin {
         this.getServer().getScheduler().runTaskLater(this, this::bakePacks, 1L);
 
         // Register event listeners
-        this.getServer().getPluginManager().registerEvents(new GuiEventListener(), this);
-        this.getServer().getPluginManager().registerEvents(new ResourceEventListener(Praeter.get().getResourceManager()), this);
+        PluginManager pluginManager = this.getServer().getPluginManager();
+        pluginManager.registerEvents(new GuiEventListener(), this);
+        pluginManager.registerEvents(new ResourceEventListener(Praeter.get().getResourceManager(), this), this);
 
         // Testing
         // Register testing command

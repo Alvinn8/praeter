@@ -1,24 +1,25 @@
 package ca.bkaw.praeter.core.resources;
 
-import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.pack.send.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.plugin.Plugin;
 
 /**
  * The event listener for resource the resource pack manager.
  */
 public class ResourceEventListener implements Listener {
     private final ResourceManager resourceManager;
+    private final Plugin plugin;
 
-    public ResourceEventListener(ResourceManager resourceManager) {
+    public ResourceEventListener(ResourceManager resourceManager, Plugin plugin) {
         this.resourceManager = resourceManager;
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -48,15 +49,14 @@ public class ResourceEventListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        // TODO
-        player.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("Praeter"), () -> {
+        player.getServer().getScheduler().runTaskLater(this.plugin, () ->
             this.resourceManager.getResourcePackSender().send(
                 this.resourceManager.getBakedPacks().getMain(),
                 player,
                 true,
                 Component.text("Please accept the resource pack to see custom additions to the game.")
-            );
-        }, 20L);
+            )
+        , 20L);
     }
 
     @EventHandler
