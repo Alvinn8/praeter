@@ -1,6 +1,5 @@
-package ca.bkaw.praeter.core.resources.pack.font;
+package ca.bkaw.praeter.core.resources.font;
 
-import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
 import ca.bkaw.praeter.core.resources.pack.JsonResource;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import com.google.gson.JsonArray;
@@ -25,6 +24,7 @@ public class Font {
     private final ResourcePack pack;
     private final NamespacedKey key;
     private final JsonResource fontJson;
+    private SpaceFontProvider spaceProvider;
 
     /**
      * Load a font by namespaced key.
@@ -74,12 +74,12 @@ public class Font {
     }
 
     /**
-     * Add the specified bitmap font provider to this font.
+     * Add the specified font provider to this font.
      *
      * @param provider The provider.
      * @throws IOException If an I/O error occurs.
      */
-    public void addProvider(BitmapFontProvider provider) throws IOException {
+    public void addProvider(FontProvider provider) throws IOException {
         JsonObject json = this.fontJson.getJson();
         JsonArray providers = json.getAsJsonArray("providers");
         providers.add(provider.asJsonObject());
@@ -87,18 +87,36 @@ public class Font {
     }
 
     /**
-     * Add the font character identifier by using the next free character.
+     * Add the bitmap font character identifier by using the next free character.
      *
-     * @param fontChar The font character to add.
+     * @param bitmapFontChar The font character to add.
      * @throws IOException If an I/O error occurs.
      */
-    public void addFontChar(FontCharIdentifier fontChar) throws IOException {
+    public void addFontChar(BitmapFontCharIdentifier bitmapFontChar) throws IOException {
+        // TODO identify if its already present
         this.addProvider(new BitmapFontProvider(
-            fontChar.textureKey(),
-            fontChar.height(),
-            fontChar.ascent(),
+            bitmapFontChar.textureKey(),
+            bitmapFontChar.height(),
+            bitmapFontChar.ascent(),
             this.getNextCharAsList()
         ));
+    }
+
+    /**
+     * Add a new space font character by using the next free character.
+     *
+     * @param spaceFontChar The font character to add.
+     * @throws IOException If an I/O error occurs.
+     */
+    public void addFontChar(SpaceFontCharIdentifier spaceFontChar) throws IOException {
+        char c = this.getNextChar();
+        int advance = spaceFontChar.advance();
+        if (this.spaceProvider == null) {
+            this.spaceProvider = new SpaceFontProvider();
+            this.addProvider(this.spaceProvider);
+        }
+        this.spaceProvider.add(c, advance);
+        this.fontJson.save();
     }
 
     /**
@@ -113,12 +131,25 @@ public class Font {
         while (true) {
             char c = (char) i;
             for (JsonElement element : providers) {
-                JsonArray chars = element.getAsJsonObject().getAsJsonArray("chars");
-                for (JsonElement element2 : chars) {
-                    if (element2.getAsString().indexOf(c) >= 0) {
-                        // This character is occupied, lets increment and try again
-                        i++;
-                        continue freeValueLoop;
+                JsonObject provider = element.getAsJsonObject();
+                switch (provider.get("type").getAsString()) {
+                    case "bitmap" -> {
+                        JsonArray chars = provider.getAsJsonArray("chars");
+                        for (JsonElement element2 : chars) {
+                            if (element2.getAsString().indexOf(c) >= 0) {
+                                // This character is occupied, lets increment and try again
+                                i++;
+                                continue freeValueLoop;
+                            }
+                        }
+                    }
+                    case "space" -> {
+                        JsonObject advances = provider.getAsJsonObject("advances");
+                        if (advances.has(String.valueOf(c))) {
+                            // This character is occupied, lets increment and try again
+                            i++;
+                            continue freeValueLoop;
+                        }
                     }
                 }
             }

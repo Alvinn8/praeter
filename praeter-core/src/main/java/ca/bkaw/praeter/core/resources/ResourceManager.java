@@ -2,8 +2,8 @@ package ca.bkaw.praeter.core.resources;
 
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
-import ca.bkaw.praeter.core.resources.pack.send.ResourcePackRequest;
-import ca.bkaw.praeter.core.resources.pack.send.ResourcePackSender;
+import ca.bkaw.praeter.core.resources.send.ResourcePackRequest;
+import ca.bkaw.praeter.core.resources.send.ResourcePackSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;

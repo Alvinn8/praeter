@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.core.resources.pack.font;
+package ca.bkaw.praeter.core.resources.font;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,7 +23,7 @@ public record BitmapFontProvider(
     int height,
     int ascent,
     List<String> chars
-) {
+) implements FontProvider {
     public static final int DEFAULT_HEIGHT = 8;
 
     public BitmapFontProvider {
@@ -72,6 +72,7 @@ public record BitmapFontProvider(
      *
      * @return The json object.
      */
+    @Override
     public JsonObject asJsonObject() {
         JsonObject json = new JsonObject();
         json.addProperty("type", "bitmap");

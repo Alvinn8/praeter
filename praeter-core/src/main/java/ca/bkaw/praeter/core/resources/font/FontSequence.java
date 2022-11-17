@@ -1,9 +1,10 @@
-package ca.bkaw.praeter.core.resources.bake;
+package ca.bkaw.praeter.core.resources.font;
 
 import ca.bkaw.praeter.core.resources.MissingAssetException;
+import ca.bkaw.praeter.core.resources.bake.BakedFontChar;
+import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @param fontChars The immutable list of font characters.
  */
-public record FontSequence(@Unmodifiable List<FontCharIdentifier> fontChars) {
+public record FontSequence(List<FontCharIdentifier> fontChars) {
     /**
      * Create a new {@link FontSequence} from a list of font character identifiers
      * that will be copied to an immutable list.

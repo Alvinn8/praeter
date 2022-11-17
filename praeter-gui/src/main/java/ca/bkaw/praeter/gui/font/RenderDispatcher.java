@@ -1,7 +1,7 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
-import ca.bkaw.praeter.core.resources.bake.FontSequence;
+import ca.bkaw.praeter.core.resources.font.FontSequence;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

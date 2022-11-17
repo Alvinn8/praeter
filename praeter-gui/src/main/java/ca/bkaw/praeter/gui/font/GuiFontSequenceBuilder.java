@@ -1,10 +1,12 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
-import ca.bkaw.praeter.core.resources.bake.FontCharIdentifier;
-import ca.bkaw.praeter.core.resources.bake.FontSequence;
+import ca.bkaw.praeter.core.resources.font.BitmapFontCharIdentifier;
+import ca.bkaw.praeter.core.resources.font.FontCharIdentifier;
+import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.core.resources.font.SpaceFontCharIdentifier;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
-import ca.bkaw.praeter.core.resources.pack.font.Font;
+import ca.bkaw.praeter.core.resources.font.Font;
 import org.bukkit.NamespacedKey;
 
 import javax.imageio.ImageIO;
@@ -56,9 +58,18 @@ public class GuiFontSequenceBuilder {
         return new FontSequence(this.fontChars);
     }
 
-    public void shiftLeft(int pixels) {}
+    // todo javadoc
+    public void shiftLeft(int pixels) throws IOException {
+        this.shiftRight(-pixels);
+    }
 
-    public void shiftRight(int pixels) {}
+    public void shiftRight(int pixels) throws IOException {
+        SpaceFontCharIdentifier fontChar = new SpaceFontCharIdentifier(pixels);
+        for (Font font : this.fonts) {
+            font.addFontChar(fontChar);
+        }
+        this.fontChars.add(fontChar);
+    }
 
     private GuiFontSequenceBuilder renderImageRaw(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
         this.shiftRight(offsetX);
@@ -111,16 +122,40 @@ public class GuiFontSequenceBuilder {
         }
 
         // Add the font character to the fonts
-        FontCharIdentifier fontChar = new FontCharIdentifier(textureKey, size, ascent);
+        BitmapFontCharIdentifier fontChar = new BitmapFontCharIdentifier(textureKey, size, ascent);
         this.fontChars.add(fontChar);
         for (Font font : this.fonts) {
             font.addFontChar(fontChar);
         }
 
-        int width = 0; // TODO determine the effective width
-        this.shiftLeft(offsetX + width);
+        // Shift back, and the image had an effective width we need to move back by,
+        // and an additional 2 pixels for the single-pixel-wide space before and after
+        // the character.
+        this.shiftLeft(offsetX + this.getEffectiveWidth(image) + 1);
 
         return this;
+    }
+
+    /**
+     * Get the effective width of the image, the width the game will advance the text
+     * "cursor" by.
+     *
+     * @param image The image.
+     * @return The effective width.
+     */
+    private int getEffectiveWidth(BufferedImage image) {
+        // Don't count transparent columns to the right
+        int x;
+        for (x = image.getWidth() - 1; x >= 0; x--) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int argb = image.getRGB(x, y);
+                int alpha = argb & 0xFF000000;
+                if (alpha != 0) {
+                    return x + 1;
+                }
+            }
+        }
+        return x + 1;
     }
 
     public GuiFontSequenceBuilder renderImage(NamespacedKey textureKey, int pixelX, int pixelY) throws IOException {

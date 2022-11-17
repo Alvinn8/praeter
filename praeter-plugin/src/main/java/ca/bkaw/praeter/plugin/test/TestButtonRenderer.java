@@ -4,7 +4,7 @@ import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.components.Button;
-import ca.bkaw.praeter.core.resources.bake.FontSequence;
+import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.gui.font.FontGuiComponentRenderer;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;

@@ -1,4 +1,4 @@
-package ca.bkaw.praeter.core.resources.pack.send;
+package ca.bkaw.praeter.core.resources.send;
 
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import net.kyori.adventure.text.Component;

@@ -8,7 +8,7 @@ import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
-import ca.bkaw.praeter.core.resources.pack.send.HttpServerResourcePackSender;
+import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;

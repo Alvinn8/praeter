@@ -1,6 +1,6 @@
 package ca.bkaw.praeter.core.resources;
 
-import ca.bkaw.praeter.core.resources.pack.send.ResourcePackRequest;
+import ca.bkaw.praeter.core.resources.send.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,8 +30,9 @@ public class ResourceEventListener implements Listener {
             return;
         }
 
+        System.out.println("event.getStatus() = " + event.getStatus());
         switch (event.getStatus()) {
-            case FAILED_DOWNLOAD -> {
+            case FAILED_DOWNLOAD, DECLINED -> {
                 if (!request.isSecondAttempt()) {
                     // If the second attempt has not been attempted, send the pack again.
                     // This works around a bug, see ResourcePackRequest.
@@ -41,6 +42,8 @@ public class ResourceEventListener implements Listener {
             case SUCCESSFULLY_LOADED -> {
                 this.resourceManager.getAppliedPacks().put(player, request.getResourcePack());
                 this.resourceManager.getPendingRequests().remove(player);
+
+                System.out.println("adding (size: " + this.resourceManager.getAppliedPacks().size() + ")");
             }
         }
     }
@@ -63,5 +66,6 @@ public class ResourceEventListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         this.resourceManager.getPendingRequests().remove(event.getPlayer());
         this.resourceManager.getAppliedPacks().remove(event.getPlayer());
+        System.out.println("removing (size: " + this.resourceManager.getAppliedPacks().size() + ")");
     }
 }

@@ -1,5 +1,8 @@
 package ca.bkaw.praeter.core.resources.bake;
 
+import ca.bkaw.praeter.core.resources.font.BitmapFontCharIdentifier;
+import ca.bkaw.praeter.core.resources.font.FontCharIdentifier;
+import ca.bkaw.praeter.core.resources.font.SpaceFontCharIdentifier;
 import ca.bkaw.praeter.core.resources.pack.JsonResource;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import com.google.common.collect.ImmutableMap;
@@ -135,28 +138,43 @@ public class BakedResourcePack {
                         JsonResource jsonResource = new JsonResource(pack, path);
                         for (JsonElement element : jsonResource.getJson().getAsJsonArray("providers")) {
                             JsonObject provider = element.getAsJsonObject();
-                            if (!"bitmap".equals(provider.get("type").getAsString())) {
-                                continue;
-                            }
-                            JsonArray chars = provider.getAsJsonArray("chars");
-                            if (chars.size() != 1) {
-                                continue;
-                            }
-                            String charString = chars.get(0).getAsString();
-                            if (charString.length() != 1) {
-                                continue;
-                            }
-                            int ascent = provider.get("ascent").getAsInt();
-                            Integer height = provider.has("height") ? provider.get("height").getAsInt() : null;
-                            NamespacedKey textureKey = NamespacedKey.fromString(provider.get("file").getAsString());
 
                             String namespace = namespacePath.getFileName().toString();
                             String fontName = path.getFileName().toString();
                             fontName = fontName.substring(0, fontName.length() - ".json".length());
                             NamespacedKey fontKey = new NamespacedKey(namespace, fontName);
 
-                            FontCharIdentifier identifier = new FontCharIdentifier(textureKey, height, ascent);
-                            fontChars.put(identifier, new BakedFontChar(fontKey, charString.charAt(0)));
+                            switch (provider.get("type").getAsString()) {
+                                case "bitmap" -> {
+                                    JsonArray chars = provider.getAsJsonArray("chars");
+                                    if (chars.size() != 1) {
+                                        continue;
+                                    }
+                                    String charString = chars.get(0).getAsString();
+                                    if (charString.length() != 1) {
+                                        continue;
+                                    }
+                                    int ascent = provider.get("ascent").getAsInt();
+                                    Integer height = provider.has("height") ? provider.get("height").getAsInt() : null;
+                                    NamespacedKey textureKey = NamespacedKey.fromString(provider.get("file").getAsString());
+
+                                    BitmapFontCharIdentifier identifier = new BitmapFontCharIdentifier(textureKey, height, ascent);
+                                    fontChars.put(identifier, new BakedFontChar(fontKey, charString.charAt(0)));
+                                }
+                                case "space" -> {
+                                    JsonObject advances = provider.getAsJsonObject("advances");
+                                    for (Map.Entry<String, JsonElement> entry : advances.entrySet()) {
+                                        String charStr = entry.getKey();
+                                        if (charStr.length() != 1) {
+                                            continue;
+                                        }
+                                        int advance = entry.getValue().getAsInt();
+
+                                        SpaceFontCharIdentifier identifier = new SpaceFontCharIdentifier(advance);
+                                        fontChars.put(identifier, new BakedFontChar(fontKey, charStr.charAt(0)));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
