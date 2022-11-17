@@ -54,7 +54,16 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
                 throw new RuntimeException(e);
             }
 
-            player.setResourcePack("http://localhost:" + PORT + path, hash, prompt, required);
+            ResourcePackRequest request = new ResourcePackRequest(
+                    player,
+                    resourcePack,
+                    Praeter.get().getResourceManager(),
+                    "http://localhost:" + PORT + path,
+                    hash,
+                    required,
+                    prompt
+            );
+            request.send();
         } else {
             throw new IllegalArgumentException("Can not send the specified pack.");
         }

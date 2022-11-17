@@ -1,21 +1,17 @@
 package ca.bkaw.praeter.plugin;
 
-import ca.bkaw.praeter.core.resources.PacksHolder;
-import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
-import ca.bkaw.praeter.gui.GuiEventListener;
-import ca.bkaw.praeter.plugin.test.TestGui;
-import ca.bkaw.praeter.plugin.test.TestingCommand;
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.PacksHolder;
+import ca.bkaw.praeter.core.resources.ResourceEventListener;
 import ca.bkaw.praeter.core.resources.ResourceManager;
+import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.core.resources.pack.send.HttpServerResourcePackSender;
-import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import ca.bkaw.praeter.gui.GuiEventListener;
+import ca.bkaw.praeter.plugin.test.TestGui;
+import ca.bkaw.praeter.plugin.test.TestingCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -25,7 +21,7 @@ import java.nio.file.Path;
 /**
  * The plugin that loads the praeter classes into bukkit.
  */
-public class PraeterPlugin extends JavaPlugin implements Listener {
+public class PraeterPlugin extends JavaPlugin {
     private static PraeterPlugin instance;
     private final Path resourcePacksFolder = getDataFolder().toPath().resolve("internal/resourcepacks");
 
@@ -57,7 +53,7 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
 
         // Register event listeners
         this.getServer().getPluginManager().registerEvents(new GuiEventListener(), this);
-        this.getServer().getPluginManager().registerEvents(this, this);
+        this.getServer().getPluginManager().registerEvents(new ResourceEventListener(Praeter.get().getResourceManager()), this);
 
         // Testing
         // Register testing command
@@ -143,20 +139,5 @@ public class PraeterPlugin extends JavaPlugin implements Listener {
         }
 
         this.getLogger().info("All packs have been baked and closed.");
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        this.getServer().getScheduler().runTaskLater(this, () -> {
-            ResourceManager resourceManager = Praeter.get().getResourceManager();
-            resourceManager.getResourcePackSender().send(
-                resourceManager.getBakedPacks().getMain(),
-                player,
-                true,
-                Component.text("Please accept the resource pack to see custom additions to the game.")
-            );
-        }, 20L);
     }
 }

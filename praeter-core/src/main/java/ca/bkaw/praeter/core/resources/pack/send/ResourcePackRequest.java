@@ -17,7 +17,7 @@ public class ResourcePackRequest {
     private final BakedResourcePack resourcePack;
     private final ResourceManager resourceManager;
     private final String url;
-    private final String hash;
+    private final byte[] hash;
     private final boolean required;
     private final Component prompt;
     private boolean secondAttempt = false;
@@ -26,7 +26,7 @@ public class ResourcePackRequest {
                                BakedResourcePack resourcePack,
                                ResourceManager resourceManager,
                                String url,
-                               String hash,
+                               byte[] hash,
                                boolean required,
                                @Nullable Component prompt) {
         this.player = player;
@@ -52,7 +52,7 @@ public class ResourcePackRequest {
      */
     public void send() {
         this.resourceManager.getPendingRequests().put(this.player, this);
-        this.player.setResourcePack(this.url, this.hash, this.required, this.prompt);
+        this.player.setResourcePack(this.url, this.hash, this.prompt, this.required);
     }
 
     /**
