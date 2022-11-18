@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -28,9 +29,11 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
      */
     public static final int PORT = 50864;
 
+    private final Plugin plugin;
     private final HttpServer server;
 
-    public HttpServerResourcePackSender() throws IOException {
+    public HttpServerResourcePackSender(Plugin plugin) throws IOException {
+        this.plugin = plugin;
         this.server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
         this.server.start();
         Praeter.get().getLogger().info("Started an HTTP Server on port " + PORT + " that" +
@@ -40,7 +43,7 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
     @Override
     public void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt) {
         // TODO
-        Path file = Path.of("plugins/praeter/internal/resourcepacks/main.zip"); // TODO
+        Path file = this.plugin.getDataFolder().toPath().resolve("internal/resourcepacks/main.zip"); // TODO
         if (Files.exists(file)) {
             String path = "/";
             Handler handler = new Handler(file);

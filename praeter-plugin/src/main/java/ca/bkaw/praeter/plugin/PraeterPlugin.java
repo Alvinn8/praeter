@@ -8,10 +8,12 @@ import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
+import ca.bkaw.praeter.core.resources.pack.collision.ResourceCollisionException;
 import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -47,6 +49,7 @@ public class PraeterPlugin extends JavaPlugin {
         this.setupDirectories();
         this.setupMainResourcePack();
         this.setupVanillaAssets();
+        this.includePluginAssets();
         this.setupResourcePackSender();
 
         // Bake the packs right before startup, after plugins have loaded
@@ -100,10 +103,38 @@ public class PraeterPlugin extends JavaPlugin {
         resourceManager.setPacks(holder);
     }
 
+    private void includePluginAssets() {
+        this.getLogger().info("Including plugin assets");
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
+        for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
+            System.out.println(plugin.getName());
+            Path jarPath = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+            ResourcePack pluginAssets;
+            try {
+                pluginAssets = ResourcePack.loadZip(jarPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to open plugin jar file.", e);
+            }
+            for (ResourcePack resourcePack : resourceManager.getResourcePacks(plugin)) {
+                System.out.println("resourcePack = " + resourcePack);
+                try {
+                    resourcePack.include(pluginAssets, path -> path.startsWith("assets/"));
+                } catch (ResourceCollisionException | IOException e) {
+                    // TODO get resource pack name/id
+                    getLogger().severe("Failed to include assets from " + plugin.getName()
+                            + " into a resource pack.");
+                    e.printStackTrace();
+                    // Break out of this loop (continue to next plugin)
+                    break;
+                }
+            }
+        }
+    }
+
     private void setupResourcePackSender() {
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         try {
-            resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
+            resourceManager.setResourcePackSender(new HttpServerResourcePackSender(this));
         } catch (IOException e) {
             throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e);
         }
