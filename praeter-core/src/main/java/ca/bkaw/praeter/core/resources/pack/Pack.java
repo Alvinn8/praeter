@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 /**
  * A pack that contains resources, assets and data.
  * <p>
- * This class can be used to access, modify files, merge packs, and other stuff.
+ * This class can be used to access and modify files, merge packs, and other stuff.
  * <p>
  * JSON resources can be gotten by getting the path of the resource using
  * utility methods like {@link ResourcePack#getModelPath(NamespacedKey)} and then

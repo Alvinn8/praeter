@@ -1,10 +1,10 @@
 package ca.bkaw.praeter.plugin.test;
 
 import ca.bkaw.praeter.core.resources.font.FontSequence;
-import ca.bkaw.praeter.core.resources.font.FontSequenceBuilder;
 import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.font.FontGuiComponentRenderer;
+import ca.bkaw.praeter.gui.font.GuiFontSequenceBuilder;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import ca.bkaw.praeter.gui.gui.CustomGui;
@@ -19,7 +19,7 @@ public class TestRenderer implements FontGuiComponentRenderer<Button, Button.Typ
 
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType, RenderSetupContext context) throws IOException {
-        FontSequenceBuilder builder = context.newFontSequence();
+        GuiFontSequenceBuilder builder = context.newFontSequence();
         for (int i = 0; i < 10; i++) {
             builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), 0, i * 16);
         }

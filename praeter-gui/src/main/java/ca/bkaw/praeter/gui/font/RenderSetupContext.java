@@ -1,10 +1,9 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
-import ca.bkaw.praeter.core.resources.font.FontSequenceBuilder;
+import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
-import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
 
 import java.io.IOException;
@@ -20,16 +19,13 @@ import java.util.List;
  */
 public class RenderSetupContext {
     /**
-     * The y offset from the title of a gui (where custom fonts are placed to render a
-     * gui) to the top-left pixel of the top-left slot, slot (0, 0).
+     * The key of the font where all characters to render the font are placed.
      */
-    public static final int ORIGIN_OFFSET_X = -3;
-
-    /**
-     * The y offset from the title of a gui (where custom fonts are placed to render a
-     * gui) to the top-left pixel of the top-left slot, slot (0, 0).
-     */
-    public static final int ORIGIN_OFFSET_Y = 2;
+    // We use the same font key for all guis so common characters like spaces can
+    // be reused. Characters are also not stored past restart, so it does not matter
+    // that they will change frequently. (This differs from for example if the
+    // characters were used in item lore)
+    public static final NamespacedKey FONT_KEY = new NamespacedKey(Praeter.NAMESPACE, "gui");
 
     private final List<ResourcePack> resourcePacks;
 
@@ -39,15 +35,11 @@ public class RenderSetupContext {
 
     /**
      * Create a new builder for a font sequence.
-     * <p>
-     * The origin of the {@link FontSequenceBuilder} will be the top-left pixel of the
-     * top-left slot, slot (0, 0).
      *
-     * @return The builder.
+     * @return The builder, for chaining.
      * @throws IOException If an I/O error occurs.
      */
-    public FontSequenceBuilder newFontSequence() throws IOException {
-        NamespacedKey fontKey = new NamespacedKey(Praeter.NAMESPACE, "gui"); // TODO use gui key?
-        return new FontSequenceBuilder(this.resourcePacks, fontKey, ORIGIN_OFFSET_X, ORIGIN_OFFSET_Y);
+    public GuiFontSequenceBuilder newFontSequence() throws IOException {
+        return new GuiFontSequenceBuilder(this.resourcePacks, FONT_KEY);
     }
 }

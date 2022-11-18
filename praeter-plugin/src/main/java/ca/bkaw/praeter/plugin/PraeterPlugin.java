@@ -20,30 +20,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 /**
  * The plugin that loads the praeter classes into bukkit.
  */
 public class PraeterPlugin extends JavaPlugin {
-    private static PraeterPlugin instance;
     private final Path resourcePacksFolder = getDataFolder().toPath().resolve("internal/resourcepacks");
-
-    /**
-     * Get the {@link PraeterPlugin} instance.
-     *
-     * @return The instance.
-     */
-    public static PraeterPlugin get() {
-        if (instance == null) {
-            throw new IllegalStateException("The praeter plugin has not been enabled yet.");
-        }
-        return instance;
-    }
 
     @Override
     public void onEnable() {
-        instance = this;
-
         Praeter.get().setLogger(this.getLogger());
 
         this.setupDirectories();
@@ -62,12 +48,17 @@ public class PraeterPlugin extends JavaPlugin {
 
         // Testing
         // Register testing command
-        this.getCommand("praetertest").setExecutor(new TestingCommand());
+        Objects.requireNonNull(this.getCommand("praetertest")).setExecutor(
+            new TestingCommand()
+        );
 
         TestGui.TYPE.setPlugin(this);
         TestGui.TYPE.getRenderer().onSetup(TestGui.TYPE);
     }
 
+    /**
+     * Create directories.
+     */
     private void setupDirectories() {
         try {
             Files.createDirectories(this.resourcePacksFolder);
@@ -76,17 +67,9 @@ public class PraeterPlugin extends JavaPlugin {
         }
     }
 
-    private void setupVanillaAssets() {
-        // TODO only do this setup if praeter-resources is actually used?
-        ResourceManager resourceManager = Praeter.get().getResourceManager();
-        Path vanillaAssetsPath = this.resourcePacksFolder.resolve("vanilla.zip");
-        try {
-            resourceManager.getPacks().setVanillaAssets(VanillaAssets.readOrExtract(vanillaAssetsPath));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read or extract vanilla assets.", e);
-        }
-    }
-
+    /**
+     * Set up the main resource pack.
+     */
     private void setupMainResourcePack() {
         this.getLogger().info("Setting up resource packs");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
@@ -103,6 +86,25 @@ public class PraeterPlugin extends JavaPlugin {
         resourceManager.setPacks(holder);
     }
 
+    /**
+     * Set up the vanilla assets.
+     */
+    private void setupVanillaAssets() {
+        // TODO only do this setup if praeter-resources is actually used?
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
+        Path vanillaAssetsPath = this.resourcePacksFolder.resolve("vanilla.zip");
+        try {
+            resourceManager.getPacks().setVanillaAssets(VanillaAssets.readOrExtract(vanillaAssetsPath));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read or extract vanilla assets.", e);
+        }
+    }
+
+    /**
+     * Include assets from plugins into the resource packs they affect.
+     *
+     * @see ResourceManager#getResourcePacks(Plugin)
+     */
     private void includePluginAssets() {
         this.getLogger().info("Including plugin assets");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
@@ -128,9 +130,17 @@ public class PraeterPlugin extends JavaPlugin {
                     break;
                 }
             }
+            try {
+                pluginAssets.getRoot().getFileSystem().close();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to close plugin jar file.", e);
+            }
         }
     }
 
+    /**
+     * Set up the {@link ca.bkaw.praeter.core.resources.send.ResourcePackSender}.
+     */
     private void setupResourcePackSender() {
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         try {
@@ -140,6 +150,12 @@ public class PraeterPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * Bake the resource packs.
+     * <p>
+     * After this method is called, packs will no longer be accessible from the
+     * resource manager and baked packs will become available.
+     */
     private void bakePacks() {
         this.getLogger().info("Baking and closing packs");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
