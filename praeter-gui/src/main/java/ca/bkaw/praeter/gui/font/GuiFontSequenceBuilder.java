@@ -28,18 +28,18 @@ public class GuiFontSequenceBuilder {
      * The y offset from the title of a gui (where custom fonts are placed to render a
      * gui) to the top-left pixel of the top-left slot, slot (0, 0).
      */
-    public static final int ORIGIN_OFFSET_X = 0; // TODO find value
+    public static final int ORIGIN_OFFSET_X = -3;
 
     /**
      * The y offset from the title of a gui (where custom fonts are placed to render a
      * gui) to the top-left pixel of the top-left slot, slot (0, 0).
      */
-    public static final int ORIGIN_OFFSET_Y = 0; // TODO find value
+    public static final int ORIGIN_OFFSET_Y = 2;
 
     /**
      * The width/height of a slot, measured in pixels.
      */
-    public static final int SLOT_SIZE = 18; // TODO confirm
+    public static final int SLOT_SIZE = 18;
 
     private final List<ResourcePack> resourcePacks;
     private final List<Font> fonts;
@@ -72,11 +72,14 @@ public class GuiFontSequenceBuilder {
     }
 
     private GuiFontSequenceBuilder renderImageRaw(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
+        // x offset: shift right with spaces (and shift back afterwards)
+        // y offset: use the character ascent
         this.shiftRight(offsetX);
-
         int ascent = -offsetY;
 
         // Read the texture
+        // Find the image manually instead of using ResourcePack#getTexturePath because
+        // we want to ensure that the key contains the file extension.
         Path texturePath = Praeter.get().getResourceManager().getPacks().getResource(
             this.resourcePacks,
             "assets/" + textureKey.getNamespace() + "/textures/" + textureKey.getKey()
@@ -93,6 +96,7 @@ public class GuiFontSequenceBuilder {
 
         // If the current image isn't already the expected size (it's either not a
         // square or we need to resize it)
+        // TODO does it need to be a square?
         if (image.getWidth() != size || image.getHeight() != size) {
             BufferedImage createdImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
             Graphics graphics = createdImage.getGraphics();
@@ -107,7 +111,7 @@ public class GuiFontSequenceBuilder {
                 + createdKey.substring(0, extIndex)
                 + "_" + size
                 + textureKey.getKey().substring(extIndex);
-            textureKey = new NamespacedKey("generated", createdKey);
+            textureKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, createdKey);
 
             // Save the image
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -115,7 +119,7 @@ public class GuiFontSequenceBuilder {
             byte[] bytes = stream.toByteArray();
             // Save the image to all packs
             for (ResourcePack resourcePack : this.resourcePacks) {
-                Path path = resourcePack.getPath("assets/generated/textures/" + createdKey);
+                Path path = resourcePack.getTexturePath(textureKey);
                 Files.createDirectories(path.getParent());
                 Files.write(path, bytes);
             }
@@ -128,9 +132,8 @@ public class GuiFontSequenceBuilder {
             font.addFontChar(fontChar);
         }
 
-        // Shift back, and the image had an effective width we need to move back by,
-        // and an additional 2 pixels for the single-pixel-wide space before and after
-        // the character.
+        // Shift back, and the image has an effective width we need to move back by,
+        // and an additional pixel for the single-pixel-wide space after the character.
         this.shiftLeft(offsetX + this.getEffectiveWidth(image) + 1);
 
         return this;

@@ -22,6 +22,10 @@ public class TestRenderer implements FontGuiComponentRenderer<Button, Button.Typ
         for (int i = 0; i < 10; i++) {
             builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), 0, i * 16);
         }
+        for (int i = 0; i < 6; i++) {
+            int pixelX = GuiFontSequenceBuilder.SLOT_SIZE + (int) (Math.random() * GuiFontSequenceBuilder.SLOT_SIZE * 8);
+            builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), pixelX, i * GuiFontSequenceBuilder.SLOT_SIZE);
+        }
         this.fontSequence = builder.build();
     }
 

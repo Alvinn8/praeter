@@ -32,7 +32,7 @@ public record FontSequence(List<FontCharIdentifier> fontChars) {
      * @return The text components.
      */
     public List<Component> getChars(BakedResourcePack pack) {
-        List<Component> components = new ArrayList<>();
+        List<Component> components = new ArrayList<>(this.fontChars.size());
         for (FontCharIdentifier fontCharIdentifier : this.fontChars) {
             BakedFontChar fontChar = pack.getFontChar(fontCharIdentifier);
             if (fontChar == null) {

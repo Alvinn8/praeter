@@ -2,6 +2,10 @@ package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.gui.component.GuiComponent;
+import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.gui.CustomGui;
+import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -10,6 +14,8 @@ import java.util.List;
 
 /**
  * An object created when a gui is rendered using a {@link FontGuiRenderer}.
+ *
+ * @see FontGuiComponentRenderer#onRender(CustomGuiType, CustomGui, GuiComponentType, GuiComponent, RenderDispatcher)
  */
 public class RenderDispatcher {
     private final BakedResourcePack bakedResourcePack;

@@ -23,6 +23,16 @@ public class Praeter {
 
     private Praeter() {}
 
+    /**
+     * The praeter namespace used in {@link org.bukkit.NamespacedKey}s.
+     */
+    public static final String NAMESPACE = "praeter";
+
+    /**
+     * The namespace used for generated resources.
+     */
+    public static final String GENERATED_NAMESPACE = "generated";
+
     private final ResourceManager resourceManager = new ResourceManager();
     private Logger logger;
 

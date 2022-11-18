@@ -55,8 +55,13 @@ public class ResourcePack extends Pack {
         return 11; // TODO
     }
 
-    private Path getResourcePath(NamespacedKey resourceLocation, String folder, String extension) {
-        return this.getPath("assets/" + resourceLocation.getNamespace() + "/" + folder + "/" + resourceLocation.getKey() + "." + extension);
+    private Path getResourcePath(NamespacedKey namespacedKey, String folder, String extension) {
+        String dotExtension = "." + extension;
+        String key = namespacedKey.getKey();
+        if (!key.endsWith(dotExtension)) {
+            key += dotExtension;
+        }
+        return this.getPath("assets/" + namespacedKey.getNamespace() + "/" + folder + "/" + key);
     }
 
     /**

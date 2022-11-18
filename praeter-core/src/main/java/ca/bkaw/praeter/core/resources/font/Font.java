@@ -109,14 +109,18 @@ public class Font {
      * @throws IOException If an I/O error occurs.
      */
     public void addFontChar(SpaceFontCharIdentifier spaceFontChar) throws IOException {
-        char c = this.getNextChar();
         int advance = spaceFontChar.advance();
+        // Use the shared space provider for this font
         if (this.spaceProvider == null) {
             this.spaceProvider = new SpaceFontProvider();
             this.addProvider(this.spaceProvider);
         }
-        this.spaceProvider.add(c, advance);
-        this.fontJson.save();
+        // Only add if it does not already exist
+        if (!this.spaceProvider.has(advance)) {
+            char c = this.getNextChar();
+            this.spaceProvider.add(c, advance);
+            this.fontJson.save();
+        }
     }
 
     /**
@@ -153,7 +157,7 @@ public class Font {
                     }
                 }
             }
-            // This point was reached without hitting the continue statement.
+            // This point was reached without hitting a continue statement.
             // We have an unused character.
             return c;
         }
@@ -172,56 +176,4 @@ public class Font {
         return Collections.singletonList(String.valueOf(this.getNextChar()));
     }
 
-    /**
-     * Get the namespaced key for an almost-transparent, 1x1-pixel image.
-     *
-     * @return The key.
-     * @throws IOException If an I/O error occurs while writing the texture.
-     */
-    @Deprecated(forRemoval = true)
-    private NamespacedKey getAlmostTransparent1x1Texture() throws IOException {
-        Path path = this.pack.getPath("assets/praeter/textures/font/transparent_1.png");
-        if (!Files.exists(path)) {
-            Files.createDirectories(path.getParent());
-            BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-            image.setRGB(0, 0, 0x11000000);
-            try (OutputStream output = Files.newOutputStream(path)) {
-                ImageIO.write(image, "png", output);
-            }
-        }
-        return new NamespacedKey("praeter", "font/transparent_1.png");
-    }
-
-    @Deprecated(forRemoval = true)
-    private char getChar(BitmapFontProvider provider) {
-        return provider.chars().get(0).charAt(0);
-    }
-
-    /**
-     * Get or create a font character that is a negative space of the specified amount
-     * of pixels.
-     * <p>
-     * Using this character will move the text cursor backwards.
-     *
-     * @param pixels The positive amount of pixels to go back.
-     * @return The character to use.
-     * @throws IOException If an I/O error occurs.
-     */
-    // TODO this maybe shouldn't be here?
-    @Deprecated(forRemoval = true)
-    public char negativeSpace(int pixels) throws IOException {
-        BitmapFontProvider provider = new BitmapFontProvider(
-            this.getAlmostTransparent1x1Texture(),
-
-            // subtract 2 to remove the pixels before and after the character
-            -pixels - 2, // width/height (negative)
-
-            // make it not visible, it's already transparent though
-            -32768, // ascent
-
-            this.getNextCharAsList()
-        );
-        this.addProvider(provider);
-        return this.getChar(provider);
-    }
 }
