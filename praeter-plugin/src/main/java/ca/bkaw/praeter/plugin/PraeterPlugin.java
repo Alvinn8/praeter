@@ -18,6 +18,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -113,12 +114,12 @@ public class PraeterPlugin extends JavaPlugin {
         this.getLogger().info("Including plugin assets");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
-            System.out.println(plugin.getName());
-            Path jarPath = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+            if (plugin != this) continue; // TODO
             ResourcePack pluginAssets;
             try {
+                Path jarPath = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
                 pluginAssets = ResourcePack.loadZip(jarPath);
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 throw new RuntimeException("Failed to open plugin jar file.", e);
             }
             for (ResourcePack resourcePack : resourceManager.getResourcePacks(plugin)) {
