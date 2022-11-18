@@ -1,9 +1,10 @@
 package ca.bkaw.praeter.plugin.test;
 
 import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.core.resources.font.FontSequenceBuilder;
+import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.font.FontGuiComponentRenderer;
-import ca.bkaw.praeter.gui.font.GuiFontSequenceBuilder;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import ca.bkaw.praeter.gui.gui.CustomGui;
@@ -18,13 +19,13 @@ public class TestRenderer implements FontGuiComponentRenderer<Button, Button.Typ
 
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType, RenderSetupContext context) throws IOException {
-        GuiFontSequenceBuilder builder = context.newFontSequence();
+        FontSequenceBuilder builder = context.newFontSequence();
         for (int i = 0; i < 10; i++) {
             builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), 0, i * 16);
         }
         for (int i = 0; i < 6; i++) {
-            int pixelX = GuiFontSequenceBuilder.SLOT_SIZE + (int) (Math.random() * GuiFontSequenceBuilder.SLOT_SIZE * 8);
-            builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), pixelX, i * GuiFontSequenceBuilder.SLOT_SIZE);
+            int pixelX = GuiUtils.SLOT_SIZE + (int) (Math.random() * GuiUtils.SLOT_SIZE * 8);
+            builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), pixelX, i * GuiUtils.SLOT_SIZE);
         }
         this.fontSequence = builder.build();
     }

@@ -8,6 +8,11 @@ import java.util.function.IntConsumer;
  * A utility class for guis.
  */
 public final class GuiUtils {
+    /**
+     * The width/height of a slot, measured in pixels.
+     */
+    public static final int SLOT_SIZE = 18;
+
     private GuiUtils() {}
 
     /**

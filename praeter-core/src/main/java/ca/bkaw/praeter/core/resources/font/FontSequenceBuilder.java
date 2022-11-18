@@ -1,12 +1,7 @@
-package ca.bkaw.praeter.gui.font;
+package ca.bkaw.praeter.core.resources.font;
 
 import ca.bkaw.praeter.core.Praeter;
-import ca.bkaw.praeter.core.resources.font.BitmapFontCharIdentifier;
-import ca.bkaw.praeter.core.resources.font.FontCharIdentifier;
-import ca.bkaw.praeter.core.resources.font.FontSequence;
-import ca.bkaw.praeter.core.resources.font.SpaceFontCharIdentifier;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
-import ca.bkaw.praeter.core.resources.font.Font;
 import org.bukkit.NamespacedKey;
 
 import javax.imageio.ImageIO;
@@ -20,58 +15,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A builder for a {@link FontSequence} that specializes in operations relating to
- * font usage in GUIs.
+ * A generic builder for a {@link FontSequence}.
  */
-public class GuiFontSequenceBuilder {
-    /**
-     * The y offset from the title of a gui (where custom fonts are placed to render a
-     * gui) to the top-left pixel of the top-left slot, slot (0, 0).
-     */
-    public static final int ORIGIN_OFFSET_X = -3;
-
-    /**
-     * The y offset from the title of a gui (where custom fonts are placed to render a
-     * gui) to the top-left pixel of the top-left slot, slot (0, 0).
-     */
-    public static final int ORIGIN_OFFSET_Y = 2;
-
-    /**
-     * The width/height of a slot, measured in pixels.
-     */
-    public static final int SLOT_SIZE = 18;
-
+public class FontSequenceBuilder {
     private final List<ResourcePack> resourcePacks;
     private final List<Font> fonts;
     private final List<FontCharIdentifier> fontChars = new ArrayList<>();
+    private final int originX;
+    private final int originY;
 
-    /* package-private */ GuiFontSequenceBuilder(List<ResourcePack> resourcePacks,
-                                                 NamespacedKey fontKey) throws IOException {
+    public FontSequenceBuilder(List<ResourcePack> resourcePacks,
+                               NamespacedKey fontKey,
+                               int originX,
+                               int originY) throws IOException {
         this.resourcePacks = resourcePacks;
+        this.originX = originX;
+        this.originY = originY;
         this.fonts = new ArrayList<>(this.resourcePacks.size());
         for (ResourcePack pack : this.resourcePacks) {
             this.fonts.add(new Font(pack, fontKey));
         }
     }
 
+    /**
+     * Create the {@link FontSequence} from this builder.
+     *
+     * @return The font sequence.
+     */
     public FontSequence build() {
         return new FontSequence(this.fontChars);
     }
 
     // todo javadoc
-    public void shiftLeft(int pixels) throws IOException {
+    public FontSequenceBuilder shiftLeft(int pixels) throws IOException {
         this.shiftRight(-pixels);
+        return this;
     }
 
-    public void shiftRight(int pixels) throws IOException {
+    public FontSequenceBuilder shiftRight(int pixels) throws IOException {
         SpaceFontCharIdentifier fontChar = new SpaceFontCharIdentifier(pixels);
         for (Font font : this.fonts) {
             font.addFontChar(fontChar);
         }
         this.fontChars.add(fontChar);
+        return this;
     }
 
-    private GuiFontSequenceBuilder renderImageRaw(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
+    public FontSequenceBuilder renderImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
+        offsetX += this.originX;
+        offsetY += this.originY;
+
         // x offset: shift right with spaces (and shift back afterwards)
         // y offset: use the character ascent
         this.shiftRight(offsetX);
@@ -134,7 +127,7 @@ public class GuiFontSequenceBuilder {
 
         // Shift back, and the image has an effective width we need to move back by,
         // and an additional pixel for the single-pixel-wide space after the character.
-        this.shiftLeft(offsetX + this.getEffectiveWidth(image) + 1);
+        this.shiftLeft(offsetX + getEffectiveWidth(image) + 1);
 
         return this;
     }
@@ -146,7 +139,7 @@ public class GuiFontSequenceBuilder {
      * @param image The image.
      * @return The effective width.
      */
-    private int getEffectiveWidth(BufferedImage image) {
+    public static int getEffectiveWidth(BufferedImage image) {
         // Don't count transparent columns to the right
         int x;
         for (x = image.getWidth() - 1; x >= 0; x--) {
@@ -161,9 +154,4 @@ public class GuiFontSequenceBuilder {
         return x + 1;
     }
 
-    public GuiFontSequenceBuilder renderImage(NamespacedKey textureKey, int pixelX, int pixelY) throws IOException {
-        return renderImageRaw(textureKey,
-            pixelX + ORIGIN_OFFSET_X,
-            pixelY + ORIGIN_OFFSET_Y);
-    }
 }
