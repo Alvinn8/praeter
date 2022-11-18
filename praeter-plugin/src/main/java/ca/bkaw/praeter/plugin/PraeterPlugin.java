@@ -26,11 +26,13 @@ import java.util.Objects;
  * The plugin that loads the praeter classes into bukkit.
  */
 public class PraeterPlugin extends JavaPlugin {
-    private final Path resourcePacksFolder = getDataFolder().toPath().resolve("internal/resourcepacks");
-
     @Override
     public void onEnable() {
         Praeter.get().setLogger(this.getLogger());
+        ResourceManager resourceManager = Praeter.get().getResourceManager();
+        resourceManager.setResourcePacksFolder(
+            this.getDataFolder().toPath().resolve("internal/resourcepacks")
+        );
 
         this.setupDirectories();
         this.setupMainResourcePack();
@@ -44,7 +46,7 @@ public class PraeterPlugin extends JavaPlugin {
         // Register event listeners
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new GuiEventListener(), this);
-        pluginManager.registerEvents(new ResourceEventListener(Praeter.get().getResourceManager(), this), this);
+        pluginManager.registerEvents(new ResourceEventListener(resourceManager, this), this);
 
         // Testing
         // Register testing command
@@ -61,7 +63,7 @@ public class PraeterPlugin extends JavaPlugin {
      */
     private void setupDirectories() {
         try {
-            Files.createDirectories(this.resourcePacksFolder);
+            Files.createDirectories(Praeter.get().getResourceManager().getResourcePacksFolder());
         } catch (IOException e) {
             throw new RuntimeException("Failed to create directories.", e);
         }
@@ -73,7 +75,8 @@ public class PraeterPlugin extends JavaPlugin {
     private void setupMainResourcePack() {
         this.getLogger().info("Setting up resource packs");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
-        Path path = this.resourcePacksFolder.resolve("main.zip");
+        Path resourcePacksFolder = Praeter.get().getResourceManager().getResourcePacksFolder();
+        Path path = resourcePacksFolder.resolve("main.zip");
         ResourcePack mainResourcePack;
         try {
             Files.deleteIfExists(path);
@@ -92,7 +95,8 @@ public class PraeterPlugin extends JavaPlugin {
     private void setupVanillaAssets() {
         // TODO only do this setup if praeter-resources is actually used?
         ResourceManager resourceManager = Praeter.get().getResourceManager();
-        Path vanillaAssetsPath = this.resourcePacksFolder.resolve("vanilla.zip");
+        Path resourcePacksFolder = Praeter.get().getResourceManager().getResourcePacksFolder();
+        Path vanillaAssetsPath = resourcePacksFolder.resolve("vanilla.zip");
         try {
             resourceManager.getPacks().setVanillaAssets(VanillaAssets.readOrExtract(vanillaAssetsPath));
         } catch (IOException e) {
@@ -122,9 +126,8 @@ public class PraeterPlugin extends JavaPlugin {
                 try {
                     resourcePack.include(pluginAssets, path -> path.startsWith("assets/"));
                 } catch (ResourceCollisionException | IOException e) {
-                    // TODO get resource pack name/id
                     getLogger().severe("Failed to include assets from " + plugin.getName()
-                            + " into a resource pack.");
+                            + " into resource pack " + resourceManager.getPacks().getId(resourcePack));
                     e.printStackTrace();
                     // Break out of this loop (continue to next plugin)
                     break;
@@ -144,7 +147,7 @@ public class PraeterPlugin extends JavaPlugin {
     private void setupResourcePackSender() {
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         try {
-            resourceManager.setResourcePackSender(new HttpServerResourcePackSender(this));
+            resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
         } catch (IOException e) {
             throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e);
         }

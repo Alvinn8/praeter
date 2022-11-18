@@ -10,6 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class ResourceManager {
     private final Map<Player, ResourcePackRequest> pendingRequests = new HashMap<>();
     private final Map<Player, BakedResourcePack> appliedPacks = new HashMap<>();
+    private Path resourcePacksFolder;
     private ResourcePacksHolder packs;
     private PacksHolder<BakedResourcePack> bakedPacks;
     private ResourcePackSender resourcePackSender;
@@ -145,5 +147,33 @@ public class ResourceManager {
     @ApiStatus.Internal
     public Map<Player, BakedResourcePack> getAppliedPacks() {
         return appliedPacks;
+    }
+
+    /**
+     * Get the folder where resource packs are stored.
+     * <p>
+     * It is not recommended to interact with this folder before packs have been baked
+     * and closed.
+     *
+     * @return The path to the folder.
+     */
+    public Path getResourcePacksFolder() {
+        if (this.resourcePacksFolder == null) {
+            throw new IllegalStateException();
+        }
+        return this.resourcePacksFolder;
+    }
+
+    /**
+     * Set the folder where resource packs are stored.
+     *
+     * @param resourcePacksFolder The folder.
+     */
+    @ApiStatus.Internal
+    public void setResourcePacksFolder(Path resourcePacksFolder) {
+        if (this.resourcePacksFolder != null) {
+            throw new IllegalStateException("Can not change the resource packs folder.");
+        }
+        this.resourcePacksFolder = resourcePacksFolder;
     }
 }
