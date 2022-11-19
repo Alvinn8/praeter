@@ -1,8 +1,10 @@
 package ca.bkaw.praeter.gui.gui;
 
+import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -42,7 +44,7 @@ public class CustomGuiType {
      * @return Whether registered.
      */
     public boolean isRegistered() {
-        return this.plugin != null; // TODO registering
+        return this.plugin != null;
     }
 
     /**
@@ -61,7 +63,8 @@ public class CustomGuiType {
     /**
      * Set the plugin that registered the custom gui type.
      * <p>
-     * This method is for internal use. Use TODO to register the gui.
+     * This method is for internal use. Use {@link ca.bkaw.praeter.core.Registry#register(Object, NamespacedKey, Plugin)}
+     * on {@link PraeterGui#getGuiRegistry()} to register the gui.
      *
      * @param plugin The plugin.
      */

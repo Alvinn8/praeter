@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.component.GuiComponentRenderer;
@@ -49,7 +50,9 @@ public class FontGuiRenderer implements CustomGuiRenderer {
             GuiBackgroundPainter backgroundPainter = new GuiBackgroundPainter(customGuiType.getHeight());
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(backgroundPainter.getImage(), "png", stream);
-            NamespacedKey backgroundKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, "gui/background/temp_name.png"); // TODO use gui key
+            NamespacedKey id = PraeterGui.get().getGuiRegistry().getId(customGuiType);
+            NamespacedKey backgroundKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE,
+                "gui/background/" + id.getNamespace() + '/' + id.getKey() + ".png");
             byte[] bytes = stream.toByteArray();
             for (ResourcePack resourcePack : resourcePacks) {
                 Path modelPath = resourcePack.getTexturePath(backgroundKey);
