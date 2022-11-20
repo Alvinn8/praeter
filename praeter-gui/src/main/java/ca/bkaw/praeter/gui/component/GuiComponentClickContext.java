@@ -8,13 +8,11 @@ import java.util.function.Consumer;
 /**
  * Holds data that is passed to the {@link GuiComponent#setOnClick(Consumer)}
  * callback.
- * <p>
- * Please note that this is not a bukkit event!
  */
-public class GuiComponentClickEvent {
+public class GuiComponentClickContext {
     private final InventoryClickEvent event;
 
-    public GuiComponentClickEvent(InventoryClickEvent event) {
+    public GuiComponentClickContext(InventoryClickEvent event) {
         this.event = event;
     }
 

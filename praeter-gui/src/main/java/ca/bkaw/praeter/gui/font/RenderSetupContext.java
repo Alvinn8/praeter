@@ -5,6 +5,7 @@ import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,5 +42,15 @@ public class RenderSetupContext {
      */
     public GuiFontSequenceBuilder newFontSequence() throws IOException {
         return new GuiFontSequenceBuilder(this.resourcePacks, FONT_KEY);
+    }
+
+    /**
+     * Get the resource packs where all assets need to be present.
+     *
+     * @return The immutable list of resource packs.
+     */
+    @Unmodifiable
+    public List<ResourcePack> getResourcePacks() {
+        return this.resourcePacks;
     }
 }

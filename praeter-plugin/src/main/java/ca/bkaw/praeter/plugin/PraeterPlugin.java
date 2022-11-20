@@ -11,8 +11,10 @@ import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.core.resources.pack.collision.ResourceCollisionException;
 import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
+import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,8 +57,9 @@ public class PraeterPlugin extends JavaPlugin {
             new TestingCommand()
         );
 
-        TestGui.TYPE.setPlugin(this);
-        TestGui.TYPE.getRenderer().onSetup(TestGui.TYPE);
+        PraeterGui.get().getGuiRegistry().register(TestGui.TYPE,
+            new NamespacedKey("praetertest", "test1"),
+            this);
     }
 
     /**
