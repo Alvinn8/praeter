@@ -1,11 +1,10 @@
 package ca.bkaw.praeter.plugin.test;
 
-import ca.bkaw.praeter.gui.component.GuiComponentType;
-import ca.bkaw.praeter.gui.gui.CustomGui;
-import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.components.ToggleButton;
 import ca.bkaw.praeter.gui.font.FontGuiRenderer;
+import ca.bkaw.praeter.gui.gui.CustomGui;
+import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import net.kyori.adventure.text.Component;
 
 public class TestGui extends CustomGui {
@@ -15,7 +14,7 @@ public class TestGui extends CustomGui {
         2, 1
     );
     public static final ToggleButton.Type BUTTON_2 = new ToggleButton.Type(
-        new TestToggleButtonRenderer(), // null is not allowed, just no impl. yet
+        new TestToggleButtonRenderer(),
         0, 4,
         2, 1
     );
@@ -35,7 +34,10 @@ public class TestGui extends CustomGui {
     public TestGui() {
         super(TYPE);
 
-        get(BUTTON_2).setOnClick(event -> toggleButton2());
+        get(BUTTON_2).setOnClick(event -> {
+            toggleButton2();
+            event.playClickSound();
+        });
     }
 
     public void toggleButton2() {

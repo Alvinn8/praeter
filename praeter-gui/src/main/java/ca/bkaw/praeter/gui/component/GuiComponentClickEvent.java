@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.gui.component;
 
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.function.Consumer;
@@ -27,5 +28,14 @@ public class GuiComponentClickEvent {
      */
     public InventoryClickEvent getEvent() {
         return this.event;
+    }
+
+    /**
+     * Play a {@link org.bukkit.Sound#UI_BUTTON_CLICK} sound to the player that clicked.
+     */
+    public void playClickSound() {
+        this.event.getWhoClicked().playSound(
+            Sound.sound(org.bukkit.Sound.UI_BUTTON_CLICK, Sound.Source.MASTER, 1, 1)
+        );
     }
 }
