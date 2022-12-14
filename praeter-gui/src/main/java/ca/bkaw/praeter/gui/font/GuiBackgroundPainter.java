@@ -55,7 +55,7 @@ public class GuiBackgroundPainter {
     public GuiBackgroundPainter(int rows) throws IOException {
         int height = TOP_PADDING + rows * GuiUtils.SLOT_SIZE;
         this.image = new BufferedImage(WIDTH, height, BufferedImage.TYPE_INT_ARGB);
-        this.paint();
+        this.paintBackground();
     }
 
     /**
@@ -67,7 +67,7 @@ public class GuiBackgroundPainter {
         return this.image;
     }
 
-    private void paint() throws IOException {
+    private void paintBackground() throws IOException {
         ResourcePack vanillaAssets = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
         Path generic54Path = vanillaAssets.getTexturePath(GENERIC_54_KEY);
 
@@ -88,6 +88,27 @@ public class GuiBackgroundPainter {
         // Draw the rest of the image
         for (int y = TOP_EDGE_HEIGHT + 1; y < this.image.getHeight(); y++) {
             graphics.drawImage(pixelRow, 0, y, null);
+        }
+    }
+
+    /**
+     * Carve out the specified area by replacing the pixels with transparency.
+     * <p>
+     * When carving over a slot, this results in the slot from the vanilla gui showing
+     * trough, including the hover.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param width The width.
+     * @param height The height.
+     */
+    public void carve(int x, int y, int width, int height) {
+        for (int offsetX = 0; offsetX < width; offsetX++) {
+            for (int offsetY = 0; offsetY < height; offsetY++) {
+                int pixelX = x + offsetX + HORIZONTAL_PADDING;
+                int pixelY = y + offsetY + TOP_PADDING;
+                this.image.setRGB(pixelX, pixelY, 0);
+            }
         }
     }
 }

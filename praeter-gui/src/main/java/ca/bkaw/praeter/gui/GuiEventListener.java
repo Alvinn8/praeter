@@ -23,7 +23,7 @@ public class GuiEventListener implements Listener {
         }
         // The user clicked while a custom gui was open
         CustomGui customGui = customGuiHolder.getCustomGui();
-        event.setCancelled(true);
+        // event.setCancelled(true);
 
         if (event.getClickedInventory() == event.getView().getTopInventory()) {
             // The user clicked the top inventory,
@@ -40,6 +40,7 @@ public class GuiEventListener implements Listener {
                     // Call the click handler on the component
                     GuiComponentClickContext context = new GuiComponentClickContext(event);
                     clickHandler.accept(context);
+                    event.setCancelled(true);
                 }
             }
         }

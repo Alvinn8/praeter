@@ -20,6 +20,7 @@ public class TestRenderer implements FontGuiComponentRenderer<Button, Button.Typ
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType, RenderSetupContext context) throws IOException {
         GuiFontSequenceBuilder builder = context.newFontSequence();
+        /*
         for (int i = 0; i < 10; i++) {
             builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), 0, i * 16);
         }
@@ -27,6 +28,7 @@ public class TestRenderer implements FontGuiComponentRenderer<Button, Button.Typ
             int pixelX = GuiUtils.SLOT_SIZE + (int) (Math.random() * GuiUtils.SLOT_SIZE * 8);
             builder.renderImage(NamespacedKey.minecraft("item/diamond.png"), pixelX, i * GuiUtils.SLOT_SIZE);
         }
+        */
 
         builder.renderImage(new NamespacedKey("praetertest", "button1.png"), 0, 0);
         builder.renderImage(new NamespacedKey("praetertest", "button1.png"), GuiUtils.SLOT_SIZE, 3 * GuiUtils.SLOT_SIZE);

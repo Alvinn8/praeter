@@ -44,10 +44,27 @@ public class FontGuiRenderer implements CustomGuiRenderer {
     public void onSetup(CustomGuiType customGuiType) {
         List<ResourcePack> resourcePacks = Praeter.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
         RenderSetupContext context = new RenderSetupContext(resourcePacks);
+        GuiBackgroundPainter backgroundPainter;
 
         // Create the background
         try {
-            GuiBackgroundPainter backgroundPainter = new GuiBackgroundPainter(customGuiType.getHeight());
+            backgroundPainter = new GuiBackgroundPainter(customGuiType.getHeight());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create GUI background.", e);
+        }
+
+        // Call component onSetup methods
+        for (GuiComponentType<?, ?> componentType : customGuiType.getComponentTypes()) {
+            try {
+                // TODO fix generics...
+                forEachComponentType((GuiComponentType) componentType, customGuiType, context, backgroundPainter);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to set up renderer for component " + componentType.getClass().getSimpleName(), e);
+            }
+        }
+
+        // Create the background
+        try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(backgroundPainter.getImage(), "png", stream);
             NamespacedKey id = PraeterGui.get().getGuiRegistry().getId(customGuiType);
@@ -65,24 +82,18 @@ public class FontGuiRenderer implements CustomGuiRenderer {
                 -GuiBackgroundPainter.TOP_PADDING
             ).build();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create GUI background.", e);
+            throw new RuntimeException("Failed to write GUI background.", e);
         }
 
-        // Call component onSetup methods
-        for (GuiComponentType<?, ?> componentType : customGuiType.getComponentTypes()) {
-            // TODO fix generics...
-            forEachComponentType((GuiComponentType) componentType, customGuiType, context);
-        }
     }
 
-    private <C extends GuiComponent, T extends GuiComponentType<C, T>> void forEachComponentType(T componentType, CustomGuiType customGuiType, RenderSetupContext context) {
+    private <C extends GuiComponent, T extends GuiComponentType<C, T>> void forEachComponentType(T componentType, CustomGuiType customGuiType, RenderSetupContext context, GuiBackgroundPainter background) throws IOException {
         GuiComponentRenderer<C, T> renderer = componentType.getRenderer();
         if (renderer instanceof FontGuiComponentRenderer<C, T> fontComponentRenderer) {
-            try {
-                fontComponentRenderer.onSetup(customGuiType, componentType, context);
-            } catch (IOException e) {
-                throw new RuntimeException(e); // TODO handle errors somewhere, dont crash everything
-            }
+            fontComponentRenderer.onSetup(customGuiType, componentType, context);
+        }
+        if (renderer instanceof BackgroundGuiComponentRenderer<C,T> backgroundComponentRenderer) {
+            backgroundComponentRenderer.draw(customGuiType, componentType, background);
         }
     }
 
