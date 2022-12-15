@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
 public class SlotRenderer implements BackgroundGuiComponentRenderer<Slot, Slot.Type> {
     @Override
     public void renderItems(CustomGuiType customGuiType, CustomGui customGui, Slot.Type componentType, Slot component, Inventory inventory) {
-        // Let items be handled by the TODO system. System that handles item movements
+        inventory.setItem(componentType.getY() * 9 + componentType.getX(), component.getItemStack());
     }
 
     @Override

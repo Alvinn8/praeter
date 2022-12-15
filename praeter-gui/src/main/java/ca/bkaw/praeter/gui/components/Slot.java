@@ -33,28 +33,25 @@ public class Slot extends GuiComponent {
 
     private ItemStack itemStack;
 
-    public Slot() {
-        // TODO this logic should not be here
-        this.setOnClick(event -> {
-            ItemStack cursor = event.getEvent().getCursor();
-            if (cursor == null || cursor.getType().isAir()) {
-                event.getEvent().getWhoClicked().setItemOnCursor(this.itemStack);
-                this.itemStack = null;
-            } else {
-                this.itemStack = cursor;
-                event.getEvent().getWhoClicked().setItemOnCursor(null);
-            }
-            // TODO can't update the gui from here
-            //      maybe that's not needed though
-        });
-    }
-
     @Nullable
     public ItemStack getItemStack() {
         return this.itemStack;
     }
 
     public void setItemStack(@Nullable ItemStack itemStack) {
+        if (itemStack != null && itemStack.getType().isAir()) {
+            itemStack = null;
+        }
         this.itemStack = itemStack;
+    }
+
+    /**
+     * Check whether this slot can hold the specified item stack.
+     *
+     * @param itemStack The item stack.
+     * @return Whether the item can be held.
+     */
+    public boolean supportsHolding(ItemStack itemStack) {
+        return true;
     }
 }

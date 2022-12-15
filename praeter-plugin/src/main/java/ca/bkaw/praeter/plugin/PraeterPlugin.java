@@ -62,6 +62,11 @@ public class PraeterPlugin extends JavaPlugin {
             this);
     }
 
+    @Override
+    public void onDisable() {
+        Praeter.get().getResourceManager().getResourcePackSender().remove();
+    }
+
     /**
      * Create directories.
      */

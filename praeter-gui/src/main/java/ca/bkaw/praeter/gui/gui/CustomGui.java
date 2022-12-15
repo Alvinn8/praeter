@@ -190,7 +190,7 @@ public abstract class CustomGui {
      * @throws IllegalArgumentException If the component type was not registered.
      */
     @NotNull
-    public <T extends GuiComponent> T get(GuiComponentType<T, ?> componentType) {
+    public <T extends GuiComponent> T get(@NotNull GuiComponentType<T, ?> componentType) {
         T component = this.components.get(componentType);
         if (component == null) {
             throw new IllegalArgumentException("The component type did not exist in this " +
