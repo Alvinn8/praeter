@@ -27,6 +27,7 @@ import java.util.List;
 public abstract class CustomGui {
     private final CustomGuiType type;
     private final ComponentMap components = new ComponentMap();
+    private final SlotManager slotManager;
     @Nullable
     private Inventory inventory;
     @Nullable
@@ -44,6 +45,7 @@ public abstract class CustomGui {
         for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
             this.createComponent(componentType);
         }
+        this.slotManager = new SlotManager(this);
     }
 
     private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
@@ -225,5 +227,23 @@ public abstract class CustomGui {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the component map.
+     *
+     * @return The component map.
+     */
+    public ComponentMap getComponentMap() {
+        return this.components;
+    }
+
+    /**
+     * Get the {@link SlotManager} that manages slots.
+     *
+     * @return The slot manager.
+     */
+    public SlotManager getSlotManager() {
+        return this.slotManager;
     }
 }

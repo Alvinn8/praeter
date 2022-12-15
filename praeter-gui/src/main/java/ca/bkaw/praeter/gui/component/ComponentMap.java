@@ -1,11 +1,9 @@
 package ca.bkaw.praeter.gui.component;
 
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * An object that maps component types to a component in a generic-safe way.
@@ -71,7 +69,18 @@ public class ComponentMap {
      *
      * @return The set.
      */
+    @UnmodifiableView
     public Set<GuiComponentType<?, ?>> getComponentTypes() {
         return Collections.unmodifiableSet(this.map.keySet());
+    }
+
+    /**
+     * Get an unmodifiable set of the components stored as values in this map.
+     *
+     * @return The collection.
+     */
+    @UnmodifiableView
+    public Collection<GuiComponent> getComponents() {
+        return Collections.unmodifiableCollection(this.map.values());
     }
 }

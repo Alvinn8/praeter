@@ -52,7 +52,7 @@ public class ResourcePack extends Pack {
 
     @Override
     protected int getCurrentPackFormat() {
-        return 11; // TODO
+        return 12;
     }
 
     private Path getResourcePath(NamespacedKey namespacedKey, String folder, String extension) {

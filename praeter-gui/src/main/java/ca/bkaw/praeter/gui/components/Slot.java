@@ -4,6 +4,7 @@ import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.components.render.SlotRenderer;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A slot where the user can take and place items.
@@ -46,5 +47,14 @@ public class Slot extends GuiComponent {
             // TODO can't update the gui from here
             //      maybe that's not needed though
         });
+    }
+
+    @Nullable
+    public ItemStack getItemStack() {
+        return this.itemStack;
+    }
+
+    public void setItemStack(@Nullable ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 }
