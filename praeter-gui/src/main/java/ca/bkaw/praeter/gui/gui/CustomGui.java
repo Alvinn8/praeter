@@ -4,6 +4,8 @@ import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.components.Slot;
+import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -12,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ import java.util.List;
 public abstract class CustomGui {
     private final CustomGuiType type;
     private final ComponentMap components = new ComponentMap();
-    private final SlotManager slotManager;
+    private final List<Slot> slots;
     @Nullable
     private Inventory inventory;
     @Nullable
@@ -45,7 +48,13 @@ public abstract class CustomGui {
         for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
             this.createComponent(componentType);
         }
-        this.slotManager = new SlotManager(this);
+        ImmutableList.Builder<Slot> slots = ImmutableList.builder();
+        for (GuiComponent component : this.components.getComponents()) {
+            if (component instanceof Slot slot) {
+                slots.add(slot);
+            }
+        }
+        this.slots = slots.build();
     }
 
     private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
@@ -239,11 +248,32 @@ public abstract class CustomGui {
     }
 
     /**
-     * Get the {@link SlotManager} that manages slots.
+     * Get an immutable list of the slots in the gui.
      *
-     * @return The slot manager.
+     * @return The list of slots.
      */
-    public SlotManager getSlotManager() {
-        return this.slotManager;
+    @Unmodifiable
+    public List<Slot> getSlots() {
+        return this.slots;
+    }
+
+    /**
+     * Get the {@link Slot} at the specified position.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return The slot, or null.
+     */
+    @Nullable
+    public Slot getSlot(int x, int y) {
+        GuiComponentType<?, ?> componentType = this.getComponentTypeAt(x, y);
+        if (componentType == null) {
+            return null;
+        }
+        GuiComponent guiComponent = this.get(componentType);
+        if (guiComponent instanceof Slot slot) {
+            return slot;
+        }
+        return null;
     }
 }
