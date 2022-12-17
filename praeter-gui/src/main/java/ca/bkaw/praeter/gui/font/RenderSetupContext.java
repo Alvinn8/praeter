@@ -1,7 +1,9 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
+import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import org.bukkit.NamespacedKey;
@@ -29,9 +31,20 @@ public class RenderSetupContext {
     public static final NamespacedKey FONT_KEY = new NamespacedKey(Praeter.NAMESPACE, "gui");
 
     private final List<ResourcePack> resourcePacks;
+    private DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN;
 
     public RenderSetupContext(List<ResourcePack> resourcePacks) {
         this.resourcePacks = resourcePacks;
+    }
+
+    /**
+     * Change the origin for subsequent {@link GuiFontSequenceBuilder}s.
+     *
+     * @param origin The origin.
+     * @see GuiFontSequenceBuilder#setOrigin(DrawOrigin)
+     */
+    public void setOrigin(DrawOrigin origin) {
+        this.origin = origin;
     }
 
     /**
@@ -41,7 +54,7 @@ public class RenderSetupContext {
      * @throws IOException If an I/O error occurs.
      */
     public GuiFontSequenceBuilder newFontSequence() throws IOException {
-        return new GuiFontSequenceBuilder(this.resourcePacks, FONT_KEY);
+        return new GuiFontSequenceBuilder(this.resourcePacks, FONT_KEY, this.origin);
     }
 
     /**

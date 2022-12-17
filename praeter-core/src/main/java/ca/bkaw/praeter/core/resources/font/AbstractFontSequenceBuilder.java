@@ -1,6 +1,8 @@
 package ca.bkaw.praeter.core.resources.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Contract;
@@ -22,16 +24,13 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
     private final List<ResourcePack> resourcePacks;
     private final List<Font> fonts;
     private final List<FontCharIdentifier> fontChars = new ArrayList<>();
-    private final int originX;
-    private final int originY;
+    private DrawOrigin origin;
 
     public AbstractFontSequenceBuilder(List<ResourcePack> resourcePacks,
                                        NamespacedKey fontKey,
-                                       int originX,
-                                       int originY) throws IOException {
+                                       DrawOrigin origin) throws IOException {
         this.resourcePacks = resourcePacks;
-        this.originX = originX;
-        this.originY = originY;
+        this.origin = origin;
         this.fonts = new ArrayList<>(this.resourcePacks.size());
         for (ResourcePack pack : this.resourcePacks) {
             this.fonts.add(new Font(pack, fontKey));
@@ -84,7 +83,25 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
     }
 
     /**
-     * Render an image.
+     * Get the {@link DrawOriginResolver} that is responsible for resolving the origin
+     * to absolute coordinates for the font sequence builder to use.
+     *
+     * @return The origin resolver.
+     */
+    protected abstract DrawOriginResolver getOriginResolver();
+
+    /**
+     * Set the drawing origin. All subsequent drawing operations will be relative to
+     * the set origin.
+     *
+     * @param origin The origin.
+     */
+    public void setOrigin(DrawOrigin origin) {
+        this.origin = origin;
+    }
+
+    /**
+     * Draw an image.
      *
      * @param textureKey The key of the texture to render. The key is relative to the
      *                   textures folder and must contain the file extension.
@@ -94,9 +111,9 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
      * @throws IOException If an I/O error occurs.
      */
     @Contract("_, _, _ -> this")
-    public T renderImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
-        offsetX += this.originX;
-        offsetY += this.originY;
+    public T drawImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
+        offsetX += this.getOriginResolver().resolveOriginX(this.origin);
+        offsetY += this.getOriginResolver().resolveOriginY(this.origin);
 
         // x offset: shift right with spaces (and shift back afterwards)
         // y offset: use the character ascent

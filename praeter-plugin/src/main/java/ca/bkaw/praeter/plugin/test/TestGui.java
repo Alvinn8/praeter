@@ -25,20 +25,22 @@ public class TestGui extends CustomGui {
         1, 1
     );
     public static final Slot.Type SLOT_1 = new Slot.Type(5, 1);
+    public static final Slot.Type SLOT_2 = new Slot.Type(6, 1);
+    public static final Slot.Type SLOT_3 = new Slot.Type(7, 2);
 
     public static final CustomGuiType TYPE = CustomGuiType.builder()
         .height(6)
         .title(Component.text("Test Gui"))
         .renderer(new FontGuiRenderer())
-        .add(BUTTON_1, BUTTON_2, TEMP_COMPONENT, SLOT_1)
+        .add(BUTTON_1, BUTTON_2, TEMP_COMPONENT, SLOT_1, SLOT_2, SLOT_3)
         .build();
 
     public TestGui() {
         super(TYPE);
 
-        get(BUTTON_2).setOnClick(event -> {
+        get(BUTTON_2).setOnClick(context -> {
             toggleButton2();
-            event.playClickSound();
+            context.playClickSound();
         });
     }
 

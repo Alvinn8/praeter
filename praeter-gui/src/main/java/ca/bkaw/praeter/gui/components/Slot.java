@@ -24,7 +24,7 @@ public class Slot extends GuiComponent {
          * @param y The y position of the slot.
          */
         public Type(int x, int y) {
-            super(new SlotRenderer(), x, y, 1, 1);
+            super(SlotRenderer.slot(), x, y, 1, 1);
         }
 
         @Override

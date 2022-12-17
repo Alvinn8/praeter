@@ -1,6 +1,9 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import org.bukkit.NamespacedKey;
@@ -50,7 +53,36 @@ public class GuiBackgroundPainter {
      */
     public static final Color BACKGROUND_GRAY = new Color(198, 198, 198);
 
+    /**
+     * A {@link DrawOriginResolver} that resolves origins into positions on the
+     * background.
+     */
+    public static final DrawOriginResolver ORIGIN_RESOLVER = new DrawOriginResolver() {
+        @Override
+        public int resolveOriginX(DrawOrigin origin) {
+            if (origin instanceof CompositeDrawOrigin composite) {
+                return this.resolveOriginX(composite.getOrigin()) + composite.getOffsetX();
+            }
+            if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
+                return HORIZONTAL_PADDING;
+            }
+            throw new IllegalArgumentException("The specified origin is not a supported DrawOrigin: " + origin);
+        }
+
+        @Override
+        public int resolveOriginY(DrawOrigin origin) {
+            if (origin instanceof CompositeDrawOrigin composite) {
+                return this.resolveOriginY(composite.getOrigin()) + composite.getOffsetY();
+            }
+            if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
+                return TOP_PADDING;
+            }
+            throw new IllegalArgumentException("The specified origin is not a supported DrawOrigin: " + origin);
+        }
+    };
+
     private final BufferedImage image;
+    private DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN;
 
     public GuiBackgroundPainter(int rows) throws IOException {
         int height = TOP_PADDING + rows * GuiUtils.SLOT_SIZE;
@@ -92,6 +124,16 @@ public class GuiBackgroundPainter {
     }
 
     /**
+     * Set the drawing origin. All subsequent drawing operations will be relative to
+     * the set origin.
+     *
+     * @param origin The origin.
+     */
+    public void setOrigin(DrawOrigin origin) {
+        this.origin = origin;
+    }
+
+    /**
      * Carve out the specified area by replacing the pixels with transparency.
      * <p>
      * When carving over a slot, this results in the slot from the vanilla gui showing
@@ -103,10 +145,12 @@ public class GuiBackgroundPainter {
      * @param height The height.
      */
     public void carve(int x, int y, int width, int height) {
+        x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
+        y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
         for (int offsetX = 0; offsetX < width; offsetX++) {
             for (int offsetY = 0; offsetY < height; offsetY++) {
-                int pixelX = x + offsetX + HORIZONTAL_PADDING;
-                int pixelY = y + offsetY + TOP_PADDING;
+                int pixelX = x + offsetX;
+                int pixelY = y + offsetY;
                 this.image.setRGB(pixelX, pixelY, 0);
             }
         }

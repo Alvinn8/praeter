@@ -19,18 +19,14 @@ import java.io.IOException;
 
 public class TestButtonRenderer implements FontGuiComponentRenderer<Button, Button.Type> {
 
-    private FontSequence fontSequence;
-
     @Override
     public void onSetup(CustomGuiType customGuiType, Button.Type componentType, RenderSetupContext context) throws IOException {
-        this.fontSequence = context.newFontSequence()
-                .renderImage(new NamespacedKey("minecraft", "item/diamond.png"), 5, 5)
-                .build();
+
     }
 
     @Override
     public void onRender(CustomGuiType customGuiType, CustomGui customGui, Button.Type componentType, Button component, RenderDispatcher renderDispatcher) {
-        renderDispatcher.render(this.fontSequence);
+
     }
 
     @Override

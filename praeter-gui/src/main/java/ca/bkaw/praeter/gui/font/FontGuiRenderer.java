@@ -1,6 +1,8 @@
 package ca.bkaw.praeter.gui.font;
 
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
+import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
@@ -33,6 +35,9 @@ import java.util.List;
 public class FontGuiRenderer implements CustomGuiRenderer {
     private FontSequence background;
     // TODO this means we can't reuse renderer instances, maybe that's good though?
+    //      we might just wanna remove the whole CustomGuiRenderer system to simplify
+    //      things. The implementation can just support everything we want, including
+    //      items and font stuff.
 
     @Override
     public boolean supports(GuiComponentRenderer<?, ?> componentRenderer) {
@@ -76,11 +81,8 @@ public class FontGuiRenderer implements CustomGuiRenderer {
                 Files.createDirectories(modelPath.getParent());
                 Files.write(modelPath, bytes);
             }
-            this.background = context.newFontSequence().renderImage(
-                backgroundKey,
-                -GuiBackgroundPainter.HORIZONTAL_PADDING,
-                -GuiBackgroundPainter.TOP_PADDING
-            ).build();
+            context.setOrigin(GuiUtils.GUI_WINDOW_ORIGIN);
+            this.background = context.newFontSequence().drawImage(backgroundKey, 0, 0).build();
         } catch (IOException e) {
             throw new RuntimeException("Failed to write GUI background.", e);
         }
@@ -89,10 +91,19 @@ public class FontGuiRenderer implements CustomGuiRenderer {
 
     private <C extends GuiComponent, T extends GuiComponentType<C, T>> void forEachComponentType(T componentType, CustomGuiType customGuiType, RenderSetupContext context, GuiBackgroundPainter background) throws IOException {
         GuiComponentRenderer<C, T> renderer = componentType.getRenderer();
+        // All drawing operations on a component renderer will use that component's
+        // position as the origin. This allows components to simply draw at (0, 0) to
+        // draw at the component's location.
+        DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN.add(
+            componentType.getX() * GuiUtils.SLOT_SIZE,
+            componentType.getY() * GuiUtils.SLOT_SIZE
+        );
         if (renderer instanceof FontGuiComponentRenderer<C, T> fontComponentRenderer) {
+            context.setOrigin(origin);
             fontComponentRenderer.onSetup(customGuiType, componentType, context);
         }
         if (renderer instanceof BackgroundGuiComponentRenderer<C,T> backgroundComponentRenderer) {
+            background.setOrigin(origin);
             backgroundComponentRenderer.draw(customGuiType, componentType, background);
         }
     }
@@ -111,6 +122,9 @@ public class FontGuiRenderer implements CustomGuiRenderer {
             }
         }
         if (bakedResourcePack == null) {
+            if (true) {
+                new Exception("stack trace").printStackTrace();
+            }
             return Component.empty();
         }
 

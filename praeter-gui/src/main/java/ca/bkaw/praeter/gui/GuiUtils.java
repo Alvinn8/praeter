@@ -1,6 +1,9 @@
 package ca.bkaw.praeter.gui;
 
+import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.font.GuiBackgroundPainter;
 
 import java.util.function.IntConsumer;
 
@@ -12,6 +15,25 @@ public final class GuiUtils {
      * The width/height of a slot, measured in pixels.
      */
     public static final int SLOT_SIZE = 18;
+
+    /**
+     * A {@link DrawOrigin} for the top-left pixel of the top-left slot (0, 0).
+     */
+    public static final DrawOrigin GUI_SLOT_ORIGIN = new DrawOrigin() {
+        @Override
+        public String toString() {
+            return "GUI_SLOT_ORIGIN";
+        }
+    };
+
+    /**
+     * A {@link DrawOrigin} for the top-left pixel of the gui window.
+     */
+    public static final DrawOrigin GUI_WINDOW_ORIGIN = new CompositeDrawOrigin(
+        GUI_SLOT_ORIGIN,
+        -GuiBackgroundPainter.HORIZONTAL_PADDING,
+        -GuiBackgroundPainter.TOP_PADDING
+    );
 
     private GuiUtils() {}
 
@@ -70,5 +92,16 @@ public final class GuiUtils {
      */
     public static int getY(int slot) {
         return slot / 9;
+    }
+
+    /**
+     * Get the slot index in a 9-slot-wide inventory from a pair of coordinates.
+     *
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return The slot.
+     */
+    public static int getSlot(int x, int y) {
+        return y * 9 + x;
     }
 }

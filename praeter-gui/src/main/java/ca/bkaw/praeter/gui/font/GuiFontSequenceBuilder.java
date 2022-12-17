@@ -1,5 +1,8 @@
 package ca.bkaw.praeter.gui.font;
 
+import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
+import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
 import ca.bkaw.praeter.core.resources.font.AbstractFontSequenceBuilder;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
@@ -31,9 +34,38 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
      */
     public static final int ORIGIN_OFFSET_Y = 4;
 
+    /**
+     * The {@link DrawOriginResolver} that resolves origins into positions in a font
+     * sequence rendered at the title of a gui.
+     */
+    public static final DrawOriginResolver ORIGIN_RESOLVER = new DrawOriginResolver() {
+        @Override
+        public int resolveOriginX(DrawOrigin origin) {
+            if (origin instanceof CompositeDrawOrigin composite) {
+                return this.resolveOriginX(composite.getOrigin()) + composite.getOffsetX();
+            }
+            if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
+                return ORIGIN_OFFSET_X;
+            }
+            throw new IllegalArgumentException("The specified origin is not a supported DrawOrigin: " + origin);
+        }
+
+        @Override
+        public int resolveOriginY(DrawOrigin origin) {
+            if (origin instanceof CompositeDrawOrigin composite) {
+                return this.resolveOriginY(composite.getOrigin()) + composite.getOffsetY();
+            }
+            if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
+                return ORIGIN_OFFSET_Y;
+            }
+            throw new IllegalArgumentException("The specified origin is not a supported DrawOrigin: " + origin);
+        }
+    };
+
     public GuiFontSequenceBuilder(List<ResourcePack> resourcePacks,
-                                  NamespacedKey fontKey) throws IOException {
-        super(resourcePacks, fontKey, ORIGIN_OFFSET_X, ORIGIN_OFFSET_Y);
+                                  NamespacedKey fontKey,
+                                  DrawOrigin origin) throws IOException {
+        super(resourcePacks, fontKey, origin);
     }
 
     @Override
@@ -41,8 +73,14 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
         return this;
     }
 
+    @Override
+    protected DrawOriginResolver getOriginResolver() {
+        return ORIGIN_RESOLVER;
+    }
+
     // This class mostly overrides methods to change the javadoc to clarify how
     // things work with guis.
+    // TODO we can now generify the javadoc to say relative to the set origin.
 
     /**
      * Shift the cursor to the left by the specified amount of pixels.
@@ -79,7 +117,7 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
     }
 
     /**
-     * Render an image.
+     * Draw an image.
      *
      * @param textureKey The key of the texture to render. The key is relative to the
      *                   textures folder and must contain the file extension.
@@ -92,7 +130,7 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
      */
     @Override
     @Contract("_, _, _ -> this")
-    public GuiFontSequenceBuilder renderImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
-        return super.renderImage(textureKey, offsetX, offsetY);
+    public GuiFontSequenceBuilder drawImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
+        return super.drawImage(textureKey, offsetX, offsetY);
     }
 }
