@@ -55,39 +55,69 @@ public class ResourcePack extends Pack {
         return 12;
     }
 
-    private Path getResourcePath(NamespacedKey namespacedKey, String folder, String extension) {
+    private static String getResourcePath(NamespacedKey namespacedKey, String folder, String extension) {
         String dotExtension = "." + extension;
         String key = namespacedKey.getKey();
         if (!key.endsWith(dotExtension)) {
             key += dotExtension;
         }
-        return this.getPath("assets/" + namespacedKey.getNamespace() + "/" + folder + "/" + key);
+        return "assets/" + namespacedKey.getNamespace() + "/" + folder + "/" + key;
+    }
+
+    /**
+     * Get the string path to a model resource in a resource pack.
+     * <p>
+     * The key is relative to the "textures" folder, but "item", "block", etc. folders
+     * must be provided in the key. The file extension (.json) may optionally be
+     * provided in the key.
+     *
+     * @param namespacedKey The namespaced key of the model to get the string path.
+     * @return The string path of the model.
+     */
+    public static String getModelStringPath(NamespacedKey namespacedKey) {
+        return getResourcePath(namespacedKey, "models", "json");
     }
 
     /**
      * Get the path to a model resource in this resource pack.
      * <p>
-     * Note that this does not include the folders "item", "block", etc., that must be
-     * present in the namespaced key.
+     * The key is relative to the "textures" folder, but "item", "block", etc. folders
+     * must be provided in the key. The file extension (.json) may optionally be
+     * provided in the key.
      *
-     * @param namespacedKey The namespaced key for the model to get the path of.
+     * @param namespacedKey The namespaced key of the model to get the path.
      * @return The path of the model.
      */
     public Path getModelPath(NamespacedKey namespacedKey) {
-        return this.getResourcePath(namespacedKey, "models", "json");
+        return this.getPath(getModelStringPath(namespacedKey));
+    }
+
+    /**
+     * Get the string path to a texture resource in a resource pack.
+     * <p>
+     * The key is relative to the "textures" folder, but "item", "block", etc. folders
+     * must be provided in the key. The file extension (.png) may optionally be
+     * provided in the key.
+     *
+     * @param namespacedKey The namespaced key of the texture to get the string path.
+     * @return The string path of the texture.
+     */
+    public static String getTextureStringPath(NamespacedKey namespacedKey) {
+        return getResourcePath(namespacedKey, "textures", "png");
     }
 
     /**
      * Get the path to a texture resource in this resource pack.
      * <p>
-     * Note that this does not include the folders "item", "block", etc., that must be
-     * present in the namespaced key.
+     * The key is relative to the "textures" folder, but "item", "block", etc. folders
+     * must be provided in the key. The file extension (.png) may optionally be
+     * provided in the key.
      *
-     * @param namespacedKey The namespaced key for the texture to get the path of.
+     * @param namespacedKey The namespaced key of the texture to get the string path.
      * @return The path of the texture.
      */
     public Path getTexturePath(NamespacedKey namespacedKey) {
-        return this.getResourcePath(namespacedKey, "textures", "png");
+        return this.getPath(getTextureStringPath(namespacedKey));
     }
 
     /**

@@ -45,8 +45,8 @@ public class ResourceManager {
      * @param plugin The plugin.
      * @return The list of resource packs.
      */
-    public List<ResourcePack> getResourcePacks(Plugin plugin) {
-        return Collections.singletonList(this.packs.getMain()); // TODO
+    public ResourcePackList getResourcePacks(Plugin plugin) {
+        return new ResourcePackList(Collections.singletonList(this.packs.getMain())); // TODO
     }
 
     /**

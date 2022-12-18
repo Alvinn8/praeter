@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.gui.font;
 
+import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.gui.GuiUtils;
@@ -47,13 +48,13 @@ public class FontGuiRenderer implements CustomGuiRenderer {
 
     @Override
     public void onSetup(CustomGuiType customGuiType) {
-        List<ResourcePack> resourcePacks = Praeter.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
+        ResourcePackList resourcePacks = Praeter.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
         RenderSetupContext context = new RenderSetupContext(resourcePacks);
         GuiBackgroundPainter backgroundPainter;
 
         // Create the background
         try {
-            backgroundPainter = new GuiBackgroundPainter(customGuiType.getHeight());
+            backgroundPainter = new GuiBackgroundPainter(customGuiType.getHeight(), resourcePacks);
         } catch (IOException e) {
             throw new RuntimeException("Failed to create GUI background.", e);
         }
@@ -123,7 +124,7 @@ public class FontGuiRenderer implements CustomGuiRenderer {
         }
         if (bakedResourcePack == null) {
             if (true) {
-                new Exception("stack trace").printStackTrace();
+                System.out.println("customGui.getViewers().size() = " + customGui.getViewers().size());
             }
             return Component.empty();
         }

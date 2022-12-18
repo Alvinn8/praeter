@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.gui.font;
 
+import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
@@ -42,7 +43,7 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
         @Override
         public int resolveOriginX(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginX(composite.getOrigin()) + composite.getOffsetX();
+                return composite.resolveX(this);
             }
             if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
                 return ORIGIN_OFFSET_X;
@@ -53,7 +54,7 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
         @Override
         public int resolveOriginY(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginY(composite.getOrigin()) + composite.getOffsetY();
+                return composite.resolveY(this);
             }
             if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
                 return ORIGIN_OFFSET_Y;
@@ -62,7 +63,7 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
         }
     };
 
-    public GuiFontSequenceBuilder(List<ResourcePack> resourcePacks,
+    public GuiFontSequenceBuilder(ResourcePackList resourcePacks,
                                   NamespacedKey fontKey,
                                   DrawOrigin origin) throws IOException {
         super(resourcePacks, fontKey, origin);
@@ -80,7 +81,6 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
 
     // This class mostly overrides methods to change the javadoc to clarify how
     // things work with guis.
-    // TODO we can now generify the javadoc to say relative to the set origin.
 
     /**
      * Shift the cursor to the left by the specified amount of pixels.
@@ -114,23 +114,5 @@ public class GuiFontSequenceBuilder extends AbstractFontSequenceBuilder<GuiFontS
     @Contract("_ -> this")
     public GuiFontSequenceBuilder shiftRight(int pixels) throws IOException {
         return super.shiftRight(pixels);
-    }
-
-    /**
-     * Draw an image.
-     *
-     * @param textureKey The key of the texture to render. The key is relative to the
-     *                   textures folder and must contain the file extension.
-     * @param offsetX The x offset to render the image at, in pixels, relative to the
-     *                top-left pixel of the top-left slot, slot (0, 0).
-     * @param offsetY The y offset to render the image at, in pixels, relative to the
-     *                top-left pixel of the top-left slot, slot (0, 0).
-     * @return The builder, for chaining.
-     * @throws IOException If an I/O error occurs.
-     */
-    @Override
-    @Contract("_, _, _ -> this")
-    public GuiFontSequenceBuilder drawImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
-        return super.drawImage(textureKey, offsetX, offsetY);
     }
 }

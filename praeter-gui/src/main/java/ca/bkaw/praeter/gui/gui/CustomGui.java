@@ -104,12 +104,6 @@ public abstract class CustomGui {
             CustomGuiHolder holder = new CustomGuiHolder(this);
             this.inventory = Bukkit.createInventory(holder, slotCount, renderTitle);
             this.currentRenderTitle = renderTitle;
-
-            // If the inventory was recreated with a new title,
-            // open the new inventory for the viewers
-            if (viewers != null) {
-                viewers.forEach(viewer -> viewer.openInventory(this.inventory));
-            }
         }
 
         // Clear the items
@@ -117,6 +111,12 @@ public abstract class CustomGui {
 
         // Let components render items
         this.components.forEach(this::renderComponent);
+
+        // If the inventory was recreated with a new title,
+        // open the new inventory for the viewers
+        if (viewers != null) {
+            viewers.forEach(viewer -> viewer.openInventory(this.inventory));
+        }
     }
 
     private <C extends GuiComponent, T extends GuiComponentType<C, T>>
@@ -130,7 +130,7 @@ public abstract class CustomGui {
     /**
      * Get a list of players that are viewing the gui.
      *
-     * @return The list of playrs.
+     * @return The list of players.
      */
     public List<Player> getViewers() {
         List<Player> players = new ArrayList<>();

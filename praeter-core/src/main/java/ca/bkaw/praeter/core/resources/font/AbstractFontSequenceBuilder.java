@@ -1,8 +1,10 @@
 package ca.bkaw.praeter.core.resources.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
+import ca.bkaw.praeter.core.resources.draw.Drawable;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Contract;
@@ -20,13 +22,13 @@ import java.util.List;
 /**
  * An abstract builder for a {@link FontSequence}.
  */
-public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequenceBuilder<T>> {
-    private final List<ResourcePack> resourcePacks;
+public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequenceBuilder<T>> implements Drawable<T> {
+    private final ResourcePackList resourcePacks;
     private final List<Font> fonts;
     private final List<FontCharIdentifier> fontChars = new ArrayList<>();
     private DrawOrigin origin;
 
-    public AbstractFontSequenceBuilder(List<ResourcePack> resourcePacks,
+    public AbstractFontSequenceBuilder(ResourcePackList resourcePacks,
                                        NamespacedKey fontKey,
                                        DrawOrigin origin) throws IOException {
         this.resourcePacks = resourcePacks;
@@ -90,43 +92,35 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
      */
     protected abstract DrawOriginResolver getOriginResolver();
 
-    /**
-     * Set the drawing origin. All subsequent drawing operations will be relative to
-     * the set origin.
-     *
-     * @param origin The origin.
-     */
+    @Override
+    public DrawOrigin getOrigin() {
+        return this.origin;
+    }
+
+    @Override
     public void setOrigin(DrawOrigin origin) {
         this.origin = origin;
     }
 
-    /**
-     * Draw an image.
-     *
-     * @param textureKey The key of the texture to render. The key is relative to the
-     *                   textures folder and must contain the file extension.
-     * @param offsetX The x offset to render the image at, in pixels, relative to the origin.
-     * @param offsetY The y offset to render the image at, in pixels, relative to the origin.
-     * @return The builder, for chaining.
-     * @throws IOException If an I/O error occurs.
-     */
+    @Override
     @Contract("_, _, _ -> this")
-    public T drawImage(NamespacedKey textureKey, int offsetX, int offsetY) throws IOException {
-        offsetX += this.getOriginResolver().resolveOriginX(this.origin);
-        offsetY += this.getOriginResolver().resolveOriginY(this.origin);
+    public T drawImage(NamespacedKey textureKey, int x, int y) throws IOException {
+        x += this.getOriginResolver().resolveOriginX(this.origin);
+        y += this.getOriginResolver().resolveOriginY(this.origin);
+
+        // Ensure the key ends with .png, which is required for fonts
+        if (!textureKey.getKey().endsWith(".png")) {
+            textureKey
+                = new NamespacedKey(textureKey.getNamespace(), textureKey.getKey() + ".png");
+        }
 
         // x offset: shift right with spaces (and shift back afterwards)
         // y offset: use the character ascent
-        this.shiftRight(offsetX);
-        int ascent = -offsetY;
+        this.shiftRight(x);
+        int ascent = -y;
 
         // Read the texture
-        // Find the image manually instead of using ResourcePack#getTexturePath because
-        // we want to ensure that the key contains the file extension.
-        Path texturePath = Praeter.get().getResourceManager().getPacks().getResource(
-            this.resourcePacks,
-            "assets/" + textureKey.getNamespace() + "/textures/" + textureKey.getKey()
-        );
+        Path texturePath = this.resourcePacks.getTexturePath(textureKey);
         BufferedImage image = ImageIO.read(Files.newInputStream(texturePath));
         int size = Math.max(image.getWidth(), image.getHeight());
 
@@ -177,7 +171,7 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
 
         // Shift back, and the image has an effective width we need to move back by,
         // and an additional pixel for the single-pixel-wide space after the character.
-        this.shiftLeft(offsetX + getEffectiveWidth(image) + 1);
+        this.shiftLeft(x + getEffectiveWidth(image) + 1);
 
         return getThis();
     }

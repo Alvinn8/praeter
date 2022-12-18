@@ -55,6 +55,7 @@ public class ResourcePacksHolder extends PacksHolder<ResourcePack> {
      * @throws RuntimeException If the resource could not be found, or mismatch
      * between the provided packs was detected.
      */
+    @Deprecated(forRemoval = true)
     @NotNull
     public Path getResource(List<ResourcePack> resourcePacks, String filePath) {
         Path foundPath = null;

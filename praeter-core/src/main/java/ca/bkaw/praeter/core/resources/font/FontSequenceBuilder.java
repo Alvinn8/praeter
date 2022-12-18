@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.core.resources.font;
 
+import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
@@ -24,7 +25,7 @@ public class FontSequenceBuilder extends AbstractFontSequenceBuilder<FontSequenc
         @Override
         public int resolveOriginX(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginX(composite.getOrigin()) + composite.getOffsetX();
+                return composite.resolveX(this);
             }
             if (origin == ORIGIN) {
                 return 0;
@@ -35,7 +36,7 @@ public class FontSequenceBuilder extends AbstractFontSequenceBuilder<FontSequenc
         @Override
         public int resolveOriginY(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginY(composite.getOrigin()) + composite.getOffsetY();
+                return composite.resolveY(this);
             }
             if (origin == ORIGIN) {
                 return 0;
@@ -44,7 +45,7 @@ public class FontSequenceBuilder extends AbstractFontSequenceBuilder<FontSequenc
         }
     };
 
-    public FontSequenceBuilder(List<ResourcePack> resourcePacks, NamespacedKey fontKey) throws IOException {
+    public FontSequenceBuilder(ResourcePackList resourcePacks, NamespacedKey fontKey) throws IOException {
         super(resourcePacks, fontKey, ORIGIN);
     }
 

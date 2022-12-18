@@ -1,9 +1,12 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.ResourcePackList;
+import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
+import ca.bkaw.praeter.core.resources.draw.Drawable;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import org.bukkit.NamespacedKey;
@@ -14,11 +17,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * An object responsible for painting the background in a custom gui.
  */
-public class GuiBackgroundPainter {
+public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
     /**
      * The key to the generic_54 texture, relative to the textures folder and including
      * the file extension.
@@ -61,7 +65,7 @@ public class GuiBackgroundPainter {
         @Override
         public int resolveOriginX(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginX(composite.getOrigin()) + composite.getOffsetX();
+                return composite.resolveX(this);
             }
             if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
                 return HORIZONTAL_PADDING;
@@ -72,7 +76,7 @@ public class GuiBackgroundPainter {
         @Override
         public int resolveOriginY(DrawOrigin origin) {
             if (origin instanceof CompositeDrawOrigin composite) {
-                return this.resolveOriginY(composite.getOrigin()) + composite.getOffsetY();
+                return composite.resolveY(this);
             }
             if (origin == GuiUtils.GUI_SLOT_ORIGIN) {
                 return TOP_PADDING;
@@ -82,11 +86,13 @@ public class GuiBackgroundPainter {
     };
 
     private final BufferedImage image;
+    private final ResourcePackList resourcePacks;
     private DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN;
 
-    public GuiBackgroundPainter(int rows) throws IOException {
+    public GuiBackgroundPainter(int rows, ResourcePackList resourcePacks) throws IOException {
         int height = TOP_PADDING + rows * GuiUtils.SLOT_SIZE;
         this.image = new BufferedImage(WIDTH, height, BufferedImage.TYPE_INT_ARGB);
+        this.resourcePacks = resourcePacks;
         this.paintBackground();
     }
 
@@ -123,12 +129,12 @@ public class GuiBackgroundPainter {
         }
     }
 
-    /**
-     * Set the drawing origin. All subsequent drawing operations will be relative to
-     * the set origin.
-     *
-     * @param origin The origin.
-     */
+    @Override
+    public DrawOrigin getOrigin() {
+        return this.origin;
+    }
+
+    @Override
     public void setOrigin(DrawOrigin origin) {
         this.origin = origin;
     }
@@ -139,8 +145,8 @@ public class GuiBackgroundPainter {
      * When carving over a slot, this results in the slot from the vanilla gui showing
      * trough, including the hover.
      *
-     * @param x The x coordinate.
-     * @param y The y coordinate.
+     * @param x The x coordinate, relative to the {@link #getOrigin() origin}.
+     * @param y The y coordinate, relative to the {@link #getOrigin() origin}.
      * @param width The width.
      * @param height The height.
      */
@@ -154,5 +160,21 @@ public class GuiBackgroundPainter {
                 this.image.setRGB(pixelX, pixelY, 0);
             }
         }
+    }
+
+    @Override
+    public GuiBackgroundPainter drawImage(NamespacedKey textureKey, int x, int y) throws IOException {
+        x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
+        y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
+
+        // Read the image
+        Path texturePath = this.resourcePacks.getTexturePath(textureKey);
+        BufferedImage image = ImageIO.read(Files.newInputStream(texturePath));
+
+        // Draw the image
+        Graphics2D graphics = this.image.createGraphics();
+        graphics.drawImage(image, x, y, null);
+
+        return this;
     }
 }

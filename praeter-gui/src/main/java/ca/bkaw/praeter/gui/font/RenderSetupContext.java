@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
@@ -30,10 +31,10 @@ public class RenderSetupContext {
     // characters were used in item lore)
     public static final NamespacedKey FONT_KEY = new NamespacedKey(Praeter.NAMESPACE, "gui");
 
-    private final List<ResourcePack> resourcePacks;
+    private final ResourcePackList resourcePacks;
     private DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN;
 
-    public RenderSetupContext(List<ResourcePack> resourcePacks) {
+    public RenderSetupContext(ResourcePackList resourcePacks) {
         this.resourcePacks = resourcePacks;
     }
 
@@ -62,8 +63,7 @@ public class RenderSetupContext {
      *
      * @return The immutable list of resource packs.
      */
-    @Unmodifiable
-    public List<ResourcePack> getResourcePacks() {
+    public ResourcePackList getResourcePacks() {
         return this.resourcePacks;
     }
 }

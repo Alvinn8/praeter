@@ -20,24 +20,34 @@ public final class CompositeDrawOrigin extends DrawOrigin {
         this.offsetY = offsetY;
     }
 
-    public DrawOrigin getOrigin() {
-        return this.origin;
+    /**
+     * Resolve the absolute x coordinate of this composite draw origin by using the
+     * specified {@link DrawOriginResolver}.
+     *
+     * @param originResolver The origin resolver.
+     * @return The absolute x position.
+     */
+    public int resolveX(DrawOriginResolver originResolver) {
+        return originResolver.resolveOriginX(this.origin) + this.offsetX;
     }
 
-    public int getOffsetX() {
-        return this.offsetX;
-    }
-
-    public int getOffsetY() {
-        return this.offsetY;
+    /**
+     * Resolve the absolute y coordinate of this composite draw origin by using the
+     * specified {@link DrawOriginResolver}.
+     *
+     * @param originResolver The origin resolver.
+     * @return The absolute y position.
+     */
+    public int resolveY(DrawOriginResolver originResolver) {
+        return originResolver.resolveOriginY(this.origin) + this.offsetY;
     }
 
     @Override
     public String toString() {
         return "CompositeDrawOrigin{" +
-            "origin=" + origin +
-            ", offsetX=" + offsetX +
-            ", offsetY=" + offsetY +
+            "origin=" + this.origin +
+            ", offsetX=" + this.offsetX +
+            ", offsetY=" + this.offsetY +
             '}';
     }
 }
