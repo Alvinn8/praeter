@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An object created when a gui is rendered using a {@link FontGuiRenderer}.
+ * An object created when a gui is rendered.
  *
  * @see FontGuiComponentRenderer#onRender(CustomGuiType, CustomGui, GuiComponentType, GuiComponent, RenderDispatcher)
  */

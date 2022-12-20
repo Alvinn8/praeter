@@ -225,6 +225,7 @@ public class GuiEventListener implements Listener {
                     update = true;
                     // All the items were consumed
                     event.setCurrentItem(null);
+                    break;
                 }
             }
         }

@@ -10,8 +10,6 @@ import java.io.IOException;
 
 /**
  * A {@link GuiComponentRenderer} that renders components using custom fonts.
- * <p>
- * For usage with a {@link FontGuiRenderer}.
  *
  * @param <C> The type of the {@link GuiComponent component} that this renderer
  *            will render.

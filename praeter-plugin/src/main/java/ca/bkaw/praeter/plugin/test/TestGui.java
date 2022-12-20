@@ -3,7 +3,6 @@ package ca.bkaw.praeter.plugin.test;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.components.Slot;
 import ca.bkaw.praeter.gui.components.ToggleButton;
-import ca.bkaw.praeter.gui.font.FontGuiRenderer;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import net.kyori.adventure.text.Component;
@@ -31,7 +30,6 @@ public class TestGui extends CustomGui {
     public static final CustomGuiType TYPE = CustomGuiType.builder()
         .height(6)
         .title(Component.text("Test Gui"))
-        .renderer(new FontGuiRenderer())
         .add(BUTTON_1, BUTTON_2, TEMP_COMPONENT, SLOT_1, SLOT_2, SLOT_3)
         .build();
 

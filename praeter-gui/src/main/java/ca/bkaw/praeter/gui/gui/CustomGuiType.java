@@ -22,20 +22,18 @@ import java.util.List;
  * @see CustomGui
  */
 public class CustomGuiType {
+    private final CustomGuiRenderer renderer = new CustomGuiRenderer();
     private Plugin plugin;
     private final List<GuiComponentType<?, ?>> componentTypes;
     private final int height;
     private final Component title;
-    private final CustomGuiRenderer renderer;
 
     private CustomGuiType(List<GuiComponentType<?, ?>> componentTypes,
                           int height,
-                          Component title,
-                          CustomGuiRenderer renderer) {
+                          Component title) {
         this.componentTypes = ImmutableList.copyOf(componentTypes);
         this.height = height;
         this.title = title;
-        this.renderer = renderer;
     }
 
     /**
@@ -135,7 +133,6 @@ public class CustomGuiType {
         private final List<GuiComponentType<?, ?>> componentTypes = new ArrayList<>();
         private int height = 6;
         private Component title;
-        private CustomGuiRenderer renderer;
 
         private Builder() {}
 
@@ -180,33 +177,12 @@ public class CustomGuiType {
         }
 
         /**
-         * Set the renderer of the gui.
-         * <p>
-         * If no renderer is set, a renderer will be chosen automatically based on the gui
-         * component renderers.
-         *
-         * @param renderer The renderer.
-         * @return The builder, for chaining.
-         */
-        @Contract("_ -> this")
-        public Builder renderer(CustomGuiRenderer renderer) {
-            this.renderer = renderer;
-            return this;
-        }
-
-        /**
          * Create the {@link CustomGuiType} from this builder.
          *
          * @return The created {@link CustomGuiType}.
          */
         public CustomGuiType build() {
-            if (this.renderer == null) {
-                // No renderer was set by the user
-                // TODO determine one.
-                throw new IllegalStateException("No gui renderer was set");
-            }
-            return new CustomGuiType(this.componentTypes, this.height, this.title,
-                this.renderer);
+            return new CustomGuiType(this.componentTypes, this.height, this.title);
         }
     }
 }
