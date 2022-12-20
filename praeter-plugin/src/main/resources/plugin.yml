@@ -1,5 +1,5 @@
 name: "Praeter"
-main: "${group}.plugin.PraeterPlugin"
+main: "${group}.plugin.PraeterImplPlugin"
 version: "${version}"
 api-version: "1.19"
 author: "Alvinn8"

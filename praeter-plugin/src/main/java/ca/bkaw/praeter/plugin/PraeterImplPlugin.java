@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.plugin;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.PraeterPlugin;
 import ca.bkaw.praeter.core.resources.PacksHolder;
 import ca.bkaw.praeter.core.resources.ResourceEventListener;
 import ca.bkaw.praeter.core.resources.ResourceManager;
@@ -15,6 +16,7 @@ import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.plugin.test.TestGui;
 import ca.bkaw.praeter.plugin.test.TestingCommand;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +30,7 @@ import java.util.Objects;
 /**
  * The plugin that loads the praeter classes into bukkit.
  */
-public class PraeterPlugin extends JavaPlugin {
+public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
     @Override
     public void onEnable() {
         Praeter.get().setLogger(this.getLogger());
@@ -65,6 +67,12 @@ public class PraeterPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         Praeter.get().getResourceManager().getResourcePackSender().remove();
+    }
+
+    @Override
+    public boolean isEnabledIn(World world) {
+        // Include testing assets
+        return true;
     }
 
     /**
@@ -114,7 +122,8 @@ public class PraeterPlugin extends JavaPlugin {
     }
 
     /**
-     * Include assets from plugins into the resource packs they affect.
+     * Include assets from plugins that implement {@link PraeterPlugin} into the
+     * resource packs they affect.
      *
      * @see ResourceManager#getResourcePacks(Plugin)
      */
@@ -122,7 +131,9 @@ public class PraeterPlugin extends JavaPlugin {
         this.getLogger().info("Including plugin assets");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
-            if (plugin != this) continue; // TODO
+            if (!(plugin instanceof PraeterPlugin)) {
+                continue;
+            }
             ResourcePack pluginAssets;
             try {
                 Path jarPath = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -131,7 +142,6 @@ public class PraeterPlugin extends JavaPlugin {
                 throw new RuntimeException("Failed to open plugin jar file.", e);
             }
             for (ResourcePack resourcePack : resourceManager.getResourcePacks(plugin)) {
-                System.out.println("resourcePack = " + resourcePack);
                 try {
                     resourcePack.include(pluginAssets, path -> path.startsWith("assets/"));
                 } catch (ResourceCollisionException | IOException e) {
