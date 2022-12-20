@@ -1,13 +1,12 @@
 package ca.bkaw.praeter.core.resources.pack;
 
+import ca.bkaw.praeter.core.Praeter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -25,13 +24,13 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 
 /**
  * Utility for extracting the {@link ResourcePack Resource Pack} containing all
  * vanilla assets.
  */
 public final class VanillaAssets {
-    private static final Logger LOGGER = LogManager.getLogger();
     private static final String VERSION_MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
     /**
@@ -44,7 +43,7 @@ public final class VanillaAssets {
     public static ResourcePack readOrExtract(Path path) throws IOException {
         ResourcePack vanillaAssets = ResourcePack.loadZip(path);
         if (!vanillaAssetsExists(vanillaAssets)) {
-            LOGGER.info("Extracting vanilla assets");
+            Praeter.get().getLogger().info("Extracting vanilla assets");
             // The vanilla assets didn't exist or were not up-to-date.
             vanillaAssets.getRoot().getFileSystem().close();
             Files.deleteIfExists(path);
@@ -80,7 +79,8 @@ public final class VanillaAssets {
     public static void extract(Path path) throws IOException {
         Files.createDirectories(path.getParent());
 
-        LOGGER.info("    Downloading version manifest, version info and client jar");
+        Logger logger = Praeter.get().getLogger();
+        logger.info("    Downloading version manifest, version info and client jar");
 
         // Download the version manifest
         JsonElement versionManifest = JsonParser.parseReader(getVersionManifest());
@@ -112,7 +112,7 @@ public final class VanillaAssets {
         Path downloadPath = Files.createTempFile("client", ".jar");
         download(clientDownload.get("url").getAsString(), clientDownload.get("sha1").getAsString(), downloadPath);
 
-        LOGGER.info("    Extracting vanilla assets from client jar");
+        logger.info("    Extracting vanilla assets from client jar");
 
         FileSystem clientFileSystem = FileSystems.newFileSystem(URI.create("jar:" + downloadPath.toUri()), ImmutableMap.of());
 
@@ -139,14 +139,14 @@ public final class VanillaAssets {
             }
         });
 
-        LOGGER.info("    Cleaning up");
+        logger.info("    Cleaning up");
         clientFileSystem.close();
         Files.delete(downloadPath);
 
         // Close the resource pack to save the file
         resourcePack.getRoot().getFileSystem().close();
 
-        LOGGER.info("    Done");
+        logger.info("    Done");
     }
 
     private static InputStreamReader getVersionManifest() throws IOException {

@@ -2,7 +2,6 @@ package ca.bkaw.praeter.gui.font;
 
 import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.ResourcePackList;
-import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
@@ -17,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * An object responsible for painting the background in a custom gui.
@@ -27,7 +25,7 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
      * The key to the generic_54 texture, relative to the textures folder and including
      * the file extension.
      */
-    public static final NamespacedKey GENERIC_54_KEY
+    public static final NamespacedKey GENERIC_54_TEXTURE
         = NamespacedKey.minecraft("gui/container/generic_54.png");
 
     /**
@@ -105,9 +103,19 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
         return this.image;
     }
 
+    /**
+     * Get the resource packs that the rendering should be included into.
+     *
+     * @return The resource packs.
+     */
+    public ResourcePackList getResourcePacks() {
+        return this.resourcePacks;
+    }
+    // TODO should this be here? Maybe it can all be on the context!!!!
+
     private void paintBackground() throws IOException {
         ResourcePack vanillaAssets = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
-        Path generic54Path = vanillaAssets.getTexturePath(GENERIC_54_KEY);
+        Path generic54Path = vanillaAssets.getTexturePath(GENERIC_54_TEXTURE);
 
         BufferedImage generic54 = ImageIO.read(Files.newInputStream(generic54Path));
 
@@ -164,17 +172,23 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
 
     @Override
     public GuiBackgroundPainter drawImage(NamespacedKey textureKey, int x, int y) throws IOException {
-        x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
-        y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
-
         // Read the image
         Path texturePath = this.resourcePacks.getTexturePath(textureKey);
         BufferedImage image = ImageIO.read(Files.newInputStream(texturePath));
 
         // Draw the image
+        this.drawImage(image, x, y);
+
+        return this;
+    }
+
+    @Override
+    public GuiBackgroundPainter drawImage(BufferedImage image, int x, int y) throws IOException {
+        x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
+        y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
+
         Graphics2D graphics = this.image.createGraphics();
         graphics.drawImage(image, x, y, null);
-
         return this;
     }
 }

@@ -198,4 +198,8 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
         return x + 1;
     }
 
+    @Override
+    public T drawImage(BufferedImage image, int x, int y) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 }

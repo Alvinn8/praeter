@@ -3,6 +3,7 @@ package ca.bkaw.praeter.core.resources.draw;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Contract;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -45,5 +46,17 @@ public interface Drawable<T> {
     @Contract("_, _, _ -> this")
     T drawImage(NamespacedKey textureKey, int x, int y) throws IOException;
 
-    // TODO maybe we want a method for drawing from a BufferedImage too?
+    /**
+     * Draw an image.
+     *
+     * @param image The image to draw.
+     * @param x The x offset to render the image at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @param y The y offset to render the image at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @return The same instance, for chaining.
+     * @throws IOException If an I/O error occurs.
+     */
+    @Contract("_, _, _ -> this")
+    T drawImage(BufferedImage image, int x, int y) throws IOException;
 }

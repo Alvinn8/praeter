@@ -3,13 +3,14 @@ package ca.bkaw.praeter.plugin.test;
 import ca.bkaw.praeter.gui.components.Button;
 import ca.bkaw.praeter.gui.components.Slot;
 import ca.bkaw.praeter.gui.components.ToggleButton;
+import ca.bkaw.praeter.gui.components.render.ButtonRenderer;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import net.kyori.adventure.text.Component;
 
 public class TestGui extends CustomGui {
     public static final Button.Type BUTTON_1 = new Button.Type(
-        new TestButtonRenderer(),
+        new ButtonRenderer(),
         0, 0,
         2, 1
     );
