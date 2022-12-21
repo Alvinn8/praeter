@@ -1,8 +1,11 @@
 package ca.bkaw.praeter.core.resources.draw;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.map.MapFont;
+import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.Contract;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -59,4 +62,43 @@ public interface Drawable<T> {
      */
     @Contract("_, _, _ -> this")
     T drawImage(BufferedImage image, int x, int y) throws IOException;
+
+    /**
+     * Draw text using the Minecraft font.
+     * <p>
+     * The '\n' character can be used to go to the next line.
+     *
+     * @param text The text to draw.
+     * @param x The x offset to draw the text at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @param y The y offset to draw the text at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @param color The color to draw the text.
+     * @return The same instance, for chaining.
+     * @throws IOException If an I/O error occurs.
+     * @see DrawTextUtils
+     */
+    @Contract("_, _, _, _ -> this")
+    default T drawText(String text, int x, int y, Color color) throws IOException {
+        return drawText(text, x, y, color, MinecraftFont.Font);
+    }
+
+    /**
+     * Draw text.
+     * <p>
+     * The '\n' character can be used to go to the next line.
+     *
+     * @param text The text to draw.
+     * @param x The x offset to draw the text at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @param y The y offset to draw the text at, in pixels, relative to the
+     *          {@link #getOrigin() origin}.
+     * @param color The color to draw the text.
+     * @param font The font to use for drawing.
+     * @return The same instance, for chaining.
+     * @throws IOException If an I/O error occurs.
+     * @see DrawTextUtils
+     */
+    @Contract("_, _, _, _, _ -> this")
+    T drawText(String text, int x, int y, Color color, MapFont font) throws IOException;
 }

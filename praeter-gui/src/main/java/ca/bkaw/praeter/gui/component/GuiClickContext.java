@@ -1,7 +1,10 @@
 package ca.bkaw.praeter.gui.component;
 
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -9,10 +12,10 @@ import java.util.function.Consumer;
  * Holds data that is passed to the {@link GuiComponent#setOnClick(Consumer)}
  * callback.
  */
-public class GuiComponentClickContext {
+public class GuiClickContext {
     private final InventoryClickEvent event;
 
-    public GuiComponentClickContext(InventoryClickEvent event) {
+    public GuiClickContext(InventoryClickEvent event) {
         this.event = event;
     }
 
@@ -26,6 +29,20 @@ public class GuiComponentClickContext {
      */
     public InventoryClickEvent getEvent() {
         return this.event;
+    }
+
+    /**
+     * Get the player that clicked.
+     *
+     * @return The player.
+     */
+    @NotNull
+    public Player getPlayer() {
+        HumanEntity human = this.event.getWhoClicked();
+        if (human instanceof Player player) {
+            return player;
+        }
+        throw new IllegalStateException("The one who clicked was not a player, but was: " + human);
     }
 
     /**

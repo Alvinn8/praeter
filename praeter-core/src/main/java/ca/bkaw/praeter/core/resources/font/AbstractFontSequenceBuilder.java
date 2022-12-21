@@ -7,6 +7,7 @@ import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
 import ca.bkaw.praeter.core.resources.draw.Drawable;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
+import org.bukkit.map.MapFont;
 import org.jetbrains.annotations.Contract;
 
 import javax.imageio.ImageIO;
@@ -200,6 +201,11 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
 
     @Override
     public T drawImage(BufferedImage image, int x, int y) throws IOException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // TODO
+    }
+
+    @Override
+    public T drawText(String text, int x, int y, Color color, MapFont font) throws IOException {
+        throw new UnsupportedOperationException(); // TODO
     }
 }

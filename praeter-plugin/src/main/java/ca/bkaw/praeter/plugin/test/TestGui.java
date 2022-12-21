@@ -7,10 +7,12 @@ import ca.bkaw.praeter.gui.components.render.ButtonRenderer;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class TestGui extends CustomGui {
     public static final Button.Type BUTTON_1 = new Button.Type(
-        new ButtonRenderer(),
+        new ButtonRenderer("Hello"),
         0, 0,
         2, 1
     );
@@ -18,6 +20,11 @@ public class TestGui extends CustomGui {
         new TestToggleButtonRenderer(),
         0, 4,
         2, 1
+    );
+    public static final Button.Type BUTTON_3 = new Button.Type(
+        new ButtonRenderer("Hello there"),
+        0, 2,
+        4, 1
     );
     public static final Button.Type TEMP_COMPONENT = new Button.Type(
         new TestRenderer(),
@@ -31,7 +38,7 @@ public class TestGui extends CustomGui {
     public static final CustomGuiType TYPE = CustomGuiType.builder()
         .height(6)
         .title(Component.text("Test Gui"))
-        .add(BUTTON_1, BUTTON_2, TEMP_COMPONENT, SLOT_1, SLOT_2, SLOT_3)
+        .add(BUTTON_1, BUTTON_2, BUTTON_3, TEMP_COMPONENT, SLOT_1, SLOT_2, SLOT_3)
         .build();
 
     public TestGui() {
@@ -40,6 +47,11 @@ public class TestGui extends CustomGui {
         get(BUTTON_2).setOnClick(context -> {
             toggleButton2();
             context.playClickSound();
+        });
+
+        BUTTON_3.getState(this).setOnClick(context -> {
+            context.playClickSound();
+            context.getPlayer().getInventory().addItem(new ItemStack(Material.DIAMOND));
         });
     }
 

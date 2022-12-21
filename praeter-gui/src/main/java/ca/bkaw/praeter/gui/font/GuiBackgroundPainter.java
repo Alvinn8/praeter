@@ -5,10 +5,12 @@ import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
+import ca.bkaw.praeter.core.resources.draw.DrawTextUtils;
 import ca.bkaw.praeter.core.resources.draw.Drawable;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import org.bukkit.NamespacedKey;
+import org.bukkit.map.MapFont;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -183,12 +185,22 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
     }
 
     @Override
-    public GuiBackgroundPainter drawImage(BufferedImage image, int x, int y) throws IOException {
+    public GuiBackgroundPainter drawImage(BufferedImage image, int x, int y) {
         x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
         y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
 
         Graphics2D graphics = this.image.createGraphics();
         graphics.drawImage(image, x, y, null);
+        return this;
+    }
+
+    @Override
+    public GuiBackgroundPainter drawText(String text, int x, int y, Color color, MapFont font) {
+        x += ORIGIN_RESOLVER.resolveOriginX(this.origin);
+        y += ORIGIN_RESOLVER.resolveOriginY(this.origin);
+
+        DrawTextUtils.drawText(this.image, x, y, text, color, font);
+
         return this;
     }
 }

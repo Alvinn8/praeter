@@ -1,7 +1,7 @@
 package ca.bkaw.praeter.gui;
 
 import ca.bkaw.praeter.gui.component.GuiComponent;
-import ca.bkaw.praeter.gui.component.GuiComponentClickContext;
+import ca.bkaw.praeter.gui.component.GuiClickContext;
 import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.components.Slot;
 import ca.bkaw.praeter.gui.gui.CustomGui;
@@ -353,10 +353,10 @@ public class GuiEventListener implements Listener {
             if (componentType != null) {
                 // The user clicked a component
                 GuiComponent guiComponent = customGui.get(componentType);
-                Consumer<GuiComponentClickContext> clickHandler = guiComponent.getClickHandler();
+                Consumer<GuiClickContext> clickHandler = guiComponent.getClickHandler();
                 if (clickHandler != null) {
                     // Call the click handler on the component
-                    GuiComponentClickContext context = new GuiComponentClickContext(event);
+                    GuiClickContext context = new GuiClickContext(event);
                     clickHandler.accept(context);
                 }
             }

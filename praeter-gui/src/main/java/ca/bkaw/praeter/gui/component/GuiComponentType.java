@@ -45,6 +45,10 @@ public abstract class GuiComponentType<C extends GuiComponent, T extends GuiComp
      */
     public abstract C create();
 
+    public C getState(CustomGui gui) {
+        return gui.get(this);
+    }
+
     /**
      * Get the renderer for this component type.
      *

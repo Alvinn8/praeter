@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * @see GuiComponentType
  */
 public class GuiComponent {
-    private Consumer<GuiComponentClickContext> clickHandler;
+    private Consumer<GuiClickContext> clickHandler;
 
     /**
      * Set the callback to call when the user clicks the component.
@@ -23,7 +23,7 @@ public class GuiComponent {
      *
      * @param clickHandler The click handler.
      */
-    public void setOnClick(Consumer<GuiComponentClickContext> clickHandler) {
+    public void setOnClick(Consumer<GuiClickContext> clickHandler) {
         this.clickHandler = clickHandler;
     }
 
@@ -33,7 +33,7 @@ public class GuiComponent {
      * @return The click handler.
      */
     @Nullable
-    public Consumer<GuiComponentClickContext> getClickHandler() {
+    public Consumer<GuiClickContext> getClickHandler() {
         return this.clickHandler;
     }
 }
