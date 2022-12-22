@@ -9,11 +9,10 @@ import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.PraeterGui;
-import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
-import ca.bkaw.praeter.gui.component.GuiComponentRenderer;
-import ca.bkaw.praeter.gui.component.GuiComponentType;
-import ca.bkaw.praeter.gui.font.*;
+import ca.bkaw.praeter.gui.font.GuiBackgroundPainter;
+import ca.bkaw.praeter.gui.font.RenderDispatcher;
+import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -42,7 +41,6 @@ public class CustomGuiRenderer {
      */
     public void onSetup(CustomGuiType customGuiType) {
         ResourcePackList resourcePacks = Praeter.get().getResourceManager().getResourcePacks(customGuiType.getPlugin());
-        RenderSetupContext context = new RenderSetupContext(resourcePacks);
         GuiBackgroundPainter backgroundPainter;
 
         // Create the background
@@ -52,13 +50,22 @@ public class CustomGuiRenderer {
             throw new RuntimeException("Failed to create GUI background.", e);
         }
 
+        RenderSetupContext context = new RenderSetupContext(backgroundPainter, resourcePacks);
+
         // Call component onSetup methods
-        for (GuiComponentType<?, ?> componentType : customGuiType.getComponentTypes()) {
+        for (GuiComponent component : customGuiType.getComponents()) {
+            // All drawing operations on a component renderer will use that component's
+            // position as the origin. This allows components to simply draw at (0, 0) to
+            // draw at the component's location.
+            DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN.add(
+                component.getX() * GuiUtils.SLOT_SIZE,
+                component.getY() * GuiUtils.SLOT_SIZE
+            );
+            context.setOrigin(origin);
             try {
-                // TODO fix generics...
-                forEachComponentType((GuiComponentType) componentType, customGuiType, context, backgroundPainter);
+                component.onSetup(context);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to set up renderer for component " + componentType.getClass().getSimpleName(), e);
+                throw new RuntimeException("Failed to set up renderer for component " + component.getClass().getSimpleName(), e);
             }
         }
 
@@ -79,25 +86,6 @@ public class CustomGuiRenderer {
             this.background = context.newFontSequence().drawImage(backgroundKey, 0, 0).build();
         } catch (IOException e) {
             throw new RuntimeException("Failed to write GUI background.", e);
-        }
-    }
-
-    private <C extends GuiComponent, T extends GuiComponentType<C, T>> void forEachComponentType(T componentType, CustomGuiType customGuiType, RenderSetupContext context, GuiBackgroundPainter background) throws IOException {
-        GuiComponentRenderer<C, T> renderer = componentType.getRenderer();
-        // All drawing operations on a component renderer will use that component's
-        // position as the origin. This allows components to simply draw at (0, 0) to
-        // draw at the component's location.
-        DrawOrigin origin = GuiUtils.GUI_SLOT_ORIGIN.add(
-            componentType.getX() * GuiUtils.SLOT_SIZE,
-            componentType.getY() * GuiUtils.SLOT_SIZE
-        );
-        if (renderer instanceof FontGuiComponentRenderer<C, T> fontComponentRenderer) {
-            context.setOrigin(origin);
-            fontComponentRenderer.onSetup(customGuiType, componentType, context);
-        }
-        if (renderer instanceof BackgroundGuiComponentRenderer<C,T> backgroundComponentRenderer) {
-            background.setOrigin(origin);
-            backgroundComponentRenderer.draw(customGuiType, componentType, background);
         }
     }
 
@@ -124,26 +112,24 @@ public class CustomGuiRenderer {
             }
         }
         if (bakedResourcePack == null) {
-            if (true) {
-                System.out.println("customGui.getViewers().size() = " + customGui.getViewers().size());
-            }
+            System.out.println("customGui.getViewers().size() = " + customGui.getViewers().size());
             return Component.empty();
         }
 
         RenderDispatcher renderDispatcher = new RenderDispatcher(bakedResourcePack);
 
+        // The background goes first, it should be behind everything
         renderDispatcher.render(this.background);
 
-        customGui.forEachComponent(new ComponentMap.ForEachConsumer() {
-            @Override
-            public <C extends GuiComponent, T extends GuiComponentType<C, T>> void accept(T componentType, C component) {
-                GuiComponentRenderer<C, T> renderer = componentType.getRenderer();
-                if (renderer instanceof FontGuiComponentRenderer<C, T> fontComponentRenderer) {
-                    fontComponentRenderer.onRender(customGui.getType(), customGui, componentType, component, renderDispatcher);
-                }
-            }
-        });
+        // Then draw components
+        for (GuiComponent component : customGui.getType().getComponents()) {
+            GuiComponent.State state = component.getState(customGui);
+            state.onRender(renderDispatcher);
+        }
+
+        // Finally, draw the actual title
         renderDispatcher.addTitle(title);
+
         return renderDispatcher.toComponent();
     }
 }

@@ -72,4 +72,14 @@ public class DrawTextUtils {
         }
         return maxWidth;
     }
+
+    public static int getTextHeight(String text, MapFont font) {
+        int height = font.getHeight();
+        for (char c : text.toCharArray()) {
+            if (c == '\n') {
+                height += font.getHeight() + 1;
+            }
+        }
+        return height;
+    }
 }

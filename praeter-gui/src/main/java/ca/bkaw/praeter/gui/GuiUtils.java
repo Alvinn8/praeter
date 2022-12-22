@@ -2,7 +2,7 @@ package ca.bkaw.praeter.gui;
 
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
-import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.font.GuiBackgroundPainter;
 
 import java.util.function.IntConsumer;
@@ -59,17 +59,17 @@ public final class GuiUtils {
 
     /**
      * Loop trough each slot in a 9-slot-wide inventory in the rectangle created by
-     * the component type.
+     * the component.
      *
-     * @param componentType The component type.
+     * @param component The component.
      * @param slotConsumer A consumer called with each slot.
      */
-    public static void forEachSlot(GuiComponentType<?, ?> componentType, IntConsumer slotConsumer) {
+    public static void forEachSlot(GuiComponent component, IntConsumer slotConsumer) {
         forEachSlot(
-            componentType.getX(),
-            componentType.getY(),
-            componentType.getWidth(),
-            componentType.getHeight(),
+            component.getX(),
+            component.getY(),
+            component.getWidth(),
+            component.getHeight(),
             slotConsumer
         );
     }

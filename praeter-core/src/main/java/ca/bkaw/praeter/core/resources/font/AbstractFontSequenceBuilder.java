@@ -4,6 +4,7 @@ import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
+import ca.bkaw.praeter.core.resources.draw.DrawTextUtils;
 import ca.bkaw.praeter.core.resources.draw.Drawable;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * An abstract builder for a {@link FontSequence}.
@@ -201,11 +203,32 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
 
     @Override
     public T drawImage(BufferedImage image, int x, int y) throws IOException {
-        throw new UnsupportedOperationException(); // TODO
+        // TODO store as a consistent filename
+        // Write the image as a texture in the resource packs
+        NamespacedKey textureKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, UUID.randomUUID() + ".png");
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", stream);
+        byte[] bytes = stream.toByteArray();
+        for (ResourcePack resourcePack : this.resourcePacks) {
+            Path texturePath = resourcePack.getTexturePath(textureKey);
+            Files.createDirectories(texturePath.getParent());
+            Files.write(texturePath, bytes);
+        }
+        // Then draw the image from that texture
+        return drawImage(textureKey, x, y);
     }
 
     @Override
     public T drawText(String text, int x, int y, Color color, MapFont font) throws IOException {
-        throw new UnsupportedOperationException(); // TODO
+        // Create an image to draw the text on
+        int width = DrawTextUtils.getTextWidth(text, font);
+        int height = DrawTextUtils.getTextHeight(text, font);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the text on the image
+        DrawTextUtils.drawText(image, 0, 0, text, color, font);
+
+        // Draw the image at the right place
+        return drawImage(image, x, y);
     }
 }

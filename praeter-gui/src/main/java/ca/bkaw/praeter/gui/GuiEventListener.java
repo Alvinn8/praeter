@@ -1,8 +1,7 @@
 package ca.bkaw.praeter.gui;
 
-import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.component.GuiClickContext;
-import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.components.Slot;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiHolder;
@@ -86,7 +85,7 @@ public class GuiEventListener implements Listener {
 
             switch (action) {
                 case PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> {
-                    Slot slot = customGui.getSlot(x, y);
+                    Slot.State slot = customGui.getSlot(x, y);
                     if (slot != null && slot.mayChange(player)) {
                         ItemStack itemStack = slot.getItemStack();
                         if (itemStack != null && canPickUp(itemStack, cursor)) {
@@ -117,7 +116,7 @@ public class GuiEventListener implements Listener {
 
             switch (action) {
                 case PLACE_ALL, PLACE_SOME, PLACE_ONE -> {
-                    Slot slot = customGui.getSlot(x, y);
+                    Slot.State slot = customGui.getSlot(x, y);
                     if (slot != null && slot.mayChange(player) && cursor != null && slot.canHold(cursor)) {
                         ItemStack itemStack = slot.getItemStack();
                         if (itemStack == null) {
@@ -153,7 +152,7 @@ public class GuiEventListener implements Listener {
             // Swap with cursor
 
             if (action == InventoryAction.SWAP_WITH_CURSOR && cursor != null) {
-                Slot slot = customGui.getSlot(x, y);
+                Slot.State slot = customGui.getSlot(x, y);
                 if (slot != null && slot.mayChange(player) && slot.canHold(cursor)) {
                     ItemStack itemStack = slot.getItemStack();
                     if (itemStack != null) {
@@ -167,7 +166,7 @@ public class GuiEventListener implements Listener {
             // Drop from slot
 
             if (action == InventoryAction.DROP_ALL_SLOT || action == InventoryAction.DROP_ONE_SLOT) {
-                Slot slot = customGui.getSlot(x, y);
+                Slot.State slot = customGui.getSlot(x, y);
                 if (slot != null && slot.mayChange(player)) {
                     ItemStack itemStack = slot.getItemStack();
                     if (itemStack != null) {
@@ -189,7 +188,7 @@ public class GuiEventListener implements Listener {
             // Clone
 
             if (action == InventoryAction.CLONE_STACK) {
-                Slot slot = customGui.getSlot(x, y);
+                Slot.State slot = customGui.getSlot(x, y);
                 if (slot != null) {
                     // Let vanilla handle the clone, we just needed to verify there was a slot
                     // at the clicked position
@@ -205,7 +204,7 @@ public class GuiEventListener implements Listener {
         // Shift clicking
 
         if (bottom && action == InventoryAction.MOVE_TO_OTHER_INVENTORY && currentItem != null) {
-            for (Slot slot : customGui.getSlots()) {
+            for (Slot.State slot : customGui.getSlots()) {
                 ItemStack slotItem = slot.getItemStack();
                 if (slotItem != null) {
                     if (slotItem.isSimilar(currentItem) && slot.canHold(currentItem)) {
@@ -231,7 +230,7 @@ public class GuiEventListener implements Listener {
         }
 
         if (top && action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            Slot slot = customGui.getSlot(x, y);
+            Slot.State slot = customGui.getSlot(x, y);
             if (slot != null && slot.mayChange(player)) {
                 ItemStack itemStack = slot.getItemStack();
                 if (itemStack != null) {
@@ -281,7 +280,7 @@ public class GuiEventListener implements Listener {
             if (itemToSwap != null && (itemToSwap.getType().isAir() || itemToSwap.getAmount() <= 0)) {
                 itemToSwap = null;
             }
-            Slot slot = customGui.getSlot(x, y);
+            Slot.State slot = customGui.getSlot(x, y);
             if (itemToSwap != null && slot != null && slot.mayChange(player) && slot.canHold(itemToSwap)) {
                 ItemStack itemStack = slot.getItemStack();
                 if (itemStack != null) {
@@ -305,7 +304,7 @@ public class GuiEventListener implements Listener {
         // Collect to cursor
 
         if (action == InventoryAction.COLLECT_TO_CURSOR && cursor != null) {
-            for (Slot slot : customGui.getSlots()) {
+            for (Slot.State slot : customGui.getSlots()) {
                 ItemStack slotItem = slot.getItemStack();
                 if (slotItem != null && slot.mayChange(player) && cursor.isSimilar(slotItem)) {
                     int newAmount = cursor.getAmount() + slotItem.getAmount();
@@ -349,11 +348,11 @@ public class GuiEventListener implements Listener {
         // Component onClick
 
         if (top) {
-            GuiComponentType<?, ?> componentType = customGui.getComponentTypeAt(x, y);
-            if (componentType != null) {
+            GuiComponent component = customGui.getComponentAt(x, y);
+            if (component != null) {
                 // The user clicked a component
-                GuiComponent guiComponent = customGui.get(componentType);
-                Consumer<GuiClickContext> clickHandler = guiComponent.getClickHandler();
+                GuiComponent.State state = component.getState(customGui);
+                Consumer<GuiClickContext> clickHandler = state.getClickHandler();
                 if (clickHandler != null) {
                     // Call the click handler on the component
                     GuiClickContext context = new GuiClickContext(event);

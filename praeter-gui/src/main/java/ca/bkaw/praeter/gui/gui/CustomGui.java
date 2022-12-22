@@ -1,9 +1,7 @@
 package ca.bkaw.praeter.gui.gui;
 
 import ca.bkaw.praeter.core.Praeter;
-import ca.bkaw.praeter.gui.component.ComponentMap;
 import ca.bkaw.praeter.gui.component.GuiComponent;
-import ca.bkaw.praeter.gui.component.GuiComponentType;
 import ca.bkaw.praeter.gui.components.Slot;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
@@ -12,12 +10,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A custom graphical user interface.
@@ -29,8 +30,8 @@ import java.util.List;
  */
 public abstract class CustomGui {
     private final CustomGuiType type;
-    private final ComponentMap components = new ComponentMap();
-    private final List<Slot> slots;
+    private final Map<GuiComponent, GuiComponent.State> components = new HashMap<>();
+    private final List<Slot.State> slots;
     @Nullable
     private Inventory inventory;
     @Nullable
@@ -45,22 +46,16 @@ public abstract class CustomGui {
      */
     public CustomGui(CustomGuiType type) {
         this.type = type;
-        for (GuiComponentType<?, ?> componentType : this.type.getComponentTypes()) {
-            this.createComponent(componentType);
+        for (GuiComponent component : this.type.getComponents()) {
+            this.components.put(component, component.createState());
         }
-        ImmutableList.Builder<Slot> slots = ImmutableList.builder();
-        for (GuiComponent component : this.components.getComponents()) {
-            if (component instanceof Slot slot) {
+        ImmutableList.Builder<Slot.State> slots = ImmutableList.builder();
+        for (GuiComponent.State state : this.components.values()) {
+            if (state instanceof Slot.State slot) {
                 slots.add(slot);
             }
         }
         this.slots = slots.build();
-    }
-
-    private <C extends GuiComponent> void createComponent(GuiComponentType<C, ?> componentType) {
-        // This method is used in the constructor
-        // and is required for generics to line up
-        this.components.put(componentType, componentType.create());
     }
 
     /**
@@ -110,21 +105,15 @@ public abstract class CustomGui {
         this.inventory.clear();
 
         // Let components render items
-        this.components.forEach(this::renderComponent);
+        for (GuiComponent.State state : this.components.values()) {
+            state.renderItems(this.inventory);
+        }
 
         // If the inventory was recreated with a new title,
         // open the new inventory for the viewers
         if (viewers != null) {
             viewers.forEach(viewer -> viewer.openInventory(this.inventory));
         }
-    }
-
-    private <C extends GuiComponent, T extends GuiComponentType<C, T>>
-    void renderComponent(T componentType, C component) {
-        // generics can not be used in lambda methods, but method references are okay
-        // so this is a method
-        componentType.getRenderer().renderItems(this.type, this, componentType,
-            component, this.inventory);
     }
 
     /**
@@ -145,15 +134,6 @@ public abstract class CustomGui {
             players.add(this.pendingPlayer);
         }
         return players;
-    }
-
-    /**
-     * Loop trough each component in the gui.
-     *
-     * @param consumer The consumer for the entries.
-     */
-    public void forEachComponent(ComponentMap.ForEachConsumer consumer) {
-        this.components.forEach(consumer);
     }
 
     /**
@@ -188,24 +168,27 @@ public abstract class CustomGui {
     }
 
     /**
-     * Get the {@link GuiComponent} from the {@link GuiComponentType}.
+     * Get the {@link GuiComponent.State} from the {@link GuiComponent.State}.
      * <p>
-     * The component type must be registered in this {@link #getType() gui type} by
-     * calling {@link CustomGuiType.Builder#add(GuiComponentType[])}.
+     * The component must be registered in this {@link #getType() gui type} by
+     * calling {@link CustomGuiType.Builder#add(GuiComponent...)}.
+     * <p>
+     * Using {@link GuiComponent#getState(CustomGui)} is preferred over this method
+     * due to it providing the correct return type for the state.
      *
-     * @param componentType The component type.
-     * @param <T> The class of the component.
-     * @return The component.
-     * @throws IllegalArgumentException If the component type was not registered.
+     * @param component The component.
+     * @return The component state.
+     * @throws IllegalArgumentException If the component was not registered.
      */
+    @ApiStatus.Internal
     @NotNull
-    public <T extends GuiComponent> T get(@NotNull GuiComponentType<T, ?> componentType) {
-        T component = this.components.get(componentType);
-        if (component == null) {
-            throw new IllegalArgumentException("The component type did not exist in this " +
+    public GuiComponent.State getStateFor(@NotNull GuiComponent component) {
+        GuiComponent.State state = this.components.get(component);
+        if (state == null) {
+            throw new IllegalArgumentException("The component did not exist in this " +
                 "custom gui, did you forget to add it to the custom gui type?");
         }
-        return component;
+        return state;
     }
 
     /**
@@ -221,15 +204,15 @@ public abstract class CustomGui {
     }
 
     /**
-     * Get the component type at the specified coordinates.
+     * Get the component at the specified coordinates.
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
-     * @return The component type.
+     * @return The component.
      */
     @Nullable
-    public GuiComponentType<?, ?> getComponentTypeAt(int x, int y) {
-        for (GuiComponentType<?, ?> c : this.components.getComponentTypes()) {
+    public GuiComponent getComponentAt(int x, int y) {
+        for (GuiComponent c : this.components.keySet()) {
             if (x >= c.getX() && x < c.getX() + c.getWidth()
             &&  y >= c.getY() && y < c.getY() + c.getHeight()) {
                 return c;
@@ -239,39 +222,30 @@ public abstract class CustomGui {
     }
 
     /**
-     * Get the component map.
-     *
-     * @return The component map.
-     */
-    public ComponentMap getComponentMap() {
-        return this.components;
-    }
-
-    /**
      * Get an immutable list of the slots in the gui.
      *
      * @return The list of slots.
      */
     @Unmodifiable
-    public List<Slot> getSlots() {
+    public List<Slot.State> getSlots() {
         return this.slots;
     }
 
     /**
-     * Get the {@link Slot} at the specified position.
+     * Get the {@link Slot.State} at the specified position.
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
      * @return The slot, or null.
      */
     @Nullable
-    public Slot getSlot(int x, int y) {
-        GuiComponentType<?, ?> componentType = this.getComponentTypeAt(x, y);
-        if (componentType == null) {
+    public Slot.State getSlot(int x, int y) {
+        GuiComponent component = this.getComponentAt(x, y);
+        if (component == null) {
             return null;
         }
-        GuiComponent guiComponent = this.get(componentType);
-        if (guiComponent instanceof Slot slot) {
+        GuiComponent.State state = component.getState(this);
+        if (state instanceof Slot.State slot) {
             return slot;
         }
         return null;

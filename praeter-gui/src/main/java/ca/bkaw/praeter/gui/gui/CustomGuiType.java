@@ -1,7 +1,7 @@
 package ca.bkaw.praeter.gui.gui;
 
 import ca.bkaw.praeter.gui.PraeterGui;
-import ca.bkaw.praeter.gui.component.GuiComponentType;
+import ca.bkaw.praeter.gui.component.GuiComponent;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,14 +23,14 @@ import java.util.List;
 public class CustomGuiType {
     private final CustomGuiRenderer renderer = new CustomGuiRenderer();
     private Plugin plugin;
-    private final List<GuiComponentType<?, ?>> componentTypes;
+    private final List<GuiComponent> components;
     private final int height;
     private final Component title;
 
-    private CustomGuiType(List<GuiComponentType<?, ?>> componentTypes,
+    private CustomGuiType(List<GuiComponent> components,
                           int height,
                           Component title) {
-        this.componentTypes = ImmutableList.copyOf(componentTypes);
+        this.components = ImmutableList.copyOf(components);
         this.height = height;
         this.title = title;
     }
@@ -75,13 +74,13 @@ public class CustomGuiType {
     }
 
     /**
-     * Get a collection of component types.
+     * Get a list of components.
      *
-     * @return The collection.
+     * @return The list.
      */
     @Unmodifiable
-    public Collection<GuiComponentType<?, ?>> getComponentTypes() {
-        return this.componentTypes;
+    public List<GuiComponent> getComponents() {
+        return this.components;
     }
 
     /**
@@ -130,21 +129,21 @@ public class CustomGuiType {
      * @see #builder()
      */
     public static class Builder {
-        private final List<GuiComponentType<?, ?>> componentTypes = new ArrayList<>();
+        private final List<GuiComponent> components = new ArrayList<>();
         private int height = 6;
         private Component title;
 
         private Builder() {}
 
         /**
-         * Add {@link GuiComponentType component types} to the inventory type.
+         * Add {@link GuiComponent}s to the inventory type.
          *
-         * @param componentTypes The component types to add.
+         * @param components The components to add.
          * @return The builder, for chaining.
          */
         @Contract("_ -> this")
-        public Builder add(GuiComponentType<?, ?>... componentTypes) {
-            Collections.addAll(this.componentTypes, componentTypes);
+        public Builder add(GuiComponent... components) {
+            Collections.addAll(this.components, components);
             return this;
         }
 
@@ -182,7 +181,7 @@ public class CustomGuiType {
          * @return The created {@link CustomGuiType}.
          */
         public CustomGuiType build() {
-            return new CustomGuiType(this.componentTypes, this.height, this.title);
+            return new CustomGuiType(this.components, this.height, this.title);
         }
     }
 }

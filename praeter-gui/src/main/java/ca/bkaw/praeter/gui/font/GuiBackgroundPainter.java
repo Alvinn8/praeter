@@ -105,16 +105,6 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
         return this.image;
     }
 
-    /**
-     * Get the resource packs that the rendering should be included into.
-     *
-     * @return The resource packs.
-     */
-    public ResourcePackList getResourcePacks() {
-        return this.resourcePacks;
-    }
-    // TODO should this be here? Maybe it can all be on the context!!!!
-
     private void paintBackground() throws IOException {
         ResourcePack vanillaAssets = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
         Path generic54Path = vanillaAssets.getTexturePath(GENERIC_54_TEXTURE);
@@ -134,7 +124,7 @@ public class GuiBackgroundPainter implements Drawable<GuiBackgroundPainter> {
         graphics.drawImage(topEdge, 0, 0, null);
 
         // Draw the rest of the image
-        for (int y = TOP_EDGE_HEIGHT + 1; y < this.image.getHeight(); y++) {
+        for (int y = TOP_EDGE_HEIGHT; y < this.image.getHeight(); y++) {
             graphics.drawImage(pixelRow, 0, y, null);
         }
     }
