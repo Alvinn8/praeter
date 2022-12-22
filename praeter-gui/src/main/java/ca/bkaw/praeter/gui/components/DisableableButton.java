@@ -3,11 +3,11 @@ package ca.bkaw.praeter.gui.components;
 import ca.bkaw.praeter.core.resources.draw.DrawTextUtils;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.gui.GuiUtils;
+import ca.bkaw.praeter.gui.component.GuiClickContext;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import ca.bkaw.praeter.gui.gui.CustomGui;
-import org.bukkit.NamespacedKey;
 import org.bukkit.map.MinecraftFont;
 
 import javax.imageio.ImageIO;
@@ -16,11 +16,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * A button in a {@link CustomGui} that can be enabled and disabled.
  * <p>
- * When the button is disabled the click handler will not be called. <!-- TODO -->
+ * When the button is disabled the click handler will not be called.
  */
 public class DisableableButton extends Button {
     /**
@@ -35,7 +36,6 @@ public class DisableableButton extends Button {
 
     private FontSequence enabled;
     private FontSequence disabled;
-    private FontSequence test;
 
     /**
      * Create a new {@link DisableableButton}.
@@ -91,11 +91,6 @@ public class DisableableButton extends Button {
             .build();
 
         // TODO: overlap issues... complex stuff with splitting vs non-splitting spaces/text/font
-        this.test = context.newFontSequence()
-            .drawText("Hello", 0, 0, Color.GREEN)
-            .drawImage(NamespacedKey.minecraft("block/diamond_boots.png"), 0, 0)
-            .drawText("Hello", 0, 0, Color.RED)
-            .build();
     }
 
     /**
@@ -106,10 +101,23 @@ public class DisableableButton extends Button {
     // as doing extends GuiComponent.State
     public class State extends Button.State {
         private boolean isEnabled = true;
+        private Consumer<GuiClickContext> enabledClickHandler;
+        private Consumer<GuiClickContext> disabledClickHandler;
+
+        public State() {
+            // We must use super.setOnClick because we change this.setOnClick to set the
+            // enabled click handler.
+            super.setOnClick(context -> {
+                if (isEnabled) {
+                    enabledClickHandler.accept(context);
+                } else {
+                    disabledClickHandler.accept(context);
+                }
+            });
+        }
 
         @Override
         public void onRender(RenderDispatcher renderDispatcher) {
-            renderDispatcher.render(test);
             if (isEnabled) {
                 renderDispatcher.render(enabled);
             } else {
@@ -118,9 +126,35 @@ public class DisableableButton extends Button {
         }
 
         /**
+         * Set the callback to call when the button is pressed. The callback will only be
+         * called if the button is enabled.
+         * <p>
+         * There can only be one handler. Calling this twice will override the previous
+         * handler.
+         *
+         * @param clickHandler The click handler.
+         */
+        @Override
+        public void setOnClick(Consumer<GuiClickContext> clickHandler) {
+            this.enabledClickHandler = clickHandler;
+        }
+
+        /**
+         * Set the callback to call when the button is disabled and pressed.
+         * <p>
+         * There can only be one handler. Calling this twice will override the previous
+         * handler.
+         *
+         * @param clickHandler The click handler.
+         */
+        public void setOnDisabledClick(Consumer<GuiClickContext> clickHandler) {
+            this.disabledClickHandler = clickHandler;
+        }
+
+        /**
          * Get whether the button is enabled.
          * <p>
-         * When a button is not enabled the click handler will not be called. <!-- TODO -->
+         * When a button is disabled the click handler will not be called.
          *
          * @return Whether enabled.
          */

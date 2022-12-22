@@ -84,6 +84,7 @@ public class GuiEventListener implements Listener {
             // Pick up
 
             switch (action) {
+                // TODO some pickup operations are not working
                 case PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> {
                     Slot.State slot = customGui.getSlot(x, y);
                     if (slot != null && slot.mayChange(player)) {

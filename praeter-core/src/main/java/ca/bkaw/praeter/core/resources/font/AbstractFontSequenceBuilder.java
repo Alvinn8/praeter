@@ -26,6 +26,7 @@ import java.util.UUID;
  * An abstract builder for a {@link FontSequence}.
  */
 public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequenceBuilder<T>> implements Drawable<T> {
+    private static int nextGeneratedFilename = 1;
     private final ResourcePackList resourcePacks;
     private final List<Font> fonts;
     private final List<FontCharIdentifier> fontChars = new ArrayList<>();
@@ -125,20 +126,18 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
         // Read the texture
         Path texturePath = this.resourcePacks.getTexturePath(textureKey);
         BufferedImage image = ImageIO.read(Files.newInputStream(texturePath));
-        int size = Math.max(image.getWidth(), image.getHeight());
+        int height = Math.max(image.getWidth(), image.getHeight());
 
         // Bitmap font providers don't allow the ascent to be larger than the height of
         // the character. If that is the case we must create a new image that is big
         // enough. The rest of the area will just be transparent.
-        if (ascent > size) {
-            size = ascent;
+        if (ascent > height) {
+            height = ascent;
         }
 
-        // If the current image isn't already the expected size (it's either not a
-        // square or we need to resize it)
-        // TODO does it need to be a square?
-        if (image.getWidth() != size || image.getHeight() != size) {
-            BufferedImage createdImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        // If the current image isn't already the expected height
+        if (image.getHeight() != height) {
+            BufferedImage createdImage = new BufferedImage(image.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
             Graphics graphics = createdImage.getGraphics();
 
             // Draw the image in the top-left corner.
@@ -149,7 +148,7 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
             int extIndex = createdKey.lastIndexOf('.');
             createdKey = textureKey.getNamespace() + '/'
                 + createdKey.substring(0, extIndex)
-                + "_" + size
+                + "_" + height
                 + textureKey.getKey().substring(extIndex);
             textureKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, createdKey);
 
@@ -166,7 +165,7 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
         }
 
         // Add the font character to the fonts
-        BitmapFontCharIdentifier fontChar = new BitmapFontCharIdentifier(textureKey, size, ascent);
+        BitmapFontCharIdentifier fontChar = new BitmapFontCharIdentifier(textureKey, height, ascent);
         this.fontChars.add(fontChar);
         for (Font font : this.fonts) {
             font.addFontChar(fontChar);
@@ -203,9 +202,8 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
 
     @Override
     public T drawImage(BufferedImage image, int x, int y) throws IOException {
-        // TODO store as a consistent filename
         // Write the image as a texture in the resource packs
-        NamespacedKey textureKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, UUID.randomUUID() + ".png");
+        NamespacedKey textureKey = new NamespacedKey(Praeter.GENERATED_NAMESPACE, nextGeneratedFilename++ + ".png");
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         ImageIO.write(image, "png", stream);
         byte[] bytes = stream.toByteArray();

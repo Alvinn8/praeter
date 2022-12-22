@@ -110,7 +110,6 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
      * Set up the vanilla assets.
      */
     private void setupVanillaAssets() {
-        // TODO only do this setup if praeter-resources is actually used?
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         Path resourcePacksFolder = Praeter.get().getResourceManager().getResourcePacksFolder();
         Path vanillaAssetsPath = resourcePacksFolder.resolve("vanilla.zip");

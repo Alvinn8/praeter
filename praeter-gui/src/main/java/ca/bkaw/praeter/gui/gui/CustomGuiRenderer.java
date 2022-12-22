@@ -16,6 +16,7 @@ import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
@@ -99,6 +100,7 @@ public class CustomGuiRenderer {
      * @param customGui The custom gui that is being rendered.
      * @return The final, rendered, title.
      */
+    @Nullable
     public Component getRenderTitle(Component title, CustomGui customGui) {
         BakedResourcePack bakedResourcePack = null;
         ResourceManager resourceManager = Praeter.get().getResourceManager();
@@ -112,8 +114,7 @@ public class CustomGuiRenderer {
             }
         }
         if (bakedResourcePack == null) {
-            System.out.println("customGui.getViewers().size() = " + customGui.getViewers().size());
-            return Component.empty();
+            return null;
         }
 
         RenderDispatcher renderDispatcher = new RenderDispatcher(bakedResourcePack);

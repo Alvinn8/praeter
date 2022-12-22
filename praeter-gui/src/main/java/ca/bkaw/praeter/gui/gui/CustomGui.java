@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A custom graphical user interface.
@@ -64,7 +65,7 @@ public abstract class CustomGui {
      * @param player The player to open the gui for.
      */
     public void show(Player player) {
-        if (this.inventory == null) {
+        if (this.inventory == null || this.currentRenderTitle == null) {
             // We must set pending player to allow the getPlayers method to be populated
             // with the player that is about to view the gui. This allows getting the
             // correct baked resource pack.
@@ -83,12 +84,11 @@ public abstract class CustomGui {
     public void update() {
         // Create the title to use
         Component renderTitle = this.type.getRenderer().getRenderTitle(this.getTitle(), this);
-        Praeter.get().getLogger().info(GsonComponentSerializer.gson().serialize(renderTitle)); // TODO debug code
 
         // In case the title has changed we need to recreate the inventory
         // and open it again for all viewers
         List<HumanEntity> viewers = null;
-        if (!renderTitle.equals(this.currentRenderTitle) && this.inventory != null) {
+        if (!Objects.equals(this.currentRenderTitle, renderTitle) && this.inventory != null) {
             viewers = new ArrayList<>(this.inventory.getViewers());
             this.inventory = null;
         }
@@ -97,8 +97,14 @@ public abstract class CustomGui {
             // Create the inventory
             int slotCount = this.type.getHeight() * 9;
             CustomGuiHolder holder = new CustomGuiHolder(this);
-            this.inventory = Bukkit.createInventory(holder, slotCount, renderTitle);
+            // The render title may be null if the gui is being rendered before it is shown
+            // to a player. In that case, set the currentRenderTitle to null, but render an
+            // empty component (because it may not be null)
             this.currentRenderTitle = renderTitle;
+            if (renderTitle == null) {
+                renderTitle = Component.empty();
+            }
+            this.inventory = Bukkit.createInventory(holder, slotCount, renderTitle);
         }
 
         // Clear the items

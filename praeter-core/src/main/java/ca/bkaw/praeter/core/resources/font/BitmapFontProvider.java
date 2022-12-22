@@ -38,20 +38,17 @@ public record BitmapFontProvider(
      * @param json The json.
      * @return Whether they are equal.
      */
-    @Deprecated
     public boolean isEqual(JsonObject json) {
         if (!("bitmap".equals(json.get("type").getAsString())
             && this.textureKey.equals(NamespacedKey.fromString(json.get("file").getAsString()))
             && this.ascent == json.get("ascent").getAsInt())) {
             return false;
         }
-        /*
-        if (this.height != null == json.has("height")) {
-            if (this.height != json.get("height").getAsInt()) {
-                return false;
-            }
+        int height = json.has("height") ? json.get("height").getAsInt() : 8;
+        if (this.height != height) {
+            return false;
         }
-        */
+
         JsonArray chars = json.get("chars").getAsJsonArray();
         if (chars.size() != this.chars.size()) {
             return false;

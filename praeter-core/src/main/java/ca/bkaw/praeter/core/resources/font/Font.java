@@ -93,13 +93,21 @@ public class Font {
      * @throws IOException If an I/O error occurs.
      */
     public void addFontChar(BitmapFontCharIdentifier bitmapFontChar) throws IOException {
-        // TODO identify if its already present
-        this.addProvider(new BitmapFontProvider(
+        BitmapFontProvider provider = new BitmapFontProvider(
             bitmapFontChar.textureKey(),
             bitmapFontChar.height(),
             bitmapFontChar.ascent(),
             this.getNextCharAsList()
-        ));
+        );
+        JsonArray providers = this.fontJson.getJson().getAsJsonArray("providers");
+        for (JsonElement element : providers) {
+            JsonObject json = element.getAsJsonObject();
+            if (provider.isEqual(json)) {
+                // The font character is already present
+                return;
+            }
+        }
+        this.addProvider(provider);
     }
 
     /**
