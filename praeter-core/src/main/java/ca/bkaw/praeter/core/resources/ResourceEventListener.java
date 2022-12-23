@@ -32,18 +32,24 @@ public class ResourceEventListener implements Listener {
 
         System.out.println("event.getStatus() = " + event.getStatus());
         switch (event.getStatus()) {
-            case FAILED_DOWNLOAD, DECLINED -> {
-                if (!request.isSecondAttempt()) {
+            case ACCEPTED -> request.accepted();
+            case FAILED_DOWNLOAD -> {
+                if (request.canTryAgain()) {
                     // If the second attempt has not been attempted, send the pack again.
                     // This works around a bug, see ResourcePackRequest.
                     request.resend();
                 }
             }
             case SUCCESSFULLY_LOADED -> {
-                this.resourceManager.getAppliedPacks().put(player, request.getResourcePack());
-                this.resourceManager.getPendingRequests().remove(player);
+                if (request.canTryAgain() && request.isTooSoon()) {
+                    // The player accepted too fast. It is assumed to be a failed download that
+                    // sends a successful packet due to a bug.
+                    request.resend();
+                } else {
+                    this.resourceManager.getAppliedPacks().put(player, request.getResourcePack());
+                    this.resourceManager.getPendingRequests().remove(player);
 
-                System.out.println("adding (size: " + this.resourceManager.getAppliedPacks().size() + ")");
+                }
             }
         }
     }
