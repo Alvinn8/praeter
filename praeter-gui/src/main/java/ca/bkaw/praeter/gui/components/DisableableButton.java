@@ -89,8 +89,6 @@ public class DisableableButton extends Button {
             .drawImage(disabledImage, 0, 0)
             .drawText(this.text, textX, textY, DISABLED_TEXT_COLOR)
             .build();
-
-        // TODO: overlap issues... complex stuff with splitting vs non-splitting spaces/text/font
     }
 
     /**

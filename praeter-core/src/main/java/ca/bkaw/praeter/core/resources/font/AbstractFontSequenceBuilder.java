@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * An abstract builder for a {@link FontSequence}.
@@ -31,6 +30,7 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
     private final List<Font> fonts;
     private final List<FontCharIdentifier> fontChars = new ArrayList<>();
     private DrawOrigin origin;
+    private boolean hasNewLayerChar = false;
 
     public AbstractFontSequenceBuilder(ResourcePackList resourcePacks,
                                        NamespacedKey fontKey,
@@ -89,6 +89,49 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
     }
 
     /**
+     * Insert a character that ensures things rendered before this character are
+     * rendered behind and the things that come after are rendered in front of the
+     * things that come behind.
+     * <p>
+     * It almost works as declaring a "new layer".
+     *
+     * @throws IOException If an I/O error occurs.
+     */
+    protected void newLayer() throws IOException {
+        // We create what is known as a "splitting" character. This character is large
+        // enough that rendering is split, causing predictable z-index ordering.
+
+        NamespacedKey key = new NamespacedKey(Praeter.NAMESPACE, "split.png");
+
+        // A height of -2 means the character will shift left enough to cancel out its
+        // own shift to the right, effectively making it a zero-width character.
+        BitmapFontCharIdentifier fontChar = new BitmapFontCharIdentifier(key, -2, -Short.MAX_VALUE);
+        if (!this.hasNewLayerChar) {
+            // A transparent 256x256 image is large enough to split rendering.
+            BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB);
+
+            // One pixel is set to an almost-transparent color. This is required to be able
+            // to create a zero-width character. If it is fully transparent, the game always
+            // shifts by one pixel to the right, regardless of the height.
+            image.setRGB(255, 0, 0x11000000);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+            byte[] bytes = stream.toByteArray();
+            for (ResourcePack resourcePack : this.resourcePacks) {
+                Path path = resourcePack.getTexturePath(key);
+                Files.createDirectories(path.getParent());
+                Files.write(path, bytes);
+            }
+            for (Font font : this.fonts) {
+                font.addFontChar(fontChar);
+            }
+            this.hasNewLayerChar = true;
+        }
+        this.fontChars.add(fontChar);
+    }
+
+    /**
      * Get the {@link DrawOriginResolver} that is responsible for resolving the origin
      * to absolute coordinates for the font sequence builder to use.
      *
@@ -117,6 +160,12 @@ public abstract class AbstractFontSequenceBuilder<T extends AbstractFontSequence
             textureKey
                 = new NamespacedKey(textureKey.getNamespace(), textureKey.getKey() + ".png");
         }
+
+        // To ensure the things drawn last are drawn on top, we need to insert a special
+        // character. It almost works as declaring a "new layer". We do that now to
+        // ensure the coming image will be displayed in front of everything before it in
+        // case there is overlap.
+        this.newLayer();
 
         // x offset: shift right with spaces (and shift back afterwards)
         // y offset: use the character ascent
