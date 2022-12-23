@@ -39,7 +39,7 @@ public class TestComponent extends GuiComponent {
     public void onSetup(RenderSetupContext context) throws IOException {
         GuiFontSequenceBuilder builder = context.newFontSequence();
         for (int i = -5; i < 5; i++) {
-            builder.drawImage(NamespacedKey.minecraft("item/diamond.png"), 36, i * 18);
+            // builder.drawImage(NamespacedKey.minecraft("item/diamond.png"), 36, i * 18);
         }
         this.fontSequence = builder.build();
     }

@@ -109,8 +109,10 @@ public class DisableableButton extends Button {
             // enabled click handler.
             super.setOnClick(context -> {
                 if (isEnabled) {
-                    enabledClickHandler.accept(context);
-                } else {
+                    if (enabledClickHandler != null) {
+                        enabledClickHandler.accept(context);
+                    }
+                } else if (disabledClickHandler != null) {
                     disabledClickHandler.accept(context);
                 }
             });

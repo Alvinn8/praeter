@@ -47,11 +47,10 @@ public abstract class CustomGui {
      */
     public CustomGui(CustomGuiType type) {
         this.type = type;
-        for (GuiComponent component : this.type.getComponents()) {
-            this.components.put(component, component.createState());
-        }
         ImmutableList.Builder<Slot.State> slots = ImmutableList.builder();
-        for (GuiComponent.State state : this.components.values()) {
+        for (GuiComponent component : this.type.getComponents()) {
+            GuiComponent.State state = component.createState();
+            this.components.put(component, state);
             if (state instanceof Slot.State slot) {
                 slots.add(slot);
             }

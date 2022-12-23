@@ -28,6 +28,12 @@ public class TestGui extends CustomGui {
     public TestGui() {
         super(TYPE);
 
+        BUTTON_1.getState(this).setOnClick(context -> {
+            DisableableButton.State button3 = BUTTON_3.getState(this);
+            button3.setEnabled(!button3.isEnabled());
+            update();
+        });
+
         BUTTON_2.getState(this).setOnClick(context -> {
             toggleButton2();
             context.playClickSound();
