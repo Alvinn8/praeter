@@ -1,7 +1,7 @@
 package ca.bkaw.praeter.core.resources;
 
+import ca.bkaw.praeter.core.resources.apply.ResourcePackApplier;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
-import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.send.ResourcePackRequest;
 import ca.bkaw.praeter.core.resources.send.ResourcePackSender;
 import org.bukkit.entity.Player;
@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +25,7 @@ public class ResourceManager {
     private ResourcePacksHolder packs;
     private PacksHolder<BakedResourcePack> bakedPacks;
     private ResourcePackSender resourcePackSender;
+    private ResourcePackApplier resourcePackApplier;
 
     /**
      * Get the baked resource pack to currently use for the specified player. The
@@ -127,6 +127,27 @@ public class ResourceManager {
             this.resourcePackSender.remove();
         }
         this.resourcePackSender = resourcePackSender;
+    }
+
+    /**
+     * Get the {@link ResourcePackApplier} used to determine when to apply resource
+     * packs.
+     *
+     * @return The applier.
+     */
+    @NotNull
+    public ResourcePackApplier getResourcePackApplier() {
+        return this.resourcePackApplier;
+    }
+
+    /**
+     * Get the {@link ResourcePackApplier} used to determine when to apply resource
+     * packs.
+     *
+     * @param resourcePackApplier The applier.
+     */
+    public void setResourcePackApplier(@NotNull ResourcePackApplier resourcePackApplier) {
+        this.resourcePackApplier = resourcePackApplier;
     }
 
     /**

@@ -6,6 +6,7 @@ import ca.bkaw.praeter.core.resources.PacksHolder;
 import ca.bkaw.praeter.core.resources.ResourceEventListener;
 import ca.bkaw.praeter.core.resources.ResourceManager;
 import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
+import ca.bkaw.praeter.core.resources.apply.DefaultResourcePackApplier;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
@@ -48,10 +49,14 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         // Bake the packs right before startup, after plugins have loaded
         this.getServer().getScheduler().runTaskLater(this, this::bakePacks, 1L);
 
+        DefaultResourcePackApplier resourcePackApplier = new DefaultResourcePackApplier(resourceManager, this);
+        resourceManager.setResourcePackApplier(resourcePackApplier);
+
         // Register event listeners
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new GuiEventListener(), this);
-        pluginManager.registerEvents(new ResourceEventListener(resourceManager, this), this);
+        pluginManager.registerEvents(new ResourceEventListener(resourceManager), this);
+        pluginManager.registerEvents(resourcePackApplier, this);
 
         // Testing
         // Register testing command

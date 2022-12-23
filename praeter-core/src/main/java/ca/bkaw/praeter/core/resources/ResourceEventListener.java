@@ -15,11 +15,9 @@ import org.bukkit.plugin.Plugin;
  */
 public class ResourceEventListener implements Listener {
     private final ResourceManager resourceManager;
-    private final Plugin plugin;
 
-    public ResourceEventListener(ResourceManager resourceManager, Plugin plugin) {
+    public ResourceEventListener(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        this.plugin = plugin;
     }
 
     @EventHandler
@@ -52,20 +50,6 @@ public class ResourceEventListener implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        player.getServer().getScheduler().runTaskLater(this.plugin, () ->
-            this.resourceManager.getResourcePackSender().send(
-                this.resourceManager.getBakedPacks().getMain(),
-                player,
-                true,
-                Component.text("Please accept the resource pack to see custom additions to the game.")
-            )
-        , 20L);
     }
 
     @EventHandler
