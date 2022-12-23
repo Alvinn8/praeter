@@ -84,28 +84,20 @@ public class GuiEventListener implements Listener {
             // Pick up
 
             switch (action) {
-                // TODO some pickup operations are not working
-                case PICKUP_ALL, PICKUP_HALF, PICKUP_ONE, PICKUP_SOME -> {
+                case PICKUP_ALL, PICKUP_HALF -> {
                     Slot.State slot = customGui.getSlot(x, y);
-                    if (slot != null && slot.mayChange(player)) {
+                    if (slot != null && slot.mayChange(player) && cursor == null) {
                         ItemStack itemStack = slot.getItemStack();
-                        if (itemStack != null && canPickUp(itemStack, cursor)) {
+                        if (itemStack != null) {
                             ItemStack pickedUpStack = itemStack.clone();
                             int newCursorAmount = pickedUpStack.getAmount();
-                            if (action == InventoryAction.PICKUP_ONE) {
-                                newCursorAmount = 1;
-                            } else if (action == InventoryAction.PICKUP_HALF) {
-                                newCursorAmount /= 2;
+                            if (action == InventoryAction.PICKUP_HALF) {
+                                // round up
+                                newCursorAmount = (int) (newCursorAmount / 2.0 + 0.5);
                             }
-                            if (cursor != null) {
-                                newCursorAmount += cursor.getAmount();
-                            }
-                            if (newCursorAmount > pickedUpStack.getMaxStackSize()) {
-                                int leftOverAmount = newCursorAmount - pickedUpStack.getMaxStackSize();
-                                itemStack.setAmount(leftOverAmount);
-                            } else {
-                                slot.setItemStack(null);
-                            }
+                            int leftOverAmount = pickedUpStack.getAmount() - newCursorAmount;
+                            itemStack.setAmount(leftOverAmount);
+                            pickedUpStack.setAmount(newCursorAmount);
                             player.setItemOnCursor(pickedUpStack);
                             update = true;
                         }
