@@ -54,7 +54,7 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
 
         // Register event listeners
         PluginManager pluginManager = this.getServer().getPluginManager();
-        pluginManager.registerEvents(new GuiEventListener(), this);
+        pluginManager.registerEvents(new GuiEventListener(this), this);
         pluginManager.registerEvents(new ResourceEventListener(resourceManager), this);
         pluginManager.registerEvents(resourcePackApplier, this);
 

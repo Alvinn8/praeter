@@ -5,6 +5,8 @@ import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.components.Slot;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiHolder;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,6 +18,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -27,6 +30,11 @@ import java.util.function.Consumer;
  * the player's own inventory.
  */
 public class GuiEventListener implements Listener {
+    private final Plugin plugin;
+
+    public GuiEventListener(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
@@ -359,28 +367,20 @@ public class GuiEventListener implements Listener {
         }
     }
 
-    private boolean canPickUp(ItemStack toPickUp, ItemStack cursor) {
-        if (cursor == null) {
-            return true;
-        }
-        if (!cursor.isSimilar(toPickUp)) {
-            return false;
-        }
-        return cursor.getAmount() < cursor.getMaxStackSize();
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        InventoryHolder holder = event.getView().getTopInventory().getHolder();
+        InventoryView view = event.getView();
+        InventoryHolder holder = view.getTopInventory().getHolder();
         if (!(holder instanceof CustomGuiHolder customGuiHolder)) {
             return;
         }
         event.setCancelled(true);
+        CustomGui customGui = customGuiHolder.getCustomGui();
 
         boolean onlyBottom = true;
         for (Integer rawSlot : event.getRawSlots()) {
-            Inventory inventory = event.getView().getInventory(rawSlot);
-            if (inventory == event.getView().getTopInventory()) {
+            Inventory inventory = view.getInventory(rawSlot);
+            if (inventory == view.getTopInventory()) {
                 onlyBottom = false;
             }
         }
@@ -388,8 +388,98 @@ public class GuiEventListener implements Listener {
             // Items were only dragged in the bottom inventory
             // Let vanilla handle it.
             event.setCancelled(false);
-        }
+        } else {
+            // The drag contained slots in the custom gui
+            boolean update = false;
+            IntList rawSlots = new IntArrayList();
+            HumanEntity player = event.getWhoClicked();
+            for (Integer rawSlotInteger : event.getRawSlots()) {
+                int rawSlot = rawSlotInteger;
+                Inventory inventory = view.getInventory(rawSlot);
+                if (inventory == view.getTopInventory()) {
+                    int slotNumber = view.convertSlot(rawSlot);
+                    int x = GuiUtils.getX(slotNumber);
+                    int y = GuiUtils.getY(slotNumber);
+                    Slot.State slot = customGui.getSlot(x, y);
+                    if (slot != null && slot.mayChange(player) && slot.canHold(event.getOldCursor())) {
+                        ItemStack itemStack = slot.getItemStack();
+                        if (itemStack == null || itemStack.isSimilar(event.getOldCursor())) {
+                            // There is a slot that we can move into
+                            rawSlots.add(rawSlot);
+                        }
+                    }
+                } else {
+                    ItemStack existingItem = view.getItem(rawSlot);
+                    if (existingItem == null || existingItem.getType().isAir() || existingItem.getAmount() <= 0 || existingItem.isSimilar(event.getOldCursor())) {
+                        rawSlots.add(rawSlot);
+                    }
+                }
 
-        // TODO handle drag in custom gui
+            }
+            if (rawSlots.size() == 0) {
+                return;
+            }
+            int cursorAmount = event.getOldCursor().getAmount();
+            ItemStack addItem = event.getOldCursor().clone();
+            switch (event.getType()) {
+                case SINGLE -> addItem.setAmount(1);
+                case EVEN -> addItem.setAmount(cursorAmount / rawSlots.size());
+            }
+            for (int i = 0; i < rawSlots.size(); i++) {
+                int rawSlot = rawSlots.getInt(i);
+                Inventory inventory = view.getInventory(rawSlot);
+                ItemStack existingItem;
+                if (inventory == view.getTopInventory()) {
+                    int slotNumber = view.convertSlot(rawSlot);
+                    int x = GuiUtils.getX(slotNumber);
+                    int y = GuiUtils.getY(slotNumber);
+                    Slot.State slot = customGui.getSlot(x, y);
+                    if (slot != null) { // Should always be true
+                        existingItem = slot.getItemStack();
+                    } else {
+                        existingItem = null;
+                    }
+                } else {
+                    existingItem = view.getItem(rawSlot);
+                }
+                ItemStack newItem = addItem.clone();
+                int insertAmount = newItem.getAmount();
+                if (existingItem != null) {
+                    int newAmount = insertAmount + existingItem.getAmount();
+                    if (newAmount > newItem.getMaxStackSize()) {
+                        // All the items do not fit
+                        // Add as much as we can
+                        insertAmount = newItem.getMaxStackSize() - existingItem.getAmount();
+                        newItem.setAmount(newItem.getMaxStackSize());
+                    }
+                    newItem.setAmount(newAmount);
+                }
+                if (inventory == view.getTopInventory()) {
+                    int slotNumber = view.convertSlot(rawSlot);
+                    int x = GuiUtils.getX(slotNumber);
+                    int y = GuiUtils.getY(slotNumber);
+                    Slot.State slot = customGui.getSlot(x, y);
+                    if (slot != null) { // Should always be true
+                        slot.setItemStack(newItem);
+                        update = true;
+                    }
+                } else {
+                    view.setItem(rawSlot, newItem);
+                }
+                cursorAmount -= insertAmount;
+            }
+            ItemStack newCursor = event.getOldCursor().clone();
+            newCursor.setAmount(cursorAmount);
+            // Unfortunately, CraftBukkit resets the cursor to the old cursor after the
+            // event is called if the event is cancelled, This means we have to set the
+            // cursor one tick later, hopefully players don't have time to dupe in one
+            // tick...
+            this.plugin.getServer().getScheduler().runTask(this.plugin, () ->
+                player.setItemOnCursor(newCursor)
+            );
+            if (update) {
+                customGui.update();
+            }
+        }
     }
 }

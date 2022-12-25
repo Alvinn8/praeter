@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 /**
- * Holds data that is passed to the {@link GuiComponent#setOnClick(Consumer)}
+ * Holds data that is passed to the {@link GuiComponent.State#setOnClick(Consumer)}
  * callback.
  */
 public class GuiClickContext {
