@@ -107,6 +107,7 @@ public class GuiEventListener implements Listener {
                             itemStack.setAmount(leftOverAmount);
                             pickedUpStack.setAmount(newCursorAmount);
                             player.setItemOnCursor(pickedUpStack);
+                            slot.onChange(player);
                             update = true;
                         }
                     }
@@ -123,6 +124,7 @@ public class GuiEventListener implements Listener {
                         if (itemStack == null) {
                             player.setItemOnCursor(null);
                             slot.setItemStack(cursor);
+                            slot.onChange(player);
                             update = true;
                         } else if (itemStack.isSimilar(cursor)) {
                             int amount;
@@ -144,6 +146,7 @@ public class GuiEventListener implements Listener {
                             } else {
                                 player.setItemOnCursor(null);
                             }
+                            slot.onChange(player);
                             update = true;
                         }
                     }
@@ -159,6 +162,7 @@ public class GuiEventListener implements Listener {
                     if (itemStack != null) {
                         player.setItemOnCursor(itemStack);
                         slot.setItemStack(cursor);
+                        slot.onChange(player);
                         update = true;
                     }
                 }
@@ -180,6 +184,7 @@ public class GuiEventListener implements Listener {
                             default -> throw new RuntimeException(action.toString());
                         };
                         itemStack.setAmount(newAmount);
+                        slot.onChange(player);
                         // Maybe more actions can benefit from letting vanilla handle things and
                         // predicting the outcome?
                     }
@@ -213,6 +218,7 @@ public class GuiEventListener implements Listener {
                         int requestedInsertAmount = currentItem.getAmount();
                         int insertAmount = Math.min(requestedInsertAmount, maxInsertAmount);
                         slotItem.setAmount(slotItem.getAmount() + insertAmount);
+                        slot.onChange(player);
                         update = true;
                         currentItem.setAmount(currentItem.getAmount() - insertAmount);
                         if (currentItem.getAmount() <= 0) {
@@ -222,6 +228,7 @@ public class GuiEventListener implements Listener {
                 } else if (slot.canHold(currentItem)) {
                     // No item here, we can shift click into this slot
                     slot.setItemStack(currentItem.clone());
+                    slot.onChange(player);
                     update = true;
                     // All the items were consumed
                     event.setCurrentItem(null);
@@ -247,6 +254,7 @@ public class GuiEventListener implements Listener {
                             int insertAmount = Math.min(requestedInsertAmount, maxInsertAmount);
                             slotItem.setAmount(slotItem.getAmount() + insertAmount);
                             itemStack.setAmount(itemStack.getAmount() - insertAmount);
+                            slot.onChange(player);
                             update = true;
                             if (itemStack.getAmount() <= 0) {
                                 break;
@@ -261,6 +269,7 @@ public class GuiEventListener implements Listener {
                             // No item here, we can shift click into this slot
                             view.setItem(rawSlot, itemStack.clone());
                             slot.setItemStack(null);
+                            slot.onChange(player);
                             update = true;
                             break;
                         }
@@ -286,6 +295,7 @@ public class GuiEventListener implements Listener {
                 ItemStack itemStack = slot.getItemStack();
                 if (itemStack != null) {
                     slot.setItemStack(itemToSwap);
+                    slot.onChange(player);
                     update = true;
                     if (action == InventoryAction.HOTBAR_SWAP) {
                         switch (event.getClick()) {
@@ -318,6 +328,7 @@ public class GuiEventListener implements Listener {
                         // We need to consume parts of the stack to fill up the cursor
                         int consumedAmount = cursor.getMaxStackSize() - cursor.getAmount();
                         slotItem.setAmount(slotItem.getAmount() - consumedAmount);
+                        slot.onChange(player);
                         update = true;
                         cursor.setAmount(cursor.getMaxStackSize());
                         break;
