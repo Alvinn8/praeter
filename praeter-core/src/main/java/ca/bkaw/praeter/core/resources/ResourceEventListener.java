@@ -1,14 +1,11 @@
 package ca.bkaw.praeter.core.resources;
 
 import ca.bkaw.praeter.core.resources.send.ResourcePackRequest;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
-import org.bukkit.plugin.Plugin;
 
 /**
  * The event listener for resource the resource pack manager.
@@ -39,7 +36,7 @@ public class ResourceEventListener implements Listener {
                 }
             }
             case SUCCESSFULLY_LOADED -> {
-                if (request.canTryAgain() && request.isTooSoon()) {
+                if (request.isTooSoon() && request.canTryAgain()) {
                     // The player accepted too fast. It is assumed to be a failed download that
                     // sends a successful packet due to a bug.
                     request.resend();

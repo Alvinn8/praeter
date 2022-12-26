@@ -14,6 +14,10 @@ import java.io.IOException;
 
 /**
  * A slot where the user can take and place items.
+ * <p>
+ * Subclasses can override the {@link #canHold(ItemStack)} and
+ * {@link #mayChange(HumanEntity)} methods to control the slot. These methods can
+ * also be overridden in the state to control this on a per-state basis.
  */
 public class Slot extends GuiComponent {
     /**
@@ -27,7 +31,8 @@ public class Slot extends GuiComponent {
     }
 
     @Override
-    public void onSetup(RenderSetupContext context) {
+    @SuppressWarnings("RedundantThrows") // subclasses may want to throw
+    public void onSetup(RenderSetupContext context) throws IOException {
         // Carve out the slot to let the vanilla slot shine trough
         context.getBackground().carve(0, 0, GuiUtils.SLOT_SIZE, GuiUtils.SLOT_SIZE);
     }
@@ -42,12 +47,52 @@ public class Slot extends GuiComponent {
         return (Slot.State) super.getState(gui);
     }
 
+    /**
+     * Check whether this slot can hold the specified item stack.
+     *
+     * @param itemStack The item stack.
+     * @return Whether the item can be held.
+     */
+    public boolean canHold(@NotNull ItemStack itemStack) {
+        return true;
+    }
+
+    /**
+     * Check whether the player is allowed to change the contents of this slot.
+     *
+     * @param player The player.
+     * @return Whether the player may change the slot.
+     */
+    public boolean mayChange(HumanEntity player) {
+        return true;
+    }
+
     public class State extends GuiComponent.State {
         private ItemStack itemStack;
 
         @Override
         public void renderItems(Inventory inventory) {
             inventory.setItem(GuiUtils.getSlot(x, y), itemStack);
+        }
+
+        /**
+         * Check whether this slot can hold the specified item stack.
+         *
+         * @param itemStack The item stack.
+         * @return Whether the item can be held.
+         */
+        public boolean canHold(@NotNull ItemStack itemStack) {
+            return Slot.this.canHold(itemStack);
+        }
+
+        /**
+         * Check whether the player is allowed to change the contents of this slot.
+         *
+         * @param player The player.
+         * @return Whether the player may change the slot.
+         */
+        public boolean mayChange(HumanEntity player) {
+            return Slot.this.mayChange(player);
         }
 
         /**
@@ -85,26 +130,6 @@ public class Slot extends GuiComponent {
                 itemStack = null;
             }
             this.itemStack = itemStack;
-        }
-
-        /**
-         * Check whether this slot can hold the specified item stack.
-         *
-         * @param itemStack The item stack.
-         * @return Whether the item can be held.
-         */
-        public boolean canHold(@NotNull ItemStack itemStack) {
-            return true;
-        }
-
-        /**
-         * Check whether the player is allowed to change the contents of this slot.
-         *
-         * @param player The player.
-         * @return Whether the player may change the slot.
-         */
-        public boolean mayChange(HumanEntity player) {
-            return true;
         }
     }
 

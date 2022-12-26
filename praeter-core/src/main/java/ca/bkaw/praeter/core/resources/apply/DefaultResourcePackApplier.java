@@ -25,14 +25,14 @@ public class DefaultResourcePackApplier implements Listener, ResourcePackApplier
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        player.getServer().getScheduler().runTaskLater(this.plugin, () ->
+        player.getServer().getScheduler().runTask(this.plugin, () ->
                 this.resourceManager.getResourcePackSender().send(
                     this.resourceManager.getBakedPacks().getMain(),
                     player,
                     true,
                     Component.text("Please accept the resource pack to see custom additions to the game.")
                 )
-            , 20L);
+        );
     }
 
 }

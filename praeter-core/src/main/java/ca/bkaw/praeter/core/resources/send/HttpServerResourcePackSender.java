@@ -60,7 +60,7 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
             ResourcePackRequest request = new ResourcePackRequest(
                     player,
                     resourcePack,
-                resourceManager,
+                    resourceManager,
                     "http://localhost:" + PORT + path,
                     hash,
                     required,
@@ -92,7 +92,7 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
                 inputStream.transferTo(exchange.getResponseBody());
                 exchange.close();
             } finally {
-                // server.removeContext(context);
+                server.removeContext(context);
             }
         }
     }

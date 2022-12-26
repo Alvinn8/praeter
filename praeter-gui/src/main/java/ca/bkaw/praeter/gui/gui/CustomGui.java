@@ -1,11 +1,9 @@
 package ca.bkaw.praeter.gui.gui;
 
-import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import ca.bkaw.praeter.gui.components.Slot;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -47,6 +45,9 @@ public abstract class CustomGui {
      */
     public CustomGui(CustomGuiType type) {
         this.type = type;
+        if (!this.type.isRegistered()) {
+            throw new IllegalStateException("Tried to create a custom gui that was not registered.");
+        }
         ImmutableList.Builder<Slot.State> slots = ImmutableList.builder();
         for (GuiComponent component : this.type.getComponents()) {
             GuiComponent.State state = component.createState();
