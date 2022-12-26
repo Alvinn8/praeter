@@ -27,7 +27,7 @@ public void onSetup(RenderSetupContext context) throws IOException {
 
 This would render the image located at `assets/foo/textures/gui/bar.png`. The
 coordinates (0, 0) correspond to the top-left corner of the component. The scale
-is in pixels, where 18 pixels (`GuiUtils.GUI_SIZE`) is the size of one slot.
+is in pixels, where 18 pixels (`GuiUtils.SLOT_SIZE`) is the size of one slot.
 Keep this in mind when creating the textures to make them the right size.
 
 ## Components with custom state

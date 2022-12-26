@@ -1,5 +1,8 @@
 # praeter
-Praeter is a Bukkit framework for using Resource Packs in plugins to create cool stuff.
+Praeter is a Bukkit framework for using Resource Packs in plugins.
+
+The project is still in its early stages! There is no download for the built
+plugin jar, and the modules are not on any maven repository yet.
 
 ## praeter-core
 The core module handles resource packs.
