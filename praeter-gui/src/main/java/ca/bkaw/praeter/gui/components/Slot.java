@@ -43,8 +43,8 @@ public class Slot extends GuiComponent {
     }
 
     @Override
-    public Slot.State getState(CustomGui gui) {
-        return (Slot.State) super.getState(gui);
+    public Slot.State get(CustomGui gui) {
+        return (Slot.State) super.get(gui);
     }
 
     /**

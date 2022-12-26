@@ -6,7 +6,6 @@ import ca.bkaw.praeter.gui.font.GuiFontSequenceBuilder;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import ca.bkaw.praeter.gui.gui.CustomGui;
-import org.bukkit.NamespacedKey;
 
 import java.io.IOException;
 
@@ -31,8 +30,8 @@ public class TestComponent extends GuiComponent {
     }
 
     @Override
-    public State getState(CustomGui gui) {
-        return (State) super.getState(gui);
+    public State get(CustomGui gui) {
+        return (State) super.get(gui);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class GuiComponent {
      * @param gui The gui.
      * @return The state.
      */
-    public GuiComponent.State getState(CustomGui gui) {
+    public GuiComponent.State get(CustomGui gui) {
         return gui.getStateFor(this);
     }
 
@@ -117,7 +117,7 @@ public class GuiComponent {
      * <p>
      * The state holds data that can change during the lifespan of the server.
      * <p>
-     * Get using {@link #getState(CustomGui)}.
+     * Get using {@link #get(CustomGui)}.
      * <p>
      * Subclasses can be static classes or inner classes.
      */

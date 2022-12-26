@@ -28,29 +28,29 @@ public class TestGui extends CustomGui {
     public TestGui() {
         super(TYPE);
 
-        BUTTON_1.getState(this).setOnClick(context -> {
-            DisableableButton.State button3 = BUTTON_3.getState(this);
+        BUTTON_1.get(this).setOnClick(context -> {
+            DisableableButton.State button3 = BUTTON_3.get(this);
             button3.setEnabled(!button3.isEnabled());
             update();
         });
 
-        BUTTON_2.getState(this).setOnClick(context -> {
+        BUTTON_2.get(this).setOnClick(context -> {
             toggleButton2();
             context.playClickSound();
         });
 
-        BUTTON_3.getState(this).setOnClick(context -> {
+        BUTTON_3.get(this).setOnClick(context -> {
             context.playClickSound();
             context.getPlayer().getInventory().addItem(new ItemStack(Material.DIAMOND));
         });
 
-        BUTTON_3.getState(this).setOnDisabledClick(context ->
+        BUTTON_3.get(this).setOnDisabledClick(context ->
             context.getPlayer().playSound(context.getPlayer(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f)
         );
     }
 
     public void toggleButton2() {
-        DisableableButton.State button = BUTTON_2.getState(this);
+        DisableableButton.State button = BUTTON_2.get(this);
         button.setEnabled(!button.isEnabled());
         update();
     }

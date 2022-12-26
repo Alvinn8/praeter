@@ -56,8 +56,8 @@ public class DisableableButton extends Button {
     }
 
     @Override
-    public DisableableButton.State getState(CustomGui gui) {
-        return (DisableableButton.State) super.getState(gui);
+    public DisableableButton.State get(CustomGui gui) {
+        return (DisableableButton.State) super.get(gui);
     }
 
     @Override

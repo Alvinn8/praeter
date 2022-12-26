@@ -124,7 +124,7 @@ public class CustomGuiRenderer {
 
         // Then draw components
         for (GuiComponent component : customGui.getType().getComponents()) {
-            GuiComponent.State state = component.getState(customGui);
+            GuiComponent.State state = component.get(customGui);
             state.onRender(renderDispatcher);
         }
 

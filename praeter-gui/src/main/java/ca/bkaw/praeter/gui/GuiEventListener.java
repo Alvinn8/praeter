@@ -352,7 +352,7 @@ public class GuiEventListener implements Listener {
             GuiComponent component = customGui.getComponentAt(x, y);
             if (component != null) {
                 // The user clicked a component
-                GuiComponent.State state = component.getState(customGui);
+                GuiComponent.State state = component.get(customGui);
                 Consumer<GuiClickContext> clickHandler = state.getClickHandler();
                 if (clickHandler != null) {
                     // Call the click handler on the component

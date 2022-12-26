@@ -179,7 +179,7 @@ public abstract class CustomGui {
      * The component must be registered in this {@link #getType() gui type} by
      * calling {@link CustomGuiType.Builder#add(GuiComponent...)}.
      * <p>
-     * Using {@link GuiComponent#getState(CustomGui)} is preferred over this method
+     * Using {@link GuiComponent#get(CustomGui)} is preferred over this method
      * due to it providing the correct return type for the state.
      *
      * @param component The component.
@@ -250,7 +250,7 @@ public abstract class CustomGui {
         if (component == null) {
             return null;
         }
-        GuiComponent.State state = component.getState(this);
+        GuiComponent.State state = component.get(this);
         if (state instanceof Slot.State slot) {
             return slot;
         }
