@@ -2,6 +2,7 @@ package ca.bkaw.praeter.plugin;
 
 import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.PraeterPlugin;
+import ca.bkaw.praeter.core.resources.CustomModelDataStore;
 import ca.bkaw.praeter.core.resources.PacksHolder;
 import ca.bkaw.praeter.core.resources.ResourceEventListener;
 import ca.bkaw.praeter.core.resources.ResourceManager;
@@ -32,12 +33,18 @@ import java.util.Objects;
  * The plugin that loads the praeter classes into bukkit.
  */
 public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
+    /**
+     * The directory that contains files that praeter needs to run. The name internal
+     * indicates to the server admins that the folder should not be modified.
+     */
+    private final Path internalDirectory = this.getDataFolder().toPath().resolve("internal");
+
     @Override
     public void onEnable() {
         Praeter.get().setLogger(this.getLogger());
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         resourceManager.setResourcePacksFolder(
-            this.getDataFolder().toPath().resolve("internal/resourcepacks")
+            this.internalDirectory.resolve("resourcepacks")
         );
 
         this.setupDirectories();
@@ -107,7 +114,14 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         } catch (IOException e) {
             throw new RuntimeException("Failed to set up the main resource pack.", e);
         }
-        ResourcePacksHolder holder = new ResourcePacksHolder(mainResourcePack);
+        Path storePath = this.internalDirectory.resolve("customModelData.json");
+        CustomModelDataStore customModelDataStore;
+        try {
+            customModelDataStore = new CustomModelDataStore(storePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read custom model data store.", e);
+        }
+        ResourcePacksHolder holder = new ResourcePacksHolder(mainResourcePack, customModelDataStore);
         resourceManager.setPacks(holder);
     }
 
@@ -135,9 +149,11 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         this.getLogger().info("Including plugin assets");
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
-            if (!(plugin instanceof PraeterPlugin)) {
+            if (!(plugin instanceof PraeterPlugin praeterPlugin)) {
                 continue;
             }
+
+            // Read the assets
             ResourcePack pluginAssets;
             try {
                 Path jarPath = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -145,6 +161,8 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
             } catch (IOException | URISyntaxException e) {
                 throw new RuntimeException("Failed to open plugin jar file.", e);
             }
+
+            // Include assets into resource packs
             for (ResourcePack resourcePack : resourceManager.getResourcePacks(plugin)) {
                 try {
                     resourcePack.include(pluginAssets, path -> path.startsWith("assets/"));
@@ -155,7 +173,18 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
                     // Break out of this loop (continue to next plugin)
                     break;
                 }
+                try {
+                    praeterPlugin.onIncludeAssets(resourcePack);
+                } catch (Throwable e) {
+                    getLogger().severe("Error in onIncludeAssets method from " + plugin.getName()
+                        + " for resource pack " + resourceManager.getPacks().getId(resourcePack));
+                    e.printStackTrace();
+                    // Break out of this loop (continue to next plugin)
+                    break;
+                }
             }
+
+            // Close assets
             try {
                 pluginAssets.getRoot().getFileSystem().close();
             } catch (IOException e) {
@@ -188,6 +217,14 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         // Get the packs before removing the PacksHolder
         ResourcePack pack = resourceManager.getPacks().getMain();
         ResourcePack vanillaAssets = resourceManager.getPacks().getVanillaAssets();
+
+        // Save custom model data store
+        try {
+            resourceManager.getPacks().getCustomModelDataStore().save();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save custom model data store.", e);
+        }
+
         // Remove the PacksHolder for resource packs
         resourceManager.setPacks(null);
 
@@ -214,5 +251,16 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         }
 
         this.getLogger().info("All packs have been baked and closed.");
+
+        for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
+            if (plugin instanceof PraeterPlugin praeterPlugin) {
+                try {
+                    praeterPlugin.onPacksBaked();
+                } catch (Throwable e) {
+                    getLogger().severe("Exception in onPacksBaked for plugin " + plugin.getName());
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

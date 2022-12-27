@@ -47,7 +47,11 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
         if (Files.exists(file)) {
             String path = "/";
             Handler handler = new Handler(file);
-            handler.context = this.server.createContext(path, handler);
+            try {
+                handler.context = this.server.createContext(path, handler);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
 
             byte[] hash;
             try {
@@ -61,7 +65,7 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
                     player,
                     resourcePack,
                     resourceManager,
-                    "http://localhost:" + PORT + path,
+                    "http://localhost:" + PORT + path, // TODO
                     hash,
                     required,
                     prompt

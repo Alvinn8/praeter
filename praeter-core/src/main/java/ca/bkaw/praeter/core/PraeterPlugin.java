@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.core;
 
+import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.World;
 
 /**
@@ -21,4 +22,17 @@ public interface PraeterPlugin {
      * @return Whether the plugin is enabled in the specified world.
      */
     boolean isEnabledIn(World world);
+
+    /**
+     * A method called after the assets of this plugin has been included into the
+     * specified resource pack.
+     *
+     * @param resourcePack The resource pack that assets have been included into.
+     */
+    default void onIncludeAssets(ResourcePack resourcePack) {}
+
+    /**
+     * A method called after the packs have been baked.
+     */
+    default void onPacksBaked() {} // TODO better name
 }

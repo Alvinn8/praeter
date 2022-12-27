@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.core.resources.pack;
 
 import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.CustomModelDataStore;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -138,15 +139,16 @@ public class ResourcePack extends Pack {
      * and wasn't found in the vanilla assets either.
      * @see #getModelPath(NamespacedKey)
      */
-    // TODO add value argument, or make it default to hashcode?
     public int addCustomModelData(NamespacedKey vanillaModel, NamespacedKey model) throws IOException {
         Path path = this.getModelPath(vanillaModel);
         if (!Files.exists(path)) {
             // Copy from vanilla assets
-            ResourcePack vanillaAssets = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
+            ResourcePack vanillaAssets
+                = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
             Path vanillaPath = vanillaAssets.getModelPath(vanillaModel);
             if (!Files.exists(vanillaPath)) {
-                throw new IllegalArgumentException("The model " + vanillaModel + " was not found in the vanilla resource pack.");
+                throw new IllegalArgumentException("The model " + vanillaModel + " was not " +
+                    "found in the vanilla resource pack.");
             }
             Files.createDirectories(path.getParent());
             Files.copy(vanillaPath, path);
@@ -161,18 +163,30 @@ public class ResourcePack extends Pack {
         }
         String modelKey = model.toString();
 
+        CustomModelDataStore store
+            = Praeter.get().getResourceManager().getPacks().getCustomModelDataStore();
+
         // Look for an existing custom model data for this model
         for (JsonElement existingOverrideElement : overrides) {
             JsonObject existingOverride = existingOverrideElement.getAsJsonObject();
             JsonObject predicate = existingOverride.get("predicate").getAsJsonObject();
             if (!predicate.has("custom_model_data")) continue;
 
-            if (predicate.size() == 1 && modelKey.equals(existingOverride.get("model").getAsString())) {
-                // Cool, the model we were trying to add already existed and has no other predicates.
-                return predicate.get("custom_model_data").getAsInt();
+            String existingModel = existingOverride.get("model").getAsString();
+            if (predicate.size() == 1 && modelKey.equals(existingModel)) {
+                // The model we were trying to add already existed and has no other predicates.
+                int customModelData = predicate.get("custom_model_data").getAsInt();
+                // Let's ensure the store is aware of this value
+                store.set(model, customModelData);
+                return customModelData;
             }
         }
-        int value = 1;
+
+        int value = store.has(model) ? store.get(model) : store.next();
+
+        // Ensure this value isn't used, it really shouldn't be, but in case plugins
+        // add their own custom model data manually or something. We really don't
+        // want duplicates.
         findFreeValue:
         while (true) {
             for (JsonElement existingOverrideElement : overrides) {
@@ -183,8 +197,11 @@ public class ResourcePack extends Pack {
                 }
                 int existingValue = predicate.get("custom_model_data").getAsInt();
                 if (existingValue == value) {
+                    Praeter.get().getLogger().warning("Occupied custom model data value " + value
+                        + " existed for " + existingOverride.get("model").getAsString()
+                        + " while trying to add " + model);
                     // This custom model data value is occupied, increment it and look again
-                    value++;
+                    value = store.next();
                     continue findFreeValue;
                 }
             }
@@ -192,6 +209,10 @@ public class ResourcePack extends Pack {
             // a custom model data value that isn't used.
             break;
         }
+
+        // Store the custom model data value used so that it stays consistent past
+        // restarts and between resource packs.
+        store.set(model, value);
 
         JsonObject override = new JsonObject();
         JsonObject predicate = new JsonObject();

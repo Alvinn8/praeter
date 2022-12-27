@@ -14,9 +14,11 @@ import java.util.List;
  */
 public class ResourcePacksHolder extends PacksHolder<ResourcePack> {
     private ResourcePack vanillaAssets;
+    private final CustomModelDataStore customModelDataStore;
 
-    public ResourcePacksHolder(ResourcePack main) {
+    public ResourcePacksHolder(ResourcePack main, CustomModelDataStore customModelDataStore) {
         super(main);
+        this.customModelDataStore = customModelDataStore;
     }
 
     /**
@@ -30,6 +32,15 @@ public class ResourcePacksHolder extends PacksHolder<ResourcePack> {
             throw new RuntimeException("Vanilla assets was not set.");
         }
         return this.vanillaAssets;
+    }
+
+    /**
+     * Get the {@link CustomModelDataStore}.
+     *
+     * @return The store.
+     */
+    public CustomModelDataStore getCustomModelDataStore() {
+        return this.customModelDataStore;
     }
 
     /**

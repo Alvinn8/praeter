@@ -89,7 +89,7 @@ public class BakedResourcePack {
     private static Map<NamespacedKey, BakedItemModel> bakeItemModels(ResourcePack pack) throws IOException {
         Map<NamespacedKey, BakedItemModel> itemModels = new HashMap<>();
 
-        Path itemPath = pack.getPath("assets/minecraft/item");
+        Path itemPath = pack.getPath("assets/minecraft/models/item");
         if (Files.notExists(itemPath)) {
             return itemModels;
         }
@@ -102,8 +102,9 @@ public class BakedResourcePack {
                     JsonArray overrides = jsonResource.getJson().getAsJsonArray("overrides");
                     for (JsonElement e : overrides) {
                         JsonObject override = e.getAsJsonObject();
-                        if (override.has("predicate") && override.has("custom_model_data")) {
-                            int customModelData = override.get("custom_model_data").getAsInt();
+                        JsonObject predicate = override.getAsJsonObject("predicate");
+                        if (predicate.has("custom_model_data")) {
+                            int customModelData = predicate.get("custom_model_data").getAsInt();
                             String model = override.get("model").getAsString();
                             NamespacedKey modelKey = NamespacedKey.fromString(model);
                             String vanillaItem = path.toString().substring("assets/minecraft/models/item/".length());
