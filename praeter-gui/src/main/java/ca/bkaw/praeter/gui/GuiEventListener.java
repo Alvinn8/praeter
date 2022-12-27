@@ -121,25 +121,31 @@ public class GuiEventListener implements Listener {
                     Slot.State slot = customGui.getSlot(x, y);
                     if (slot != null && slot.mayChange(player) && cursor != null && slot.canHold(cursor)) {
                         ItemStack itemStack = slot.getItemStack();
-                        if (itemStack == null) {
-                            player.setItemOnCursor(null);
-                            slot.setItemStack(cursor);
-                            slot.onChange(player);
-                            update = true;
-                        } else if (itemStack.isSimilar(cursor)) {
-                            int amount;
+                        int amount;
+                        if (itemStack != null) {
+                            amount = itemStack.getAmount();
+                        } else {
+                            amount = 0;
+                        }
+                        if (itemStack == null || itemStack.isSimilar(cursor)) {
                             int remaining = 0;
                             if (action == InventoryAction.PLACE_ONE) {
-                                amount = itemStack.getAmount() + 1;
+                                amount += 1;
                                 remaining = cursor.getAmount() - 1;
                             } else {
-                                amount = itemStack.getAmount() + cursor.getAmount();
+                                amount += cursor.getAmount();
                             }
-                            if (amount > itemStack.getMaxStackSize()) {
-                                remaining = amount - itemStack.getMaxStackSize();
-                                amount = itemStack.getMaxStackSize();
+                            if (itemStack != null) {
+                                if (amount > itemStack.getMaxStackSize()) {
+                                    remaining = amount - itemStack.getMaxStackSize();
+                                    amount = itemStack.getMaxStackSize();
+                                }
+                                itemStack.setAmount(amount);
+                            } else {
+                                itemStack = cursor.clone();
+                                itemStack.setAmount(amount);
+                                slot.setItemStack(itemStack);
                             }
-                            itemStack.setAmount(amount);
                             if (remaining > 0) {
                                 cursor.setAmount(remaining);
                                 player.setItemOnCursor(cursor);
@@ -213,7 +219,7 @@ public class GuiEventListener implements Listener {
             for (Slot.State slot : customGui.getSlots()) {
                 ItemStack slotItem = slot.getItemStack();
                 if (slotItem != null) {
-                    if (slotItem.isSimilar(currentItem) && slot.canHold(currentItem)) {
+                    if (slotItem.isSimilar(currentItem) && slot.mayChange(player) && slot.canHold(currentItem)) {
                         int maxInsertAmount = slotItem.getMaxStackSize() - slotItem.getAmount();
                         int requestedInsertAmount = currentItem.getAmount();
                         int insertAmount = Math.min(requestedInsertAmount, maxInsertAmount);
