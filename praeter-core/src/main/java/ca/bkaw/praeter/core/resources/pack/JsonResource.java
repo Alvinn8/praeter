@@ -104,6 +104,10 @@ public class JsonResource {
      * @throws IOException If an I/O error occurs
      */
     public void save(Gson gson) throws IOException {
+        Path parent = this.path.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
         Files.writeString(this.path, gson.toJson(this.json));
     }
 }
