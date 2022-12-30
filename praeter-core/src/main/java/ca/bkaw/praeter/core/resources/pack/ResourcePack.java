@@ -121,6 +121,19 @@ public class ResourcePack extends Pack {
         return this.getPath(getTextureStringPath(namespacedKey));
     }
 
+    private void copyModelFromVanilla(Path path, NamespacedKey vanillaModel) throws IOException {
+        // Copy from vanilla assets
+        ResourcePack vanillaAssets
+            = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
+        Path vanillaPath = vanillaAssets.getModelPath(vanillaModel);
+        if (!Files.exists(vanillaPath)) {
+            throw new IllegalArgumentException("The model " + vanillaModel + " was not " +
+                "found in the vanilla resource pack.");
+        }
+        Files.createDirectories(path.getParent());
+        Files.copy(vanillaPath, path);
+    }
+
     /**
      * Add a custom model data entry to the vanilla model, redirecting the model
      * to {@code model}.
@@ -142,16 +155,7 @@ public class ResourcePack extends Pack {
     public int addCustomModelData(NamespacedKey vanillaModel, NamespacedKey model) throws IOException {
         Path path = this.getModelPath(vanillaModel);
         if (!Files.exists(path)) {
-            // Copy from vanilla assets
-            ResourcePack vanillaAssets
-                = Praeter.get().getResourceManager().getPacks().getVanillaAssets();
-            Path vanillaPath = vanillaAssets.getModelPath(vanillaModel);
-            if (!Files.exists(vanillaPath)) {
-                throw new IllegalArgumentException("The model " + vanillaModel + " was not " +
-                    "found in the vanilla resource pack.");
-            }
-            Files.createDirectories(path.getParent());
-            Files.copy(vanillaPath, path);
+            this.copyModelFromVanilla(path, vanillaModel);
         }
         JsonResource jsonResource = new JsonResource(this, path);
         JsonArray overrides;
@@ -222,5 +226,36 @@ public class ResourcePack extends Pack {
         overrides.add(override);
         jsonResource.save();
         return value;
+    }
+
+    /**
+     * Add an override to the vanilla model, redirecting the model to {@code model}
+     * when the predicate is met.
+     *
+     * @param vanillaModel The model to add the override to.
+     * @param model The model to redirect to when the predicate is met.
+     * @param predicate The predicate to add with the override.
+     * @throws IOException If an I/O error occurs.
+     */
+    public void addOverride(NamespacedKey vanillaModel, NamespacedKey model, JsonObject predicate) throws IOException {
+        Path vanillaModelPath = this.getModelPath(vanillaModel);
+        if (!Files.exists(vanillaModelPath)) {
+            this.copyModelFromVanilla(vanillaModelPath, vanillaModel);
+        }
+        JsonResource resource = new JsonResource(this, vanillaModelPath);
+        JsonArray overrides;
+        if (resource.getJson().has("overrides")) {
+            overrides = resource.getJson().getAsJsonArray("overrides");
+        } else {
+            overrides = new JsonArray();
+            resource.getJson().add("overrides", overrides);
+        }
+
+        JsonObject override = new JsonObject();
+        override.add("predicate", predicate);
+        override.addProperty("model", model.toString());
+        overrides.add(override);
+
+        resource.save();
     }
 }
