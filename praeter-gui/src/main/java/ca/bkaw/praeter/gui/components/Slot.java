@@ -67,14 +67,6 @@ public class Slot extends GuiComponent {
         return true;
     }
 
-    /**
-     * Called right after the slot content has been changed. The gui will update
-     * shortly after this method is called.
-     *
-     * @param player The player that changed the slot.
-     */
-    public void onChange(HumanEntity player) {}
-
     public class State extends GuiComponent.State {
         private ItemStack itemStack;
 
@@ -109,9 +101,7 @@ public class Slot extends GuiComponent {
          *
          * @param player The player that changed the slot.
          */
-        public void onChange(HumanEntity player) {
-            Slot.this.onChange(player);
-        }
+        public void onChange(HumanEntity player) {}
 
         /**
          * Get the item stack stored in this slot.

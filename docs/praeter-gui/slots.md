@@ -1,7 +1,7 @@
 # Slots
 You can create slots where the player can put items.
 
-Create and add slots like any other components.
+Create and add slots like any other component.
 
 ```java
 private static final Slot SLOT_1 = new Slot(5, 1);
@@ -25,7 +25,7 @@ constructor to set the starting item that the player can take.
 
 ## Custom Slots
 You can create custom slots to customize which items are allowed in the slot,
-and when the slot can be changed.
+when the slot can be changed, and to call a method when the slot is changed.
 
 The following is a slot where the player can only insert diamonds.
 ```java
@@ -135,3 +135,22 @@ appear and the player can no longer change the contents of the slot (nether add
 nor remove items). Unless the player has the `example.override_lock` permission,
 in which case they can always change the slot. Note that items always display on
 top, so the lock may not be visible if there are items in the way.
+
+## onChange
+Additionally, there is an `onChange` method on the `Slot.State`. This method is
+called whenever the item in the slot changes.
+```java
+...
+
+public class State extends Slot.State {
+    @Override
+    public void onChange(HumanEntity player) {
+        ItemStack itemStack = getItemStack();
+        if (itemStack != null && itemStack.getType() == Material.TNT) {
+            player.getLocation().createExplosion(3);
+        }
+    }
+}
+```
+The method is called after the change has happened, and the gui will update
+shortly after to render the new changes.

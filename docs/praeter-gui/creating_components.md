@@ -100,13 +100,56 @@ public class State extends GuiComponent.State {
 
 These items can not be changed by the player. For that you should use a `Slot`.
 
+## Hover text
+It is common to wait to use items to display a text message when the player
+hovers the component. There is therefore a method called `setHoverText` on
+`State`. This method can be called from the `CustomGui`. If you want to render
+hover text as part of your render, you can call `setHoverText` in the
+constructor, or if you need the hover text to change, call `renderItems` before
+calling the super method.
+
+An example that renders the current percentage each update:
+```java
+...
+
+ public class State extends GuiComponent.State {
+    private float percentage;
+
+    @Override
+    public void renderItems(Inventory inventory) {
+        this.setHoverText(List.of(
+            Component.text(Math.round(this.percentage * 100) + "%")
+        ));
+        super.renderItems(inventory);
+    }
+    
+    ...
+}
+```
+
+An example that sets the hover text once, meaning it can be changed later by
+the gui.
+```java
+...
+
+public class State extends GuiComponent.State {
+    public State() {
+        this.setHoverText(List.of(
+            Component.text("This is the first line of the hover text."),
+            Component.text("And this is the second one", NamedTextColor.YELLOW)
+        ));
+    }
+}
+```
+
 ## Rendering using custom fonts
 When using custom state that can change, you may want to alter the rendering of
 the component depending on the state. To do this, we can no longer simply draw
 on the background. We must instead prepare drawable sequences of font characters
-that will render something, and determine which to render. In other words, you
-cannot freely draw things. You must prepare what you want to draw before it is
-rendered so that the textures can be put in the resource pack beforehand.
+that will render something, and determine which of these to render. In other
+words, you cannot freely draw things. You must prepare what you want to draw
+before it is rendered so that the textures can be put in the resource pack
+beforehand.
 
 These drawable sequences of font characters are known as `FontSequence`s. You
 can create them in the `onSetup` method, store them, and then render them in

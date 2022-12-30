@@ -1,5 +1,5 @@
 # Getting Started with praeter-core
-`praeter-core` is the module that handles the resource pack(s).
+`praeter-core` is the module that handles resource packs.
 
 Firstly, add `Praeter` as a `depends` in your `plugin.yml` and add the
 dependency to your build system.
@@ -12,7 +12,7 @@ depend:
 
 > Note: the dependency is not in any repository yet...
 
-Gradle (Kotlin DSL)
+Gradle
 ````kotlin
 compileOnly("ca.bkaw.praeter:praeter-core:0.1-SNAPSHOT")
 ````
