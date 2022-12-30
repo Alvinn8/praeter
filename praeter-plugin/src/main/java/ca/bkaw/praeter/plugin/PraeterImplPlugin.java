@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.plugin;
 
+import ca.bkaw.praeter.core.ItemUtils;
 import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.PraeterPlugin;
 import ca.bkaw.praeter.core.resources.CustomModelDataStore;
@@ -9,25 +10,27 @@ import ca.bkaw.praeter.core.resources.ResourceManager;
 import ca.bkaw.praeter.core.resources.ResourcePacksHolder;
 import ca.bkaw.praeter.core.resources.apply.DefaultResourcePackApplier;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
+import ca.bkaw.praeter.core.resources.pack.JsonResource;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.core.resources.pack.collision.ResourceCollisionException;
 import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
-import ca.bkaw.praeter.gui.PraeterGui;
-import ca.bkaw.praeter.plugin.test.TestGui;
-import ca.bkaw.praeter.plugin.test.TestingCommand;
+import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 /**
  * The plugin that loads the praeter classes into bukkit.
@@ -64,16 +67,6 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         pluginManager.registerEvents(new GuiEventListener(this), this);
         pluginManager.registerEvents(new ResourceEventListener(resourceManager), this);
         pluginManager.registerEvents(resourcePackApplier, this);
-
-        // Testing
-        // Register testing command
-        Objects.requireNonNull(this.getCommand("praetertest")).setExecutor(
-            new TestingCommand()
-        );
-
-        PraeterGui.get().getGuiRegistry().register(TestGui.TYPE,
-            new NamespacedKey("praetertest", "test1"),
-            this);
     }
 
     @Override
@@ -83,8 +76,41 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
 
     @Override
     public boolean isEnabledIn(World world) {
-        // Include testing assets
+        // Praeter includes some common assets, like a transparent texture and model,
+        // into all packs.
         return true;
+    }
+
+    @Override
+    public void onIncludeAssets(ResourcePack resourcePack) {
+        // Create the transparent item
+        try {
+            // Create the image
+            BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Path texturePath = resourcePack.getTexturePath(ItemUtils.TRANSPARENT_ITEM);
+            Files.createDirectories(texturePath.getParent());
+            try (OutputStream stream = Files.newOutputStream(texturePath)) {
+                ImageIO.write(image, "png", stream);
+            }
+
+            // Create the model
+            JsonObject json = new JsonObject();
+            json.addProperty("parent", "item/generated");
+            JsonObject textures = new JsonObject();
+            textures.addProperty("layer0", ItemUtils.TRANSPARENT_ITEM.toString());
+            json.add("textures", textures);
+
+            // Save the model
+            Path modelPath = resourcePack.getModelPath(ItemUtils.TRANSPARENT_ITEM);
+            JsonResource resource = new JsonResource(resourcePack, modelPath, json);
+            resource.save();
+
+            // Add the redirect
+            NamespacedKey vanillaModel = NamespacedKey.minecraft("item/paper");
+            resourcePack.addCustomModelData(vanillaModel, ItemUtils.TRANSPARENT_ITEM);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to create transparent item.", e);
+        }
     }
 
     /**

@@ -1,15 +1,22 @@
 package ca.bkaw.praeter.gui.component;
 
+import ca.bkaw.praeter.core.ItemUtils;
+import ca.bkaw.praeter.core.Praeter;
+import ca.bkaw.praeter.core.resources.bake.BakedItemModel;
+import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import ca.bkaw.praeter.gui.font.RenderDispatcher;
 import ca.bkaw.praeter.gui.font.RenderSetupContext;
 import ca.bkaw.praeter.gui.gui.CustomGui;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
@@ -121,8 +128,9 @@ public class GuiComponent {
      * <p>
      * Subclasses can be static classes or inner classes.
      */
-    public static class State {
+    public class State {
         private Consumer<GuiClickContext> clickHandler;
+        protected List<Component> hoverText;
 
         /**
          * Set the callback to call when the user clicks the component.
@@ -147,6 +155,17 @@ public class GuiComponent {
         }
 
         /**
+         * Set the hover text of the component.
+         * <p>
+         * Some components may not support changing the hover text using this method.
+         *
+         * @param hoverText The hover text.
+         */
+        public void setHoverText(List<Component> hoverText) {
+            this.hoverText = hoverText;
+        }
+
+        /**
          * Called when the component is being rendered.
          * <p>
          * Is called before {@link #renderItems(Inventory)} to create the title of the gui.
@@ -163,7 +182,21 @@ public class GuiComponent {
          *
          * @param inventory The inventory to place items in.
          */
-        public void renderItems(Inventory inventory) {}
+        public void renderItems(Inventory inventory) {
+            if (this.hoverText != null) {
+                // Since the transparent item is added to all packs, getting it from main is
+                // fine in this case, but somewhat ugly.
+                BakedResourcePack main = Praeter.get().getResourceManager().getBakedPacks().getMain();
+                BakedItemModel itemModel = main.getItemModel(ItemUtils.TRANSPARENT_ITEM);
+                if (itemModel != null) {
+                    // Should never be null
+                    ItemStack item = new ItemStack(itemModel.material());
+                    item.editMeta(meta -> meta.setCustomModelData(itemModel.customModelData()));
+                    ItemUtils.setItemText(item, this.hoverText);
+                    GuiUtils.forEachSlot(GuiComponent.this, slot -> inventory.setItem(slot, item));
+                }
+            }
+        }
 
     }
 
