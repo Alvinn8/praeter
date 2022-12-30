@@ -1,5 +1,6 @@
 package ca.bkaw.praeter.core.resources;
 
+import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.resources.apply.ResourcePackApplier;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.send.ResourcePackRequest;
@@ -10,6 +11,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,15 +71,25 @@ public class ResourceManager {
     /**
      * Get the {@link PacksHolder} that contains the baked resource packs.
      * <p>
-     * It is only possible to get the baked resource packs after startup. Before that,
-     * the packs have not been baked yet.
+     * It is only recommended to get the baked resource packs after startup. Before
+     * that, the packs have not been baked yet.
      *
      * @return The {@link PacksHolder}.
      */
     @NotNull
     public PacksHolder<BakedResourcePack> getBakedPacks() {
         if (this.bakedPacks == null) {
-            throw new IllegalStateException("Packs have not been baked yet.");
+            // throw new IllegalStateException("Packs have not been baked yet.");
+            Praeter.get().getLogger().warning("Call to getBakedPacks before packs have been " +
+                "baked! A temporary bake will be created, this will affect performance. Please " +
+                "only access getBakedPacks after startup.");
+            new Exception("stack trace").printStackTrace();
+            try {
+                BakedResourcePack main = BakedResourcePack.bake(this.packs.getMain());
+                return new PacksHolder<>(main);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
         return this.bakedPacks;
     }
