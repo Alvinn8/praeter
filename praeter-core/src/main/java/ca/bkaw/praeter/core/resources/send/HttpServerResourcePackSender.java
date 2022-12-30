@@ -61,11 +61,13 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
                 throw new RuntimeException(e);
             }
 
+            String url = "http://" + Utils.getHostnameFor(player) + ":" + PORT + path;
+
             ResourcePackRequest request = new ResourcePackRequest(
                     player,
                     resourcePack,
                     resourceManager,
-                    "http://localhost:" + PORT + path, // TODO
+                    url,
                     hash,
                     required,
                     prompt
