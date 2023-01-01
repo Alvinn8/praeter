@@ -10,11 +10,17 @@ import org.bukkit.NamespacedKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link Pack} that contains assets for the client like models and textures.
  */
 public class ResourcePack extends Pack {
+    public static final String CUSTOM_MODEL_DATA = "custom_model_data";
+    public static final String OVERRIDES = "overrides";
+    public static final String PREDICATE = "predicate";
+
     protected ResourcePack(Path root) {
         super(root);
     }
@@ -159,11 +165,11 @@ public class ResourcePack extends Pack {
         }
         JsonResource jsonResource = new JsonResource(this, path);
         JsonArray overrides;
-        if (jsonResource.getJson().has("overrides")) {
-            overrides = jsonResource.getJson().get("overrides").getAsJsonArray();
+        if (jsonResource.getJson().has(OVERRIDES)) {
+            overrides = jsonResource.getJson().get(OVERRIDES).getAsJsonArray();
         } else {
             overrides = new JsonArray();
-            jsonResource.getJson().add("overrides", overrides);
+            jsonResource.getJson().add(OVERRIDES, overrides);
         }
         String modelKey = model.toString();
 
@@ -173,13 +179,13 @@ public class ResourcePack extends Pack {
         // Look for an existing custom model data for this model
         for (JsonElement existingOverrideElement : overrides) {
             JsonObject existingOverride = existingOverrideElement.getAsJsonObject();
-            JsonObject predicate = existingOverride.get("predicate").getAsJsonObject();
-            if (!predicate.has("custom_model_data")) continue;
+            JsonObject predicate = existingOverride.get(PREDICATE).getAsJsonObject();
+            if (!predicate.has(CUSTOM_MODEL_DATA)) continue;
 
             String existingModel = existingOverride.get("model").getAsString();
             if (predicate.size() == 1 && modelKey.equals(existingModel)) {
                 // The model we were trying to add already existed and has no other predicates.
-                int customModelData = predicate.get("custom_model_data").getAsInt();
+                int customModelData = predicate.get(CUSTOM_MODEL_DATA).getAsInt();
                 // Let's ensure the store is aware of this value
                 store.set(model, customModelData);
                 return customModelData;
@@ -195,11 +201,11 @@ public class ResourcePack extends Pack {
         while (true) {
             for (JsonElement existingOverrideElement : overrides) {
                 JsonObject existingOverride = existingOverrideElement.getAsJsonObject();
-                JsonObject predicate = existingOverride.get("predicate").getAsJsonObject();
-                if (!predicate.has("custom_model_data")) {
+                JsonObject predicate = existingOverride.get(PREDICATE).getAsJsonObject();
+                if (!predicate.has(CUSTOM_MODEL_DATA)) {
                     continue;
                 }
-                int existingValue = predicate.get("custom_model_data").getAsInt();
+                int existingValue = predicate.get(CUSTOM_MODEL_DATA).getAsInt();
                 if (existingValue == value) {
                     Praeter.get().getLogger().warning("Occupied custom model data value " + value
                         + " existed for " + existingOverride.get("model").getAsString()
@@ -220,10 +226,35 @@ public class ResourcePack extends Pack {
 
         JsonObject override = new JsonObject();
         JsonObject predicate = new JsonObject();
-        override.add("predicate", predicate);
-        predicate.addProperty("custom_model_data", value);
+        override.add(PREDICATE, predicate);
+        predicate.addProperty(CUSTOM_MODEL_DATA, value);
         override.addProperty("model", modelKey);
         overrides.add(override);
+
+        // Overrides need to be sorted by the custom model data value, otherwise the
+        // value that is last in the list will take priority in a way.
+        List<JsonObject> overridesArrayList = new ArrayList<>(overrides.size());
+        for (JsonElement jsonElement : overrides) {
+            overridesArrayList.add(jsonElement.getAsJsonObject());
+        }
+        overridesArrayList.sort((a, b) -> {
+            if (a.has(PREDICATE) && b.has(PREDICATE)) {
+                JsonObject predicateA = a.getAsJsonObject(PREDICATE);
+                JsonObject predicateB = b.getAsJsonObject(PREDICATE);
+                if (predicateA.has(CUSTOM_MODEL_DATA) && predicateB.has(CUSTOM_MODEL_DATA)) {
+                    int valueA = predicateA.get(CUSTOM_MODEL_DATA).getAsInt();
+                    int valueB = predicateB.get(CUSTOM_MODEL_DATA).getAsInt();
+                    return valueA - valueB;
+                }
+            }
+            return 0;
+        });
+        overrides = new JsonArray(overridesArrayList.size());
+        for (JsonObject jsonObject : overridesArrayList) {
+            overrides.add(jsonObject);
+        }
+        jsonResource.getJson().add(OVERRIDES, overrides);
+
         jsonResource.save();
         return value;
     }
@@ -244,15 +275,15 @@ public class ResourcePack extends Pack {
         }
         JsonResource resource = new JsonResource(this, vanillaModelPath);
         JsonArray overrides;
-        if (resource.getJson().has("overrides")) {
-            overrides = resource.getJson().getAsJsonArray("overrides");
+        if (resource.getJson().has(OVERRIDES)) {
+            overrides = resource.getJson().getAsJsonArray(OVERRIDES);
         } else {
             overrides = new JsonArray();
-            resource.getJson().add("overrides", overrides);
+            resource.getJson().add(OVERRIDES, overrides);
         }
 
         JsonObject override = new JsonObject();
-        override.add("predicate", predicate);
+        override.add(PREDICATE, predicate);
         override.addProperty("model", model.toString());
         overrides.add(override);
 
