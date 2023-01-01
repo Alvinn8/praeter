@@ -231,7 +231,7 @@ public class GuiEventListener implements Listener {
                             break;
                         }
                     }
-                } else if (slot.canHold(currentItem)) {
+                } else if (slot.canHold(currentItem) && slot.mayChange(player)) {
                     // No item here, we can shift click into this slot
                     slot.setItemStack(currentItem.clone());
                     slot.onChange(player);

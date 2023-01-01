@@ -27,7 +27,7 @@ import java.util.function.IntConsumer;
  * <p>
  * Instances of {@link GuiComponent.State} are created for each opened gui.
  */
-public class GuiComponent {
+public class GuiComponent implements GuiComponentLike {
     protected final int x, y, width, height;
 
     /**
@@ -117,6 +117,11 @@ public class GuiComponent {
      */
     public int getHeight() {
         return this.height;
+    }
+
+    @Override
+    public void addTo(CustomGuiType.Builder builder) {
+        builder.add(this);
     }
 
     /**

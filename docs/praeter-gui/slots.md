@@ -23,6 +23,39 @@ You can access the item currently in a slot from the slot's state:
 You can also change the item by calling `setItemStack`, for example in the
 constructor to set the starting item that the player can take.
 
+You may also create a `StaticSlot` that the player can not change, but retains
+the same appearance as a slot.
+
+## Slot groups
+
+You may want to create a group of slots, for example to store many items.
+Instead of creating each slot individually, which can get quite repetitive,
+you can use a `SlotGroup`.
+```java
+public class ExampleGui extends CustomGui {
+    private static final SlotGroup<Slot> LEFT_SLOTS = SlotGroup.box(0, 0, 3, 6, Slot::new);
+    private static final SlotGroup<Slot> RIGHT_SLOTS = SlotGroup.box(7, 0, 3, 6, Slot::new);
+    
+    public static final CustomGuiType TYPE = CustomGuiType.builder()
+        .title(Component.text("A lot of slots."))
+        .height(6)
+        .add(LEFT_SLOTS, RIGHT_SLOTS)
+        .build();
+    
+    public ExampleGui() {
+        super(TYPE);
+        
+        LEFT_SLOTS.getSlot(0).get(this).setItemStack(new ItemStack(Material.DIAMOND));
+    }
+}
+```
+This creates a total of 36 slots. They can be accessed by their index by
+calling `getSlot(...)`, which returns the `Slot`. The index is relative
+to the slot group.
+
+You can change `Slot::new` to `StaticSlot::new`, or your own `Slot` subclass,
+to create instances of that instead.
+
 ## Custom Slots
 You can create custom slots to customize which items are allowed in the slot,
 when the slot can be changed, and to call a method when the slot is changed.

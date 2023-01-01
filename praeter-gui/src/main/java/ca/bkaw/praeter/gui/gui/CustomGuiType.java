@@ -2,6 +2,7 @@ package ca.bkaw.praeter.gui.gui;
 
 import ca.bkaw.praeter.gui.PraeterGui;
 import ca.bkaw.praeter.gui.component.GuiComponent;
+import ca.bkaw.praeter.gui.component.GuiComponentLike;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -142,8 +143,14 @@ public class CustomGuiType {
          * @return The builder, for chaining.
          */
         @Contract("_ -> this")
-        public Builder add(GuiComponent... components) {
-            Collections.addAll(this.components, components);
+        public Builder add(GuiComponentLike... components) {
+            for (GuiComponentLike componentLike : components) {
+                if (componentLike instanceof GuiComponent component) {
+                    this.components.add(component);
+                } else {
+                    componentLike.addTo(this);
+                }
+            }
             return this;
         }
 
