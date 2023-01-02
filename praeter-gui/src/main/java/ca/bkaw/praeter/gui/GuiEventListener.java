@@ -8,10 +8,12 @@ import ca.bkaw.praeter.gui.gui.CustomGuiHolder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -34,6 +36,27 @@ public class GuiEventListener implements Listener {
 
     public GuiEventListener(Plugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        InventoryHolder holder = event.getView().getTopInventory().getHolder();
+        if (!(holder instanceof CustomGuiHolder customGuiHolder)) {
+            return;
+        }
+        CustomGui customGui = customGuiHolder.getCustomGui();
+
+        if (event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW
+            && customGui.isReopening()) {
+            // The player did not close the gui, it was just the gui opening a new
+            // inventory with a new title.
+            return;
+        }
+
+        HumanEntity humanEntity = event.getPlayer();
+        if (humanEntity instanceof Player player) {
+            customGui.onClose(player, event);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

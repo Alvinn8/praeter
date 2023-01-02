@@ -1,12 +1,14 @@
 package ca.bkaw.praeter.gui.gui;
 
 import ca.bkaw.praeter.gui.component.GuiComponent;
+import ca.bkaw.praeter.gui.component.GuiComponentLike;
 import ca.bkaw.praeter.gui.components.Slot;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +39,7 @@ public abstract class CustomGui {
     private Component currentRenderTitle;
     @Nullable
     private Player pendingPlayer;
+    private boolean isReopening;
 
     /**
      * Create a new {@link CustomGui} instance.
@@ -58,6 +61,14 @@ public abstract class CustomGui {
         }
         this.slots = slots.build();
     }
+
+    /**
+     * Called when the player closes the gui.
+     *
+     * @param player The player that closed the gui.
+     * @param event The event that contains more details about the close.
+     */
+    public void onClose(Player player, InventoryCloseEvent event) {}
 
     /**
      * Open the gui for the specified player.
@@ -118,7 +129,9 @@ public abstract class CustomGui {
         // If the inventory was recreated with a new title,
         // open the new inventory for the viewers
         if (viewers != null) {
+            this.isReopening = true;
             viewers.forEach(viewer -> viewer.openInventory(this.inventory));
+            this.isReopening = false;
         }
     }
 
@@ -177,7 +190,7 @@ public abstract class CustomGui {
      * Get the {@link GuiComponent.State} from the {@link GuiComponent.State}.
      * <p>
      * The component must be registered in this {@link #getType() gui type} by
-     * calling {@link CustomGuiType.Builder#add(GuiComponent...)}.
+     * calling {@link CustomGuiType.Builder#add(GuiComponentLike...)}.
      * <p>
      * Using {@link GuiComponent#get(CustomGui)} is preferred over this method
      * due to it providing the correct return type for the state.
@@ -195,6 +208,18 @@ public abstract class CustomGui {
                 "custom gui, did you forget to add it to the custom gui type?");
         }
         return state;
+    }
+
+    /**
+     * Get whether the inventory that is displaying this gui is currently being
+     * reopened. This flag is used to determine whether the inventory was closed, or
+     * whether the player closed the gui.
+     *
+     * @return Whether reopening.
+     */
+    @ApiStatus.Internal
+    public boolean isReopening() {
+        return this.isReopening;
     }
 
     /**
