@@ -2,6 +2,7 @@ package ca.bkaw.praeter.gui.components;
 
 import ca.bkaw.praeter.gui.component.GuiComponentLike;
 import ca.bkaw.praeter.gui.gui.CustomGuiType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * A group of slots in a gui.
  */
+@ApiStatus.Experimental
 public class SlotGroup<T extends Slot> implements GuiComponentLike {
     private final List<T> slots;
 
@@ -48,7 +50,7 @@ public class SlotGroup<T extends Slot> implements GuiComponentLike {
                 slots.add(slot);
             }
         }
-        return new SlotGroup<T>(slots);
+        return new SlotGroup<>(slots);
     }
 
     /**
