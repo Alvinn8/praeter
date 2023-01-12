@@ -85,6 +85,13 @@ public class ModelElementList {
         return diff;
     }
 
+    /**
+     * Get the {@link ModelElement} at the index.
+     *
+     * @param index The index.
+     * @return The model element.
+     * @throws IndexOutOfBoundsException If the index is out of bounds.
+     */
     @NotNull
     public ModelElement getElement(int index) {
         ModelElement element = this.elements.get(index);
