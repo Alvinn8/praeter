@@ -5,13 +5,11 @@ import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
 import ca.bkaw.praeter.core.resources.font.AbstractFontSequenceBuilder;
-import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.gui.GuiUtils;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Contract;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * A builder for a {@link ca.bkaw.praeter.core.resources.font.FontSequence} that

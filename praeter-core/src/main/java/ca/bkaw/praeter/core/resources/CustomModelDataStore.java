@@ -78,7 +78,7 @@ public class CustomModelDataStore {
      * @param modelKey The model key.
      * @param customModelData The value.
      */
-    public void set(NamespacedKey modelKey, int customModelData) throws IOException {
+    public void set(NamespacedKey modelKey, int customModelData) {
         if (this.map.containsKey(modelKey)) {
             int existingValue = this.map.getInt(modelKey);
             if (existingValue == customModelData) {

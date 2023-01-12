@@ -4,11 +4,9 @@ import ca.bkaw.praeter.core.resources.ResourcePackList;
 import ca.bkaw.praeter.core.resources.draw.CompositeDrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOrigin;
 import ca.bkaw.praeter.core.resources.draw.DrawOriginResolver;
-import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import org.bukkit.NamespacedKey;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * A generic builder for a {@link FontSequence}.

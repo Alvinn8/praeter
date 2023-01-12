@@ -61,7 +61,7 @@ public final class VanillaAssets {
         // the version.json file will not exist.
         Path path = vanillaAssets.getPath("version.json");
         if (Files.exists(path)) {
-            // The file exists, but let's make sure it's up to date.
+            // The file exists, but let's make sure it's up-to-date.
             JsonElement json = JsonParser.parseReader(Files.newBufferedReader(path));
             String version = json.getAsJsonObject().get("name").getAsString();
             // If the version matches, the vanilla assets are up-to-date

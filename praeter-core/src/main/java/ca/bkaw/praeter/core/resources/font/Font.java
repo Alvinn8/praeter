@@ -8,10 +8,7 @@ import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Unmodifiable;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;

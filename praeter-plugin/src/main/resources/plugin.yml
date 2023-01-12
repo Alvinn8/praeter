@@ -3,6 +3,3 @@ main: "${group}.plugin.PraeterImplPlugin"
 version: "${version}"
 api-version: "1.19"
 author: "Alvinn8"
-
-commands:
-  praetertest: {}
