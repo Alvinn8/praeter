@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Model API
 The Model API allows you to create and modify JSON block and item models.
 
@@ -30,7 +32,8 @@ can see javadoc). You can do things like change display settings, modify
 elements, explore Blockbench groups, etc.
 
 ## ModelElementList
-A `ModelElementList` provides methods for transforming many `Element`s at once.
+A `ModelElementList` provides methods for transforming many `ModelElement`s at
+once.
 
 Like everything regarding the Model API, a `ModelElementList` wraps JSON, and
 isn't simply an `ArrayList` of `ModelElement`s. The instance of

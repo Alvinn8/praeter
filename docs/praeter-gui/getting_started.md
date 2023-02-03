@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Getting started with praeter-gui
 You must first perform the setup for `praeter-core` [here](../praeter-core/getting_started.md).
 

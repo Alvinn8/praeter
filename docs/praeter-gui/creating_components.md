@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Creating components
 > Do you want to create a custom slot? There is a specific article for that: [Slots](slots.md).
 

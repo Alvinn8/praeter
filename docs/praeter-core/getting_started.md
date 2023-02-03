@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Getting Started with praeter-core
 `praeter-core` is the module that handles resource packs.
 

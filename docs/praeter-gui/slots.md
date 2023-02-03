@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Slots
 You can create slots where the player can put items.
 

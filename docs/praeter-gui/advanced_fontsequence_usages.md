@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Advanced FontSequence usages
 This article is not done yet!
 

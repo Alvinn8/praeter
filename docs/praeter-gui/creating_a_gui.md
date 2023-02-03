@@ -1,3 +1,5 @@
+[Table of Contents](../table_of_contents.md)
+
 # Creating a GUI
 Firstly, [add the `praeter-gui` dependency](getting_started.md).
 
@@ -110,6 +112,8 @@ public ExampleGui() {
     slot1.setItemStack(...);
 }
 ```
+
+Read more about slots [here](slots.md).
 
 You can now add more components like `Button`, `DisableableButton`, and `Slot`,
 attach click handlers, change state, etc. To update the GUI and render it again,
