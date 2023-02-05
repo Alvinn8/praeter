@@ -14,6 +14,7 @@ import ca.bkaw.praeter.core.resources.pack.JsonResource;
 import ca.bkaw.praeter.core.resources.pack.ResourcePack;
 import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.core.resources.pack.collision.ResourceCollisionException;
+import ca.bkaw.praeter.core.resources.send.BuiltInTcpResourcePackSender;
 import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
 import com.google.gson.JsonObject;
@@ -225,9 +226,15 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
     private void setupResourcePackSender() {
         ResourceManager resourceManager = Praeter.get().getResourceManager();
         try {
-            resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e);
+            resourceManager.setResourcePackSender(new BuiltInTcpResourcePackSender());
+        } catch (ReflectiveOperationException e) {
+            this.getLogger().info("Failed to set up built in TCP resource pack sender, using an external HTTP server instead.");
+            e.printStackTrace();
+            try {
+                resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
+            } catch (IOException e2) {
+                throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e2);
+            }
         }
     }
 

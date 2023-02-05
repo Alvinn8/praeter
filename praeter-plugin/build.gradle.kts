@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("io.netty:netty-all:4.1.77.Final")
     implementation(project(":praeter-core"))
     implementation(project(":praeter-gui"))
 }

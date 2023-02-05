@@ -1,6 +1,7 @@
 package ca.bkaw.praeter.core.resources;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A holder for packs.
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class PacksHolder<T> {
     private final T main;
 
-    public PacksHolder(T main) {
+    public PacksHolder(@NotNull T main) {
         this.main = main;
     }
 
@@ -19,6 +20,7 @@ public class PacksHolder<T> {
      *
      * @return The main pack.
      */
+    @NotNull
     public T getMain() {
         return this.main;
     }
@@ -33,10 +35,21 @@ public class PacksHolder<T> {
      * @throws IllegalArgumentException If the pack does not have an id.
      */
     @NotNull
-    public String getId(T pack) {
+    public String getId(@NotNull T pack) {
         if (pack == this.main) {
             return "main";
         }
         throw new IllegalArgumentException("The specified pack does not have an id.");
+    }
+
+    /**
+     * Get a pack by id.
+     *
+     * @param id The id of the pack.
+     * @return The pack, or null.
+     */
+    @Nullable
+    public T getById(@NotNull String id) {
+        return "main".equals(id) ? this.main : null;
     }
 }

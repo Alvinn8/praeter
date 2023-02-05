@@ -1,7 +1,6 @@
 package ca.bkaw.praeter.core.resources.send;
 
 import ca.bkaw.praeter.core.Praeter;
-import ca.bkaw.praeter.core.resources.ResourceManager;
 import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
@@ -9,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * An implementation of {@link ResourcePackSender} that sends resource packs via
@@ -39,43 +37,17 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
     }
 
     @Override
-    public void send(BakedResourcePack resourcePack, Player player, boolean required, @Nullable Component prompt) {
-        ResourceManager resourceManager = Praeter.get().getResourceManager();
-        Path resourcePacksFolder = resourceManager.getResourcePacksFolder();
-        String filename = resourceManager.getBakedPacks().getId(resourcePack) + ".zip";
-        Path file = resourcePacksFolder.resolve(filename);
-        if (Files.exists(file)) {
-            String path = "/";
-            Handler handler = new Handler(file);
-            try {
-                handler.context = this.server.createContext(path, handler);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
-            byte[] hash;
-            try {
-                byte[] bytes = Files.readAllBytes(file);
-                hash = MessageDigest.getInstance("SHA-1").digest(bytes);
-            } catch (IOException | NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-
-            String url = "http://" + Utils.getHostnameFor(player) + ":" + PORT + path;
-
-            ResourcePackRequest request = new ResourcePackRequest(
-                    player,
-                    resourcePack,
-                    resourceManager,
-                    url,
-                    hash,
-                    required,
-                    prompt
-            );
-            request.send();
-        } else {
-            throw new IllegalArgumentException("Can not send the specified pack.");
+    public void send(@NotNull BakedResourcePack resourcePack, @NotNull Player player, boolean required, @Nullable Component prompt) {
+        Path file = Utils.getPath(resourcePack);
+        String path = "/";
+        Handler handler = new Handler(file);
+        try {
+            handler.context = this.server.createContext(path, handler);
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
+
+        Utils.sendRequest(resourcePack, file, player, required, prompt, PORT, path);
     }
 
     @Override
