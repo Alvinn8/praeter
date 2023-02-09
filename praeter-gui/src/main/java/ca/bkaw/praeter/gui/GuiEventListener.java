@@ -501,6 +501,7 @@ public class GuiEventListener implements Listener {
                     Slot.State slot = customGui.getSlot(x, y);
                     if (slot != null) { // Should always be true
                         slot.setItemStack(newItem);
+                        slot.onChange(player);
                         update = true;
                     }
                 } else {
