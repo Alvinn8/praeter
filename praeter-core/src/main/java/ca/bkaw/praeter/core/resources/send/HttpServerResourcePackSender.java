@@ -71,6 +71,8 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
                 exchange.close();
             } finally {
                 server.removeContext(context);
+                // TODO if the pack fails to download the first time due to the hash changing,
+                //  the second attempt will also fail because of this call to removeContext
             }
         }
     }

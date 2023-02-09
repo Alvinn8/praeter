@@ -35,4 +35,13 @@ public class DefaultResourcePackApplier implements Listener, ResourcePackApplier
         );
     }
 
+    @Override
+    public void activate() {
+        this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+    }
+
+    @Override
+    public void remove() {
+        PlayerJoinEvent.getHandlerList().unregister(this);
+    }
 }

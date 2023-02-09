@@ -12,4 +12,18 @@ import ca.bkaw.praeter.core.resources.ResourceManager;
  * by calling {@link ResourceManager#setResourcePackApplier(ResourcePackApplier)}.
  */
 public interface ResourcePackApplier {
+    /**
+     * Called when the resource pack applier is set as the server's current applier.
+     *
+     * @see ResourceManager#setResourcePackApplier(ResourcePackApplier)
+     */
+    void activate();
+
+    /**
+     * Called when the resource pack applier will no longer be the server's current
+     * applier because it was changed.
+     *
+     * @see ResourceManager#setResourcePackApplier(ResourcePackApplier)
+     */
+    void remove();
 }

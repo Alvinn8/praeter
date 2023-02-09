@@ -39,6 +39,11 @@ public class BuiltInTcpResourcePackSender extends ChannelInboundHandlerAdapter i
         Praeter.get().getLogger().info("Using the server's TCP connections to send resource packs.");
     }
 
+    // TODO we may want to create a request id and only reply to that to avoid
+    //  being able to always access resource packs. Would avoid people being able
+    //  to download packs they don't have "access" to, and avoid people using resource
+    //  packs as a way to slow the server / waste network bandwidth.
+
     @Override
     public void send(@NotNull BakedResourcePack resourcePack, @NotNull Player player, boolean required, @Nullable Component prompt) {
         Path file = Utils.getPath(resourcePack);

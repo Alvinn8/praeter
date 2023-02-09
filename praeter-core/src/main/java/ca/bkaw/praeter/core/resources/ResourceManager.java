@@ -160,7 +160,11 @@ public class ResourceManager {
      * @param resourcePackApplier The applier.
      */
     public void setResourcePackApplier(@NotNull ResourcePackApplier resourcePackApplier) {
+        if (this.resourcePackApplier != null) {
+            this.resourcePackApplier.remove();
+        }
         this.resourcePackApplier = resourcePackApplier;
+        this.resourcePackApplier.activate();
     }
 
     /**
