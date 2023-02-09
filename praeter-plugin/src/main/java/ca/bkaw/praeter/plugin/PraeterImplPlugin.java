@@ -178,6 +178,9 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
             if (!(plugin instanceof PraeterPlugin praeterPlugin)) {
                 continue;
             }
+            if (!plugin.isEnabled()) {
+                continue;
+            }
 
             // Read the assets
             ResourcePack pluginAssets;
