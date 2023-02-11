@@ -25,14 +25,17 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
     /**
      * The default port used for the HTTP server.
      */
-    public static final int PORT = 50864;
+    public static final int DEFAULT_PORT = 50864;
 
     private final HttpServer server;
+    private final int port;
 
     public HttpServerResourcePackSender() throws IOException {
-        this.server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
+        this.port = Praeter.get().getConfig().sender().httpServer().port();
+
+        this.server = HttpServer.create(new InetSocketAddress("0.0.0.0", this.port), 0);
         this.server.start();
-        Praeter.get().getLogger().info("Started an HTTP Server on port " + PORT + " that " +
+        Praeter.get().getLogger().info("Started an HTTP Server on port " + this.port + " that " +
                 "will send resource packs to players.");
     }
 
@@ -47,7 +50,7 @@ public class HttpServerResourcePackSender implements ResourcePackSender {
             e.printStackTrace();
         }
 
-        Utils.sendRequest(resourcePack, file, player, required, prompt, PORT, path);
+        Utils.sendRequest(resourcePack, file, player, required, prompt, this.port, path);
     }
 
     @Override

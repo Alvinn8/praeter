@@ -3,6 +3,7 @@ package ca.bkaw.praeter.plugin;
 import ca.bkaw.praeter.core.ItemUtils;
 import ca.bkaw.praeter.core.Praeter;
 import ca.bkaw.praeter.core.PraeterPlugin;
+import ca.bkaw.praeter.core.config.PraeterConfig;
 import ca.bkaw.praeter.core.resources.CustomModelDataStore;
 import ca.bkaw.praeter.core.resources.PacksHolder;
 import ca.bkaw.praeter.core.resources.ResourceEventListener;
@@ -16,10 +17,13 @@ import ca.bkaw.praeter.core.resources.pack.VanillaAssets;
 import ca.bkaw.praeter.core.resources.pack.collision.ResourceCollisionException;
 import ca.bkaw.praeter.core.resources.send.BuiltInTcpResourcePackSender;
 import ca.bkaw.praeter.core.resources.send.HttpServerResourcePackSender;
+import ca.bkaw.praeter.core.resources.send.ResourcePackSender;
 import ca.bkaw.praeter.gui.GuiEventListener;
+import ca.bkaw.praeter.plugin.config.ConfigLoader;
 import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,6 +55,16 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
             this.internalDirectory.resolve("resourcepacks")
         );
 
+        try {
+            this.loadConfig();
+        } catch (InvalidConfigurationException e) {
+            this.getLogger().severe("Failed to load the praeter configuration.");
+            this.getLogger().severe(e.getMessage());
+            e.printStackTrace();
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         this.setupDirectories();
         this.setupMainResourcePack();
         this.setupVanillaAssets();
@@ -58,10 +72,11 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         this.setupResourcePackSender();
 
         // Bake the packs right before startup, after plugins have loaded
-        this.getServer().getScheduler().runTaskLater(this, this::bakePacks, 1L);
+        this.getServer().getScheduler().runTask(this, this::bakePacks);
 
-        DefaultResourcePackApplier resourcePackApplier = new DefaultResourcePackApplier(resourceManager, this);
-        resourceManager.setResourcePackApplier(resourcePackApplier);
+        resourceManager.setResourcePackApplier(
+            new DefaultResourcePackApplier(resourceManager, this)
+        );
 
         // Register event listeners
         PluginManager pluginManager = this.getServer().getPluginManager();
@@ -71,7 +86,16 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
 
     @Override
     public void onDisable() {
-        Praeter.get().getResourceManager().getResourcePackSender().remove();
+        ResourcePackSender resourcePackSender = null;
+        try {
+            resourcePackSender = Praeter.get().getResourceManager().getResourcePackSender();
+        } catch (Exception ignored) {
+            // getResourcePackSender may throw if no sender has been set due to an
+            // invalid configuration.
+        }
+        if (resourcePackSender != null) {
+            resourcePackSender.remove();
+        }
     }
 
     @Override
@@ -122,6 +146,16 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
         } catch (IOException e) {
             throw new RuntimeException("Failed to create directories.", e);
         }
+    }
+
+    /**
+     * Load the praeter configuration and set it.
+     */
+    private void loadConfig() throws InvalidConfigurationException {
+        ConfigLoader configLoader = new ConfigLoader(this.getConfig());
+        PraeterConfig config =  configLoader.loadConfig();
+        this.saveConfig();
+        Praeter.get().setConfig(config);
     }
 
     /**
@@ -224,16 +258,15 @@ public class PraeterImplPlugin extends JavaPlugin implements PraeterPlugin {
      */
     private void setupResourcePackSender() {
         ResourceManager resourceManager = Praeter.get().getResourceManager();
+        PraeterConfig config = Praeter.get().getConfig();
         try {
-            resourceManager.setResourcePackSender(new BuiltInTcpResourcePackSender());
-        } catch (ReflectiveOperationException e) {
-            this.getLogger().info("Failed to set up built in TCP resource pack sender, using an external HTTP server instead.");
-            e.printStackTrace();
-            try {
-                resourceManager.setResourcePackSender(new HttpServerResourcePackSender());
-            } catch (IOException e2) {
-                throw new RuntimeException("Failed to start HTTP server for sending resource packs.", e2);
-            }
+            ResourcePackSender sender = switch (config.sender().sender()) {
+                case BUILT_IN_TCP -> new BuiltInTcpResourcePackSender();
+                case HTTP_SERVER -> new HttpServerResourcePackSender();
+            };
+            resourceManager.setResourcePackSender(sender);
+        } catch (ReflectiveOperationException | IOException e) {
+            throw new RuntimeException("Failed to set up resource pack sender.", e);
         }
     }
 

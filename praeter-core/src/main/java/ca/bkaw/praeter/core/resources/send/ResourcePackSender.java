@@ -169,7 +169,13 @@ public interface ResourcePackSender {
          */
         @NotNull
         private static String getRemoteHostname() {
-            if (remoteHostname == null) {
+            if (remoteHostname != null) {
+                return remoteHostname;
+            }
+            String configHostname = Praeter.get().getConfig().sender().common().hostname();
+            if (configHostname != null) {
+                remoteHostname = configHostname;
+            } else {
                 try (InputStream stream = new URL(CHECK_IP_URL).openStream()) {
                     remoteHostname = new String(stream.readAllBytes()).trim();
                 } catch (IOException e) {
