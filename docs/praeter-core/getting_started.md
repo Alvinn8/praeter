@@ -12,14 +12,20 @@ depend:
   - Praeter
 ```
 
-> Note: the dependency is not in any repository yet...
+> Note: the dependency is not in any repository yet. Therefore, do the following:
 
-Gradle
+1. Git clone the praeter repository
+2. Run `./gradlew build`
+3. Run `./gradlew publishToMavenLocal`
+4. Copy `praeter-core/build/libs/praeter-plugin-0.1-SNAPSHOT.jar` to the <!-- project version -->
+   plugins folder of your server.
+
+Gradle <!-- project version -->
 ````kotlin
 compileOnly("ca.bkaw.praeter:praeter-core:0.1-SNAPSHOT")
 ````
 
-Maven
+Maven <!-- project version -->
 ```xml
 <dependency>
     <groupId>ca.bkaw.praeter</groupId>

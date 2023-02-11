@@ -7,12 +7,12 @@ Then, similarly add the `praeter-gui` dependency.
 
 > Note: the dependency is not in any repository yet...
 
-Gradle
+Gradle <!-- project version -->
 ````kotlin
 compileOnly("ca.bkaw.praeter:praeter-gui:0.1-SNAPSHOT")
 ````
 
-Maven
+Maven <!-- project version -->
 ```xml
 <dependency>
     <groupId>ca.bkaw.praeter</groupId>
