@@ -35,8 +35,8 @@ Instead of creating each slot individually, which can get quite repetitive,
 you can use a `SlotGroup`.
 ```java
 public class ExampleGui extends CustomGui {
-    private static final SlotGroup<Slot> LEFT_SLOTS = SlotGroup.box(0, 0, 3, 6, Slot::new);
-    private static final SlotGroup<Slot> RIGHT_SLOTS = SlotGroup.box(7, 0, 3, 6, Slot::new);
+    private static final SlotGroup<Slot> LEFT_SLOTS = new SlotGroup(0, 0, 3, 6, Slot::new);
+    private static final SlotGroup<Slot> RIGHT_SLOTS = new SlotGroup(6, 0, 3, 6, Slot::new);
     
     public static final CustomGuiType TYPE = CustomGuiType.builder()
         .title(Component.text("A lot of slots."))
@@ -57,6 +57,8 @@ to the slot group.
 
 You can change `Slot::new` to `StaticSlot::new`, or your own `Slot` subclass,
 to create instances of that instead.
+
+![The result of the code above.](./img/slot_group_example.png)
 
 ## Custom Slots
 You can create custom slots to customize which items are allowed in the slot,
@@ -110,11 +112,11 @@ public class BucketSlot extends Slot {
         super.onSetup(context);
         
         // Render a bucket outline
-        context.getBackground().drawImage(new NamespacedKey("example", "gui/bucket_outline.png"), 0, 0);
+        context.getBackground().drawImage(new NamespacedKey("example", "gui/bucket_outline.png"), 1, 1);
 
         // Prepare the lock icon
         this.lock = context.newFontSequence()
-            .drawImage(new NamespacedKey("example", "gui/lock.png"), 0, 0)
+            .drawImage(new NamespacedKey("example", "gui/lock.png"), 1, 1)
             .build();
     }
 
@@ -171,6 +173,47 @@ nor remove items). Unless the player has the `example.override_lock` permission,
 in which case they can always change the slot. Note that items always display on
 top, so the lock may not be visible if there are items in the way.
 
+![hello](./img/bucket_gui.gif)
+
+<details>
+<summary>Code for GUI</summary>
+<br>
+
+```java
+public class BucketGui extends CustomGui {
+
+    public static final BucketSlot BUCKET_SLOT = new BucketSlot(4, 0);
+    public static final Button CHANGE_TYPE = new Button("Change type", 0, 0, 4, 1);
+    public static final Button TOGGLE_LOCK = new Button("Toggle lock", 5, 0, 4, 1);
+
+    public static final CustomGuiType TYPE = CustomGuiType.builder()
+        .title(Component.text("Bucket Slot Gui"))
+        .height(2)
+        .add(BUCKET_SLOT, CHANGE_TYPE, TOGGLE_LOCK)
+        .build();
+
+    public BucketGui() {
+        super(TYPE);
+
+        BucketSlot.State bucketSlot = BUCKET_SLOT.get(this);
+
+        CHANGE_TYPE.get(this).setOnClick(context -> {
+            bucketSlot.setBucketType(
+                bucketSlot.getBucketType() == BucketSlot.BucketType.WATER
+                ? BucketSlot.BucketType.LAVA
+                : BucketSlot.BucketType.WATER
+            );
+        });
+
+        TOGGLE_LOCK.get(this).setOnClick(context -> {
+            bucketSlot.setLocked(!bucketSlot.isLocked());
+            update();
+        });
+    }
+}
+```
+</details>
+
 ## onChange
 Additionally, there is an `onChange` method on the `Slot.State`. This method is
 called whenever the item in the slot changes.
@@ -187,5 +230,5 @@ public class State extends Slot.State {
     }
 }
 ```
-The method is called after the change has happened, and the gui will update
+The method is called after the change has happened (meaning `getItemStack` returns the new item), and the gui will update
 shortly after to render the new changes.

@@ -19,3 +19,5 @@ Praeter handles creating the resource pack, sending that, creates the buttons,
 including the text, handles item movements, etc. See the bottom of the
 [Creating a GUI](docs/praeter-gui/creating_a_gui.md) page for the code to the
 GIF above (it is only 33 lines of code!).
+
+[More examples!](docs/praeter-gui/examples.md)

@@ -8,3 +8,4 @@
   - [Slots](./praeter-gui/slots.md)
   - [Creating components](./praeter-gui/creating_components.md)
   - [Advanced FontSequence usages](./praeter-gui/advanced_fontsequence_usages.md) (NOT DONE)
+  - [Examples](./praeter-gui/examples.md)

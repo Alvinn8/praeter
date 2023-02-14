@@ -8,7 +8,7 @@ dependency to your build system.
 
 `plugin.yml`
 ```yaml
-depend:
+depends:
   - Praeter
 ```
 
