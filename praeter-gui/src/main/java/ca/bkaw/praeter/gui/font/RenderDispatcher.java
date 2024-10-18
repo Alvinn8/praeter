@@ -4,6 +4,7 @@ import ca.bkaw.praeter.core.resources.bake.BakedResourcePack;
 import ca.bkaw.praeter.core.resources.font.FontSequence;
 import ca.bkaw.praeter.gui.component.GuiComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 public class RenderDispatcher {
     private final BakedResourcePack bakedResourcePack;
     private final List<Component> components = new ArrayList<>();
+    private Component title;
 
     /**
      * Create a new render dispatcher.
@@ -45,7 +47,7 @@ public class RenderDispatcher {
      * @param component The component.
      */
     public void addTitle(Component component) {
-        this.components.add(component.color(NamedTextColor.DARK_GRAY));
+        this.title = component;
     }
 
     /**
@@ -54,6 +56,7 @@ public class RenderDispatcher {
      * @return The text component.
      */
     public Component toComponent() {
-        return Component.text().color(NamedTextColor.WHITE).append(this.components).build();
+        TextComponent.Builder comps = Component.text().color(NamedTextColor.WHITE).append(this.components);
+        return Component.textOfChildren(comps, this.title);
     }
 }
