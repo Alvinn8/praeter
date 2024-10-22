@@ -35,4 +35,11 @@ public interface PraeterPlugin {
      * A method called after the packs have been baked.
      */
     default void onPacksBaked() {} // TODO better name
+
+    interface Global extends PraeterPlugin {
+        @Override
+        default boolean isEnabledIn(World world) {
+            return true;
+        }
+    }
 }
